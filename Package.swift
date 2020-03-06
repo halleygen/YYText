@@ -12,6 +12,7 @@
      targets: [
          .target(
              name: "YYText",
+             path: "YYText/",
              cSettings: [
                  .headerSearchPath("Component"),
                  .headerSearchPath("String"),
