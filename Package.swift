@@ -3,7 +3,7 @@
 
   let package = Package(
      name: "YYText",
-     platforms: [.iOS(.v8)],
+     platforms: [.iOS(.v13)],
      products: [
          .library(
              name: "YYText",
