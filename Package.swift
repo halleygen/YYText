@@ -11,12 +11,12 @@
      ],
      targets: [
          .target(
-             name: "YYText",
-             path: "YYText/",
-             cSettings: [
-                 .headerSearchPath("Component"),
-                 .headerSearchPath("String"),
-                 .headerSearchPath("Utility"),
-             ]),
+             name: "YYText"//,
+        )
+//             cSettings: [
+//                 .headerSearchPath("Component"),
+//                 .headerSearchPath("String"),
+//                 .headerSearchPath("Utility"),
+//             ]),
      ]
  )
