@@ -175,7 +175,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     }
 }
 
-- (YYTextHighlight *)_getHighlightAtPoint:(CGPoint)point range:(NSRangePointer)range {
+- (nullable YYTextHighlight *)getHighlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range {
     if (!self._innerLayout.containsHighlight) return nil;
     point = [self _convertPointToLayout:point];
     YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
@@ -530,7 +530,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     UITouch *touch = touches.anyObject;
     CGPoint point = [touch locationInView:self];
     
-    _highlight = [self _getHighlightAtPoint:point range:&_highlightRange];
+    _highlight = [self getHighlightAtPoint:point range:&_highlightRange];
     _highlightLayout = nil;
     _shrinkHighlightLayout = nil;
     _state.hasTapAction = _textTapAction != nil;
@@ -573,7 +573,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             }
         }
         if (_state.touchMoved && _highlight) {
-            YYTextHighlight *highlight = [self _getHighlightAtPoint:point range:NULL];
+            YYTextHighlight *highlight = [self getHighlightAtPoint:point range:NULL];
             if (highlight == _highlight) {
                 [self _showHighlightAnimated:_fadeOnHighlight];
             } else {
@@ -608,7 +608,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         }
         
         if (_highlight) {
-            if (!_state.touchMoved || [self _getHighlightAtPoint:point range:NULL] == _highlight) {
+            if (!_state.touchMoved || [self getHighlightAtPoint:point range:NULL] == _highlight) {
                 YYTextAction tapAction = _highlight.tapAction ? _highlight.tapAction : _highlightTapAction;
                 if (tapAction) {
                     YYTextPosition *start = [YYTextPosition positionWithOffset:_highlightRange.location];
@@ -1302,5 +1302,16 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         self.debugOption = debugOption;
     }
 }
+
+#pragma mark - Context Menu Additions
+
+- (nullable UITargetedPreview *)targetedPreviewForHighlightAt:(NSRange)range {
+    if (!self._innerLayout.containsHighlight) { return nil; }
+    YYTextRange *textRange = [YYTextRange rangeWithRange:range affinity:YYTextAffinityForward];
+    UIPreviewParameters *previewParams = [self->_innerLayout previewParametersForRange:textRange];
+    previewParams.backgroundColor = [UIColor clearColor];
+    return [[UITargetedPreview alloc] initWithView:self parameters:previewParams];
+}
+
 
 @end

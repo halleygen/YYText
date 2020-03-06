@@ -204,6 +204,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) CGFloat preferredMaxLayoutWidth;
 
+#pragma mark - Context Menu Additions
+
+- (nullable UITargetedPreview *)targetedPreviewForHighlightAt:(NSRange)range;
 
 #pragma mark - Interacting with Text Data
 ///=============================================================================
@@ -234,6 +237,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nullable, nonatomic, copy) YYTextAction highlightLongPressAction;
 
+#pragma mark - Getting the highlight at a point
+
+- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range;
 
 #pragma mark - Configuring the Display Mode
 ///=============================================================================

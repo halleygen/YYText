@@ -150,6 +150,9 @@ extern const CGSize YYTextContainerMaxSize;
  */
 @interface YYTextLayout : NSObject <NSCoding>
 
+#pragma mark - Context menu preview parameters
+
+- (nullable UIPreviewParameters *)previewParametersForRange:(nonnull YYTextRange *)range;
 
 #pragma mark - Generate text layout
 ///=============================================================================

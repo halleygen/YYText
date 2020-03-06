@@ -956,6 +956,22 @@ fail:
     return self;
 }
 
+#pragma mark - Preview Parameters
+
+- (nullable UIPreviewParameters *)previewParametersForRange:(nonnull YYTextRange *)range {
+    NSArray<YYTextSelectionRect *> *rects = [self selectionRectsForRange:range];
+    if (!rects || !rects.count) { return nil; }
+    
+    NSMutableArray<NSValue *> *values = [[NSMutableArray alloc] initWithCapacity:rects.count];
+    
+    for (YYTextSelectionRect *rect in rects) {
+        NSValue *value = [NSValue valueWithCGRect:rect.rect];
+        [values addObject:value];
+    }
+    
+    return [[UIPreviewParameters alloc] initWithTextLineRects:values];
+}
+
 #pragma mark - Copying
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -2045,7 +2061,7 @@ fail:
             } else {
                 topRect.rect = CGRectMake(_container.path ? startLine.left : _container.insets.left, startLine.top, topOffset - startLine.left, startLine.height);
             }
-            topRect.writingDirection = UITextWritingDirectionRightToLeft;
+            topRect.writingDirection = NSWritingDirectionRightToLeft;
         } else {
             if (isVertical) {
                 topRect.rect = CGRectMake(startLine.left, topOffset, startLine.width, (_container.path ? startLine.bottom : _container.size.height - _container.insets.bottom) - topOffset);
@@ -2066,7 +2082,7 @@ fail:
             } else {
                 bottomRect.rect = CGRectMake(bottomOffset, endLine.top, (_container.path ? endLine.right : _container.size.width - _container.insets.right) - bottomOffset, endLine.height);
             }
-            bottomRect.writingDirection = UITextWritingDirectionRightToLeft;
+            bottomRect.writingDirection = NSWritingDirectionRightToLeft;
         } else {
             if (isVertical) {
                 CGFloat top = _container.path ? endLine.top : _container.insets.top;
