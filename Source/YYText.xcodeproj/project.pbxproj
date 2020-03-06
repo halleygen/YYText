@@ -141,10 +141,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D918BFCC1F372E3000106E14 = {
+		352AE6782412E035008D470E /* Source */ = {
 			isa = PBXGroup;
 			children = (
 				D995E6C01F372ED100EBEE44 /* YYText */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		D918BFCC1F372E3000106E14 = {
+			isa = PBXGroup;
+			children = (
+				352AE6782412E035008D470E /* Source */,
 				D918BFE11F372E6800106E14 /* Frameworks */,
 				D918BFD71F372E3000106E14 /* Products */,
 			);
@@ -184,8 +192,7 @@
 				D995E6C11F372ED100EBEE44 /* Component */,
 				D995E6DF1F372ED100EBEE44 /* Utility */,
 			);
-			name = YYText;
-			path = ../YYText;
+			path = YYText;
 			sourceTree = "<group>";
 		};
 		D995E6C11F372ED100EBEE44 /* Component */ = {
