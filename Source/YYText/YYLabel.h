@@ -23,8 +23,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#if !TARGET_INTERFACE_BUILDER
-
 /**
  The YYLabel class implements a read-only text view.
  
@@ -336,51 +334,5 @@ NS_ASSUME_NONNULL_BEGIN
  */
 
 @end
-
-
-#else // TARGET_INTERFACE_BUILDER
-IB_DESIGNABLE
-@interface YYLabel : UIView <NSCoding>
-@property (nullable, nonatomic, copy) IBInspectable NSString *text;
-@property (null_resettable, nonatomic, strong) IBInspectable UIColor *textColor;
-@property (nullable, nonatomic, strong) IBInspectable NSString *fontName_;
-@property (nonatomic) IBInspectable CGFloat fontSize_;
-@property (nonatomic) IBInspectable BOOL fontIsBold_;
-@property (nonatomic) IBInspectable NSUInteger numberOfLines;
-@property (nonatomic) IBInspectable NSInteger lineBreakMode;
-@property (nonatomic) IBInspectable CGFloat preferredMaxLayoutWidth;
-@property (nonatomic, getter=isVerticalForm) IBInspectable BOOL verticalForm;
-@property (nonatomic) IBInspectable NSInteger textAlignment;
-@property (nonatomic) IBInspectable NSInteger textVerticalAlignment;
-@property (nullable, nonatomic, strong) IBInspectable UIColor *shadowColor;
-@property (nonatomic) IBInspectable CGPoint shadowOffset;
-@property (nonatomic) IBInspectable CGFloat shadowBlurRadius;
-@property (nullable, nonatomic, copy) IBInspectable NSAttributedString *attributedText;
-@property (nonatomic) IBInspectable CGFloat insetTop_;
-@property (nonatomic) IBInspectable CGFloat insetBottom_;
-@property (nonatomic) IBInspectable CGFloat insetLeft_;
-@property (nonatomic) IBInspectable CGFloat insetRight_;
-@property (nonatomic) IBInspectable BOOL debugEnabled_;
-
-@property (null_resettable, nonatomic, strong) UIFont *font;
-@property (nullable, nonatomic, copy) NSAttributedString *truncationToken;
-@property (nullable, nonatomic, strong) id<YYTextParser> textParser;
-@property (nullable, nonatomic, strong) YYTextLayout *textLayout;
-@property (nullable, nonatomic, copy) UIBezierPath *textContainerPath;
-@property (nullable, nonatomic, copy) NSArray<UIBezierPath*> *exclusionPaths;
-@property (nonatomic) UIEdgeInsets textContainerInset;
-@property (nullable, nonatomic, copy) id<YYTextLinePositionModifier> linePositionModifier;
-@property (nonnull, nonatomic, copy) YYTextDebugOption *debugOption;
-@property (nullable, nonatomic, copy) YYTextAction textTapAction;
-@property (nullable, nonatomic, copy) YYTextAction textLongPressAction;
-@property (nullable, nonatomic, copy) YYTextAction highlightTapAction;
-@property (nullable, nonatomic, copy) YYTextAction highlightLongPressAction;
-@property (nonatomic) BOOL displaysAsynchronously;
-@property (nonatomic) BOOL clearContentsBeforeAsynchronouslyDisplay;
-@property (nonatomic) BOOL fadeOnAsynchronouslyDisplay;
-@property (nonatomic) BOOL fadeOnHighlight;
-@property (nonatomic) BOOL ignoreCommonProperties;
-@end
-#endif // !TARGET_INTERFACE_BUILDER
 
 NS_ASSUME_NONNULL_END
