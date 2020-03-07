@@ -45,7 +45,7 @@ static CGColorRef YYTextGetCGColor(CGColorRef color) {
     static UIColor *defaultColor;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        defaultColor = [UIColor blackColor];
+        defaultColor = [UIColor labelColor];
     });
     if (!color) return defaultColor.CGColor;
     if ([((__bridge NSObject *)color) respondsToSelector:@selector(CGColor)]) {

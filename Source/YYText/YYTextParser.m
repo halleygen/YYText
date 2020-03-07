@@ -105,7 +105,7 @@
 }
 
 - (void)setColorWithBrightTheme {
-    _textColor = [UIColor blackColor];
+    _textColor = [UIColor labelColor];
     _controlTextColor = [UIColor colorWithWhite:0.749 alpha:1.000];
     _headerTextColor = [UIColor colorWithRed:1.000 green:0.502 blue:0.000 alpha:1.000];
     _inlineTextColor = [UIColor colorWithWhite:0.150 alpha:1.000];

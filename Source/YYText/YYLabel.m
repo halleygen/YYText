@@ -352,7 +352,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     _font = _innerText.yy_font;
     if (!_font) _font = [self _defaultFont];
     _textColor = _innerText.yy_color;
-    if (!_textColor) _textColor = [UIColor blackColor];
+    if (!_textColor) _textColor = [UIColor labelColor];
     _textAlignment = _innerText.yy_alignment;
     _lineBreakMode = _innerText.yy_lineBreakMode;
     NSShadow *shadow = _innerText.yy_shadow;
@@ -401,7 +401,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     [YYTextDebugOption addDebugTarget:self];
     
     _font = [self _defaultFont];
-    _textColor = [UIColor blackColor];
+    _textColor = [UIColor labelColor];
     _textVerticalAlignment = YYTextVerticalAlignmentCenter;
     _numberOfLines = 1;
     _textAlignment = NSTextAlignmentNatural;
@@ -706,7 +706,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (void)setTextColor:(UIColor *)textColor {
     if (!textColor) {
-        textColor = [UIColor blackColor];
+        textColor = [UIColor labelColor];
     }
     if (_textColor == textColor || [_textColor isEqual:textColor]) return;
     _textColor = textColor;

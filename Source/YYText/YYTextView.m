@@ -1457,7 +1457,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     UIColor *color = _innerText.yy_color;
     if (!color) color = _typingAttributesHolder.yy_color;
-    if (!color) color = [UIColor blackColor];
+    if (!color) color = [UIColor labelColor];
     
     [self _setText:[_innerText yy_plainTextForRange:NSMakeRange(0, _innerText.length)]];
     [self _setFont:font];
