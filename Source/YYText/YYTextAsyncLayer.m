@@ -10,7 +10,7 @@
 //
 
 #import "YYTextAsyncLayer.h"
-#import <libkern/OSAtomic.h>
+#import <stdatomic.h>
 
 
 /// Global display queue, used for content rendering.
@@ -19,7 +19,7 @@ static dispatch_queue_t YYTextAsyncLayerGetDisplayQueue() {
     static int queueCount;
     static dispatch_queue_t queues[MAX_QUEUE_COUNT];
     static dispatch_once_t onceToken;
-    static int32_t counter = 0;
+    static _Atomic(int) counter = 0;
     dispatch_once(&onceToken, ^{
         queueCount = (int)[NSProcessInfo processInfo].activeProcessorCount;
         queueCount = queueCount < 1 ? 1 : queueCount > MAX_QUEUE_COUNT ? MAX_QUEUE_COUNT : queueCount;
@@ -35,7 +35,7 @@ static dispatch_queue_t YYTextAsyncLayerGetDisplayQueue() {
             }
         }
     });
-    uint32_t cur = (uint32_t)OSAtomicIncrement32(&counter);
+    _Atomic(int) cur = atomic_fetch_add_explicit(&counter, 1, memory_order_relaxed);
     return queues[(cur) % queueCount];
 #undef MAX_QUEUE_COUNT
 }
@@ -52,19 +52,20 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 /// a thread safe incrementing counter.
 @interface _YYTextSentinel : NSObject
 /// Returns the current value of the counter.
-@property (atomic, readonly) int32_t value;
+@property (atomic, readonly) _Atomic(int) value;
 /// Increase the value atomically. @return The new value.
-- (int32_t)increase;
+- (_Atomic(int))increase;
 @end
 
 @implementation _YYTextSentinel {
-    int32_t _value;
+    _Atomic(int) _value;
 }
-- (int32_t)value {
+- (int)value {
     return _value;
 }
-- (int32_t)increase {
-    return OSAtomicIncrement32(&_value);
+- (_Atomic(int))increase {
+    return atomic_fetch_add_explicit(&_value, 1, memory_order_relaxed);
+//    return OSAtomicIncrement32(&_value);
 }
 @end
 
