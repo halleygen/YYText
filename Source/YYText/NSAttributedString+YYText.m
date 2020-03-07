@@ -36,7 +36,7 @@ static double _YYDeviceSystemVersion() {
 - (NSData *)yy_archiveToData {
     NSData *data = nil;
     @try {
-        data = [YYTextArchiver archivedDataWithRootObject:self];
+        data = [YYTextArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:nil];
     }
     @catch (NSException *exception) {
         NSLog(@"%@",exception);
@@ -47,7 +47,7 @@ static double _YYDeviceSystemVersion() {
 + (instancetype)yy_unarchiveFromData:(NSData *)data {
     NSAttributedString *one = nil;
     @try {
-        one = [YYTextUnarchiver unarchiveObjectWithData:data];
+        one = [YYTextUnarchiver unarchivedObjectOfClass:[NSAttributedString class] fromData:data error:nil];
     }
     @catch (NSException *exception) {
         NSLog(@"%@",exception);
@@ -1287,7 +1287,7 @@ return style. _attr_;
 }
 
 + (NSArray *)yy_allDiscontinuousAttributeKeys {
-    static NSMutableArray *keys;
+    static NSArray *keys;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         keys = @[(id)kCTSuperscriptAttributeName,

@@ -33,28 +33,6 @@ static double _YYDeviceSystemVersion() {
     return version;
 }
 
-#ifndef kSystemVersion
-#define kSystemVersion _YYDeviceSystemVersion()
-#endif
-
-#ifndef kiOS6Later
-#define kiOS6Later (kSystemVersion >= 6)
-#endif
-
-#ifndef kiOS7Later
-#define kiOS7Later (kSystemVersion >= 7)
-#endif
-
-#ifndef kiOS8Later
-#define kiOS8Later (kSystemVersion >= 8)
-#endif
-
-#ifndef kiOS9Later
-#define kiOS9Later (kSystemVersion >= 9)
-#endif
-
-
-
 #define kDefaultUndoLevelMax 20 // Default maximum undo level
 
 #define kAutoScrollMinimumDuration 0.1 // Time in seconds to tick auto-scroll.
@@ -745,12 +723,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                     UIEdgeInsets newIndicatorInsets = originalScrollIndicatorInsets;
                     newInset.bottom = inter.size.height + extend;
                     newIndicatorInsets.bottom = newInset.bottom;
-                    UIViewAnimationOptions curve;
-                    if (kiOS7Later) {
-                        curve = 7 << 16;
-                    } else {
-                        curve = UIViewAnimationOptionCurveEaseInOut;
-                    }
+                    UIViewAnimationOptions curve = 7 << 16;
                     [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction | curve animations:^{
                         [super setContentInset:newInset];
                         [super setScrollIndicatorInsets:newIndicatorInsets];
@@ -1681,7 +1654,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     UIViewController *ctrl = [self _getRootViewController];
     
     if (canUndo && canRedo) {
-        if (kiOS8Later) {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 [_self _undo];
@@ -1695,15 +1667,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                 [_self _restoreFirstResponderAfterUndoAlert];
             }]];
             [ctrl presentViewController:alert animated:YES completion:nil];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strings[4] message:@"" delegate:self cancelButtonTitle:strings[0] otherButtonTitles:strings[3], strings[2], nil];
-            [alert show];
-#pragma clang diagnostic pop
-        }
+        
     } else if (canUndo) {
-        if (kiOS8Later) {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 [_self _undo];
@@ -1713,15 +1678,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                 [_self _restoreFirstResponderAfterUndoAlert];
             }]];
             [ctrl presentViewController:alert animated:YES completion:nil];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strings[4] message:@"" delegate:self cancelButtonTitle:strings[0] otherButtonTitles:strings[3], nil];
-            [alert show];
-#pragma clang diagnostic pop
-        }
     } else if (canRedo) {
-        if (kiOS8Later) {
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[2] message:@"" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:strings[1] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 [_self _redo];
@@ -1731,13 +1688,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                 [_self _restoreFirstResponderAfterUndoAlert];
             }]];
             [ctrl presentViewController:alert animated:YES completion:nil];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strings[2] message:@"" delegate:self cancelButtonTitle:strings[0] otherButtonTitles:strings[1], nil];
-            [alert show];
-#pragma clang diagnostic pop
-        }
     }
 }
 #endif
@@ -3199,20 +3149,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 - (void)keyboardChangedWithTransition:(YYTextKeyboardTransition)transition {
     [self _keyboardChanged];
-}
-
-#pragma mark - @protocol UIALertViewDelegate
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    if (title.length == 0) return;
-    NSArray *strings = [self _localizedUndoStrings];
-    if ([title isEqualToString:strings[1]] || [title isEqualToString:strings[2]]) {
-        [self _redo];
-    } else if ([title isEqualToString:strings[3]] || [title isEqualToString:strings[4]]) {
-        [self _undo];
-    }
-    [self _restoreFirstResponderAfterUndoAlert];
 }
 
 #pragma mark - @protocol UIKeyInput

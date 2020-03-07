@@ -408,7 +408,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     NSData *data = nil;
     @try {
-        data = [YYTextArchiver archivedDataWithRootObject:self.attributes];
+        data = [YYTextArchiver archivedDataWithRootObject:self.attributes requiringSecureCoding:YES error:nil];
     }
     @catch (NSException *exception) {
         NSLog(@"%@",exception);
@@ -420,7 +420,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     self = [super init];
     NSData *data = [aDecoder decodeObjectForKey:@"attributes"];
     @try {
-        _attributes = [YYTextUnarchiver unarchiveObjectWithData:data];
+        _attributes = [YYTextUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:data error:nil];
     }
     @catch (NSException *exception) {
         NSLog(@"%@",exception);
