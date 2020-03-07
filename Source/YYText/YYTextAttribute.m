@@ -452,6 +452,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
             NSLog(@"%@", _ctFont);
             [[NSException exceptionWithName:@"FONT CANT BE CAST" reason:@"Font could not be cast to CTFontRef" userInfo: nil] raise];
         }
+        CFRelease(_ctFont)
         
         CTFontRef ctFont = CTFontCreateWithName((__bridge CFStringRef)font.fontName, font.pointSize, NULL);
         if (ctFont) {
