@@ -695,15 +695,9 @@ dispatch_semaphore_signal(_lock);
                     [attrs removeObjectsForKeys:[NSMutableAttributedString yy_allDiscontinuousAttributeKeys]];
                     CTFontRef font = (__bridge CFTypeRef)attrs[(id)kCTFontAttributeName];
                     CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
-                    UIFont *uiFont = [UIFont systemFontOfSize:fontSize * 0.9];
-                    if (uiFont) {
-                        font = CTFontCreateWithName((__bridge CFStringRef)uiFont.fontName, uiFont.pointSize, NULL);
-                    } else {
-                        font = NULL;
-                    }
+                    font = CTFontCreateUIFontForLanguage(kCTFontUIFontSystem, fontSize, NULL);
                     if (font) {
                         attrs[(id)kCTFontAttributeName] = (__bridge id)(font);
-                        uiFont = nil;
                         CFRelease(font);
                     }
                     CGColorRef color = (__bridge CGColorRef)(attrs[(id)kCTForegroundColorAttributeName]);
@@ -977,7 +971,6 @@ fail:
 - (id)copyWithZone:(NSZone *)zone {
     return self; // readonly object
 }
-
 
 #pragma mark - Query
 
