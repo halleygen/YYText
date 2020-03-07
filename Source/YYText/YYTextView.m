@@ -23,16 +23,6 @@
 #import "UIPasteboard+YYText.h"
 #import "UIView+YYText.h"
 
-
-static double _YYDeviceSystemVersion() {
-    static double version;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        version = [UIDevice currentDevice].systemVersion.doubleValue;
-    });
-    return version;
-}
-
 #define kDefaultUndoLevelMax 20 // Default maximum undo level
 
 #define kAutoScrollMinimumDuration 0.1 // Time in seconds to tick auto-scroll.
@@ -82,7 +72,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 @end
 
 
-@interface YYTextView () <UIScrollViewDelegate, UIAlertViewDelegate, YYTextDebugTarget, YYTextKeyboardObserver> {
+@interface YYTextView () <UIScrollViewDelegate, YYTextDebugTarget, YYTextKeyboardObserver> {
     
     YYTextRange *_selectedTextRange; /// nonnull
     YYTextRange *_markedTextRange;
@@ -126,8 +116,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     NSTimeInterval _touchBeganTime;
     NSTimeInterval _trackingTime;
     
-    NSMutableArray *_undoStack;
-    NSMutableArray *_redoStack;
+    NSUndoManager *_undoManager;
+    
     NSRange _lastTypeRange;
     
     struct {
@@ -1557,211 +1547,40 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     return ctrl;
 }
 
-/// Clear the undo and redo stack, and capture current state to undo stack.
-- (void)_resetUndoAndRedoStack {
-    [_undoStack removeAllObjects];
-    [_redoStack removeAllObjects];
-    _YYTextViewUndoObject *object = [_YYTextViewUndoObject objectWithText:_innerText.copy range:_selectedTextRange.asRange];
-    _lastTypeRange = _selectedTextRange.asRange;
-    [_undoStack addObject:object];
+#pragma mark - Undo Management
+
+- (void)_resetUndoStack {
+    [_undoManager removeAllActions];
+    [self _saveStateToUndoManager:_innerText.copy selectedRange:_selectedTextRange.asRange];
 }
 
-/// Clear the redo stack.
-- (void)_resetRedoStack {
-    [_redoStack removeAllObjects];
+- (void)_saveStateToUndoManager:(NSAttributedString *)string selectedRange:(NSRange)range {
+    _YYTextViewUndoObject *object = [_YYTextViewUndoObject objectWithText:string.copy range:range];
+    [_undoManager registerUndoWithTarget:self selector:@selector(_performUndoRedo:) object:object];
 }
 
-/// Capture current state to undo stack.
-- (void)_saveToUndoStack {
-    if (!_allowsUndoAndRedo) return;
-    _YYTextViewUndoObject *lastObject = _undoStack.lastObject;
-    if ([lastObject.text isEqualToAttributedString:self.attributedText]) return;
-    
-    _YYTextViewUndoObject *object = [_YYTextViewUndoObject objectWithText:_innerText.copy range:_selectedTextRange.asRange];
-    _lastTypeRange = _selectedTextRange.asRange;
-    [_undoStack addObject:object];
-    while (_undoStack.count > _maximumUndoLevel) {
-        [_undoStack removeObjectAtIndex:0];
-    }
-}
-
-/// Capture current state to redo stack.
-- (void)_saveToRedoStack {
-    if (!_allowsUndoAndRedo) return;
-    _YYTextViewUndoObject *lastObject = _redoStack.lastObject;
-    if ([lastObject.text isEqualToAttributedString:self.attributedText]) return;
-    
-    _YYTextViewUndoObject *object = [_YYTextViewUndoObject objectWithText:_innerText.copy range:_selectedTextRange.asRange];
-    [_redoStack addObject:object];
-    while (_redoStack.count > _maximumUndoLevel) {
-        [_redoStack removeObjectAtIndex:0];
-    }
-}
-
-- (BOOL)_canUndo {
-    if (_undoStack.count == 0) return NO;
-    _YYTextViewUndoObject *object = _undoStack.lastObject;
-    if ([object.text isEqualToAttributedString:_innerText]) return NO;
-    return YES;
-}
-
-- (BOOL)_canRedo {
-    if (_redoStack.count == 0) return NO;
-    _YYTextViewUndoObject *object = _undoStack.lastObject;
-    if ([object.text isEqualToAttributedString:_innerText]) return NO;
-    return YES;
-}
-
-- (void)_undo {
-    if (![self _canUndo]) return;
-    [self _saveToRedoStack];
-    _YYTextViewUndoObject *object = _undoStack.lastObject;
-    [_undoStack removeLastObject];
-    
+- (void)_performUndoRedo:(_YYTextViewUndoObject *)undoObject {
     _state.insideUndoBlock = YES;
-    self.attributedText = object.text;
-    self.selectedRange = object.selectedRange;
+    self.attributedText = undoObject.text;
+    self.selectedRange = undoObject.selectedRange;
     _state.insideUndoBlock = NO;
 }
 
-- (void)_redo {
-    if (![self _canRedo]) return;
-    [self _saveToUndoStack];
-    _YYTextViewUndoObject *object = _redoStack.lastObject;
-    [_redoStack removeLastObject];
-    
-    _state.insideUndoBlock = YES;
-    self.attributedText = object.text;
-    self.selectedRange = object.selectedRange;
-    _state.insideUndoBlock = NO;
-}
-
-- (void)_restoreFirstResponderAfterUndoAlert {
-    if (_state.firstResponderBeforeUndoAlert) {
-        [self performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0];
-    }
-}
-
-/// Show undo alert if it can undo or redo.
-#ifdef __IPHONE_OS_VERSION_MIN_REQUIRED
-- (void)_showUndoRedoAlert NS_EXTENSION_UNAVAILABLE_IOS(""){
-    _state.firstResponderBeforeUndoAlert = self.isFirstResponder;
-    __weak typeof(self) _self = self;
-    NSArray *strings = [self _localizedUndoStrings];
-    BOOL canUndo = [self _canUndo];
-    BOOL canRedo = [self _canRedo];
-    
-    UIViewController *ctrl = [self _getRootViewController];
-    
-    if (canUndo && canRedo) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _undo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[2] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _redo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [ctrl presentViewController:alert animated:YES completion:nil];
-        
-    } else if (canUndo) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _undo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [ctrl presentViewController:alert animated:YES completion:nil];
-    } else if (canRedo) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[2] message:@"" preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[1] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _redo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [ctrl presentViewController:alert animated:YES completion:nil];
-    }
-}
-#endif
-
-/// Get the localized undo alert strings based on app's main bundle.
-- (NSArray *)_localizedUndoStrings {
-    static NSArray *strings = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        NSDictionary *dic = @{
-            @"ar" : @[ @"إلغاء", @"إعادة", @"إعادة الكتابة", @"تراجع", @"تراجع عن الكتابة" ],
-            @"ca" : @[ @"Cancel·lar", @"Refer", @"Refer l’escriptura", @"Desfer", @"Desfer l’escriptura" ],
-            @"cs" : @[ @"Zrušit", @"Opakovat akci", @"Opakovat akci Psát", @"Odvolat akci", @"Odvolat akci Psát" ],
-            @"da" : @[ @"Annuller", @"Gentag", @"Gentag Indtastning", @"Fortryd", @"Fortryd Indtastning" ],
-            @"de" : @[ @"Abbrechen", @"Wiederholen", @"Eingabe wiederholen", @"Widerrufen", @"Eingabe widerrufen" ],
-            @"el" : @[ @"Ακύρωση", @"Επανάληψη", @"Επανάληψη πληκτρολόγησης", @"Αναίρεση", @"Αναίρεση πληκτρολόγησης" ],
-            @"en" : @[ @"Cancel", @"Redo", @"Redo Typing", @"Undo", @"Undo Typing" ],
-            @"es" : @[ @"Cancelar", @"Rehacer", @"Rehacer escritura", @"Deshacer", @"Deshacer escritura" ],
-            @"es_MX" : @[ @"Cancelar", @"Rehacer", @"Rehacer escritura", @"Deshacer", @"Deshacer escritura" ],
-            @"fi" : @[ @"Kumoa", @"Tee sittenkin", @"Kirjoita sittenkin", @"Peru", @"Peru kirjoitus" ],
-            @"fr" : @[ @"Annuler", @"Rétablir", @"Rétablir la saisie", @"Annuler", @"Annuler la saisie" ],
-            @"he" : @[ @"ביטול", @"חזור על הפעולה האחרונה", @"חזור על הקלדה", @"בטל", @"בטל הקלדה" ],
-            @"hr" : @[ @"Odustani", @"Ponovi", @"Ponovno upiši", @"Poništi", @"Poništi upisivanje" ],
-            @"hu" : @[ @"Mégsem", @"Ismétlés", @"Gépelés ismétlése", @"Visszavonás", @"Gépelés visszavonása" ],
-            @"id" : @[ @"Batalkan", @"Ulang", @"Ulang Pengetikan", @"Kembalikan", @"Batalkan Pengetikan" ],
-            @"it" : @[ @"Annulla", @"Ripristina originale", @"Ripristina Inserimento", @"Annulla", @"Annulla Inserimento" ],
-            @"ja" : @[ @"キャンセル", @"やり直す", @"やり直す - 入力", @"取り消す", @"取り消す - 入力" ],
-            @"ko" : @[ @"취소", @"실행 복귀", @"입력 복귀", @"실행 취소", @"입력 실행 취소" ],
-            @"ms" : @[ @"Batal", @"Buat semula", @"Ulang Penaipan", @"Buat asal", @"Buat asal Penaipan" ],
-            @"nb" : @[ @"Avbryt", @"Utfør likevel", @"Utfør skriving likevel", @"Angre", @"Angre skriving" ],
-            @"nl" : @[ @"Annuleer", @"Opnieuw", @"Opnieuw typen", @"Herstel", @"Herstel typen" ],
-            @"pl" : @[ @"Anuluj", @"Przywróć", @"Przywróć Wpisz", @"Cofnij", @"Cofnij Wpisz" ],
-            @"pt" : @[ @"Cancelar", @"Refazer", @"Refazer Digitação", @"Desfazer", @"Desfazer Digitação" ],
-            @"pt_PT" : @[ @"Cancelar", @"Refazer", @"Refazer digitar", @"Desfazer", @"Desfazer digitar" ],
-            @"ro" : @[ @"Renunță", @"Refă", @"Refă tastare", @"Anulează", @"Anulează tastare" ],
-            @"ru" : @[ @"Отменить", @"Повторить", @"Повторить набор на клавиатуре", @"Отменить", @"Отменить набор на клавиатуре" ],
-            @"sk" : @[ @"Zrušiť", @"Obnoviť", @"Obnoviť písanie", @"Odvolať", @"Odvolať písanie" ],
-            @"sv" : @[ @"Avbryt", @"Gör om", @"Gör om skriven text", @"Ångra", @"Ångra skriven text" ],
-            @"th" : @[ @"ยกเลิก", @"ทำกลับมาใหม่", @"ป้อนกลับมาใหม่", @"เลิกทำ", @"เลิกป้อน" ],
-            @"tr" : @[ @"Vazgeç", @"Yinele", @"Yazmayı Yinele", @"Geri Al", @"Yazmayı Geri Al" ],
-            @"uk" : @[ @"Скасувати", @"Повторити", @"Повторити введення", @"Відмінити", @"Відмінити введення" ],
-            @"vi" : @[ @"Hủy", @"Làm lại", @"Làm lại thao tác Nhập", @"Hoàn tác", @"Hoàn tác thao tác Nhập" ],
-            @"zh" : @[ @"取消", @"重做", @"重做键入", @"撤销", @"撤销键入" ],
-            @"zh_CN" : @[ @"取消", @"重做", @"重做键入", @"撤销", @"撤销键入" ],
-            @"zh_HK" : @[ @"取消", @"重做", @"重做輸入", @"還原", @"還原輸入" ],
-            @"zh_TW" : @[ @"取消", @"重做", @"重做輸入", @"還原", @"還原輸入" ]
-        };
-        NSString *preferred = [[NSBundle mainBundle] preferredLocalizations].firstObject;
-        if (preferred.length == 0) preferred = @"English";
-        NSString *canonical = [NSLocale canonicalLocaleIdentifierFromString:preferred];
-        if (canonical.length == 0) canonical = @"en";
-        strings = dic[canonical];
-        if (!strings  && ([canonical rangeOfString:@"_"].location != NSNotFound)) {
-            NSString *prefix = [canonical componentsSeparatedByString:@"_"].firstObject;
-            if (prefix.length) strings = dic[prefix];
-        }
-        if (!strings) strings = dic[@"en"];
-    });
-    return strings;
-}
+#pragma mark - Defaults
 
 /// Returns the default font for text view (same as CoreText).
 - (UIFont *)_defaultFont {
-    return [UIFont systemFontOfSize:12];
+    return [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
 }
 
 /// Returns the default tint color for text view (used for caret and select range background).
 - (UIColor *)_defaultTintColor {
-    return [UIColor colorWithRed:69/255.0 green:111/255.0 blue:238/255.0 alpha:1];
+    return [UIColor systemBlueColor];
 }
 
 /// Returns the default placeholder color for text view (same as UITextField).
 - (UIColor *)_defaultPlaceholderColor {
-    return [UIColor colorWithRed:0 green:0 blue:25/255.0 alpha:44/255.0];
+    return [UIColor secondaryLabelColor];
 }
 
 #pragma mark - Private Setter
@@ -1955,8 +1774,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self addSubview:_containerView];
     [self addSubview:_selectionView];
     
-    _undoStack = [NSMutableArray new];
-    _redoStack = [NSMutableArray new];
+    _undoManager = [NSUndoManager new];
     _allowsUndoAndRedo = YES;
     _maximumUndoLevel = kDefaultUndoLevelMax;
     
@@ -2012,8 +1830,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     _state.deleteConfirm = NO;
     [self _endTouchTracking];
     [self _hideMenu];
-    [self _resetUndoAndRedoStack];
     [self replaceRange:[YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)] withText:text];
+    [self _resetUndoStack];
 }
 
 - (void)setFont:(UIFont *)font {
@@ -2023,7 +1841,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     _state.typingAttributesOnce = NO;
     _typingAttributesHolder.yy_font = font;
     _innerText.yy_font = font;
-    [self _resetUndoAndRedoStack];
+    [self _resetUndoStack];
     [self _commitUpdate];
 }
 
@@ -2034,7 +1852,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     _state.typingAttributesOnce = NO;
     _typingAttributesHolder.yy_color = textColor;
     _innerText.yy_color = textColor;
-    [self _resetUndoAndRedoStack];
+    [self _resetUndoStack];
     [self _commitUpdate];
 }
 
@@ -2044,7 +1862,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     _typingAttributesHolder.yy_alignment = textAlignment;
     _innerText.yy_alignment = textAlignment;
-    [self _resetUndoAndRedoStack];
+    [self _resetUndoStack];
     [self _commitUpdate];
 }
 
@@ -2053,7 +1871,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self _setDataDetectorTypes:dataDetectorTypes];
     NSTextCheckingType type = YYTextNSTextCheckingTypeFromUIDataDetectorType(dataDetectorTypes);
     _dataDetector = type ? [NSDataDetector dataDetectorWithTypes:type error:NULL] : nil;
-    [self _resetUndoAndRedoStack];
+    [self _resetUndoStack];
     [self _commitUpdate];
 }
 
@@ -2079,7 +1897,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (textParser && _text.length) {
         [self replaceRange:[YYTextRange rangeWithRange:NSMakeRange(0, _text.length)] withText:_text];
     }
-    [self _resetUndoAndRedoStack];
+    [self _resetUndoStack];
     [self _commitUpdate];
 }
 
@@ -2139,7 +1957,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [[NSNotificationCenter defaultCenter] postNotificationName:YYTextViewTextDidChangeNotification object:self];
     
     if (!_state.insideUndoBlock) {
-        [self _resetUndoAndRedoStack];
+        [self _resetUndoStack];
     }
 }
 
@@ -2225,7 +2043,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self _setSelectedRange:range.asRange];
     
     if (!_state.insideUndoBlock) {
-        [self _resetUndoAndRedoStack];
+        [self _resetUndoStack];
     }
 }
 
@@ -2845,8 +2663,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (_selectedTextRange.asRange.length == 0) return;
     
     [self _copySelectedTextToPasteboard];
-    [self _saveToUndoStack];
-    [self _resetRedoStack];
     [self replaceRange:_selectedTextRange withText:@""];
 }
 
@@ -2937,11 +2753,11 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     } else {
         NSString *string = p.string;
         if (string.length > 0) {
-            [self _saveToUndoStack];
-            [self _resetRedoStack];
             [self replaceRange:_selectedTextRange withText:string];
         }
     }
+    
+    [self _saveStateToUndoManager:_innerText.copy selectedRange:_selectedTextRange.asRange];
 }
 
 - (void)select:(id)sender {
@@ -2989,7 +2805,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 }
 
 
-#pragma mark - Overrice NSObject(NSKeyValueObservingCustomization)
+#pragma mark - Override NSObject(NSKeyValueObservingCustomization)
 
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key {
     static NSSet *keys = nil;
@@ -3159,10 +2975,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 - (void)insertText:(NSString *)text {
     if (text.length == 0) return;
-    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
-        [self _saveToUndoStack];
-        [self _resetRedoStack];
-    }
     [self replaceRange:_selectedTextRange withText:text];
 }
 
@@ -3196,10 +3008,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             range = extendRange.asRange;
         }
     }
-    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
-        [self _saveToUndoStack];
-        [self _resetRedoStack];
-    }
+//    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
+//        [self _saveStateToUndoManager];
+//    }
     [self replaceRange:[YYTextRange rangeWithRange:range] withText:@""];
 }
 
@@ -3252,12 +3063,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         if (!should) return;
     }
     
-    
-    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
-        [self _saveToUndoStack];
-        [self _resetRedoStack];
-    }
-    
     BOOL needApplyHolderAttribute = NO;
     if (_innerText.length > 0 && _markedTextRange) {
         [self _updateAttributesHolder];
@@ -3307,6 +3112,10 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         [self.delegate textViewDidChange:self];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:YYTextViewTextDidChangeNotification object:self];
+    
+    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
+        [self _saveStateToUndoManager:_innerText.copy selectedRange:_selectedTextRange.asRange];
+    }
     
     _lastTypeRange = _selectedTextRange.asRange;
 }
@@ -3382,6 +3191,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         [self.delegate textViewDidChange:self];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:YYTextViewTextDidChangeNotification object:self];
+    [self _saveStateToUndoManager:_innerText.copy selectedRange:_selectedTextRange.asRange];
     
     _lastTypeRange = _selectedTextRange.asRange;
 }
