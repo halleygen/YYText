@@ -410,7 +410,7 @@ dispatch_semaphore_signal(_lock);
             needFixJoinedEmojiBug = YES;
         }
         if (systemVersionDouble >= 10) {
-            needFixLayoutSizeBug = YES;
+            needFixLayoutSizeBug = NO;
         }
     });
     if (needFixJoinedEmojiBug) {
