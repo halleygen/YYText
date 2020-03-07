@@ -397,26 +397,6 @@ dispatch_semaphore_signal(_lock);
     container->_readonly = YES;
     maximumNumberOfRows = container.maximumNumberOfRows;
     
-    // CoreText bug when draw joined emoji since iOS 8.3.
-    // See -[NSMutableAttributedString setClearColorToJoinedEmoji] for more information.
-    static BOOL needFixJoinedEmojiBug = NO;
-    // It may use larger constraint size when create CTFrame with
-    // CTFramesetterCreateFrame in iOS 10.
-    static BOOL needFixLayoutSizeBug = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        double systemVersionDouble = [UIDevice currentDevice].systemVersion.doubleValue;
-        if (8.3 <= systemVersionDouble && systemVersionDouble < 9) {
-            needFixJoinedEmojiBug = YES;
-        }
-        if (systemVersionDouble >= 10) {
-            needFixLayoutSizeBug = NO;
-        }
-    });
-    if (needFixJoinedEmojiBug) {
-        [((NSMutableAttributedString *)text) yy_setClearColorToJoinedEmoji];
-    }
-    
     layout = [[YYTextLayout alloc] _init];
     layout.text = text;
     layout.container = container;
@@ -426,17 +406,7 @@ dispatch_semaphore_signal(_lock);
     // set cgPath and cgPathBox
     if (container.path == nil && container.exclusionPaths.count == 0) {
         if (container.size.width <= 0 || container.size.height <= 0) goto fail;
-        CGRect rect = (CGRect) {CGPointZero, container.size };
-        if (needFixLayoutSizeBug) {
-            constraintSizeIsExtended = YES;
-            constraintRectBeforeExtended = UIEdgeInsetsInsetRect(rect, container.insets);
-            constraintRectBeforeExtended = CGRectStandardize(constraintRectBeforeExtended);
-            if (container.isVerticalForm) {
-                rect.size.width = YYTextContainerMaxSize.width;
-            } else {
-                rect.size.height = YYTextContainerMaxSize.height;
-            }
-        }
+        CGRect rect = (CGRect) { CGPointZero, container.size };
         rect = UIEdgeInsetsInsetRect(rect, container.insets);
         rect = CGRectStandardize(rect);
         cgPathBox = rect;
