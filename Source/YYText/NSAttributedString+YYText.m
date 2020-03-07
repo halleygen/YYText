@@ -21,16 +21,6 @@
 @interface NSAttributedString_YYText : NSObject @end
 @implementation NSAttributedString_YYText @end
 
-
-static double _YYDeviceSystemVersion() {
-    static double version;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        version = [UIDevice currentDevice].systemVersion.doubleValue;
-    });
-    return version;
-}
-
 @implementation NSAttributedString (YYText)
 
 - (NSData *)yy_archiveToData {

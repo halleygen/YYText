@@ -706,7 +706,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             if (CGRectGetMinY(inter) > CGRectGetMinY(bounds)) { // keyboard below self.top
                 
                 UIEdgeInsets originalContentInset = self.contentInset;
-                UIEdgeInsets originalScrollIndicatorInsets = self.scrollIndicatorInsets;
+                UIEdgeInsets originalScrollIndicatorInsets = self.verticalScrollIndicatorInsets;
                 if (_insetModifiedByKeyboard) {
                     originalContentInset = _originalContentInset;
                     originalScrollIndicatorInsets = _originalScrollIndicatorInsets;

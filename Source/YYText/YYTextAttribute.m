@@ -15,17 +15,6 @@
 #import "NSAttributedString+YYText.h"
 #import "YYTextArchiver.h"
 
-
-static double _YYDeviceSystemVersion() {
-    static double version;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        version = [UIDevice currentDevice].systemVersion.doubleValue;
-    });
-    return version;
-}
-
-
 NSString *const YYTextBackedStringAttributeName = @"YYTextBackedString";
 NSString *const YYTextBindingAttributeName = @"YYTextBinding";
 NSString *const YYTextShadowAttributeName = @"YYTextShadow";
@@ -72,7 +61,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
         dic[NSUnderlineStyleAttributeName] = UIKit_CoreText;
         dic[(id)kCTUnderlineColorAttributeName] = CoreText;
         dic[NSLigatureAttributeName] = All;
-        dic[(id)kCTSuperscriptAttributeName] = UIKit; //it's a CoreText attrubite, but only supported by UIKit...
+        dic[(id)kCTSuperscriptAttributeName] = UIKit; //it's a CoreText attribute, but only supported by UIKit...
         dic[NSVerticalGlyphFormAttributeName] = All;
         dic[(id)kCTGlyphInfoAttributeName] = CoreText_YYText;
         dic[(id)kCTCharacterShapeAttributeName] = CoreText_YYText;
@@ -83,7 +72,6 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
         dic[(id)kCTWritingDirectionAttributeName] = CoreText_YYText;
         dic[NSParagraphStyleAttributeName] = All;
         
-        if (_YYDeviceSystemVersion() >= 7) {
             dic[NSStrikethroughColorAttributeName] = UIKit;
             dic[NSUnderlineColorAttributeName] = UIKit;
             dic[NSTextEffectAttributeName] = UIKit;
@@ -94,10 +82,8 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
             dic[NSWritingDirectionAttributeName] = All;
             dic[NSAttachmentAttributeName] = UIKit;
             dic[NSLinkAttributeName] = UIKit;
-        }
-        if (_YYDeviceSystemVersion() >= 8) {
+        
             dic[(id)kCTRubyAnnotationAttributeName] = CoreText;
-        }
         
         dic[YYTextBackedStringAttributeName] = YYText;
         dic[YYTextBindingAttributeName] = YYText;

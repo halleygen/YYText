@@ -231,14 +231,10 @@ static CFTypeID CTRubyAnnotationTypeID() {
         return ctObj;
     } else if ([object class] == [YYTextRubyAnnotation class]) {
         YYTextRubyAnnotation *ruby = object;
-        if ([UIDevice currentDevice].systemVersion.floatValue >= 8) {
-            CTRubyAnnotationRef ct = ruby.CTRubyAnnotation;
-            id ctObj = (__bridge id)(ct);
-            if (ct) CFRelease(ct);
-            return ctObj;
-        } else {
-            return object;
-        }
+        CTRubyAnnotationRef ct = ruby.CTRubyAnnotation;
+        id ctObj = (__bridge id)(ct);
+        if (ct) CFRelease(ct);
+        return ctObj;
     } else if ([object class] == [_YYCGColor class]) {
         _YYCGColor *color = object;
         return (id)color.CGColor;
