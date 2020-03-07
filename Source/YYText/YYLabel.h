@@ -208,6 +208,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable UITargetedPreview *)targetedPreviewForHighlightAt:(NSRange)range;
 
+#pragma mark - Getting the highlight at a point
+
+- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range;
+
 #pragma mark - Interacting with Text Data
 ///=============================================================================
 /// @name Interacting with Text Data
@@ -236,10 +240,6 @@ NS_ASSUME_NONNULL_BEGIN
  The default value is nil. 
  */
 @property (nullable, nonatomic, copy) YYTextAction highlightLongPressAction;
-
-#pragma mark - Getting the highlight at a point
-
-- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range;
 
 #pragma mark - Configuring the Display Mode
 ///=============================================================================

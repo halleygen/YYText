@@ -75,29 +75,6 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     return [[UITargetedPreview alloc] initWithView:self parameters:previewParams];
 }
 
-- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range {
-    if (!self._innerLayout.containsHighlight) return nil;
-    point = [self _convertPointToLayout:point];
-    YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
-    if (!textRange) return nil;
-    
-    NSUInteger startIndex = textRange.start.offset;
-    if (startIndex == _innerText.length) {
-        if (startIndex > 0) {
-            startIndex--;
-        }
-    }
-    NSRange highlightRange = {0};
-    YYTextHighlight *highlight = [_innerText attribute:YYTextHighlightAttributeName
-                                               atIndex:startIndex
-                                 longestEffectiveRange:&highlightRange
-                                               inRange:NSMakeRange(0, _innerText.length)];
-    
-    if (!highlight) return nil;
-    if (range) *range = highlightRange;
-    return highlight;
-}
-
 #pragma mark - Private
 
 - (void)_updateIfNeeded {
@@ -206,6 +183,53 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             _state.trackingTouch = NO;
         }
     }
+}
+
+- (YYTextHighlight *)_getHighlightAtPoint:(CGPoint)point range:(NSRangePointer)range {
+    if (!self._innerLayout.containsHighlight) return nil;
+    point = [self _convertPointToLayout:point];
+    YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
+    if (!textRange) return nil;
+    
+    NSUInteger startIndex = textRange.start.offset;
+    if (startIndex == _innerText.length) {
+        if (startIndex > 0) {
+            startIndex--;
+        }
+    }
+    NSRange highlightRange = {0};
+    YYTextHighlight *highlight = [_innerText attribute:YYTextHighlightAttributeName
+                                               atIndex:startIndex
+                                 longestEffectiveRange:&highlightRange
+                                               inRange:NSMakeRange(0, _innerText.length)];
+    
+    if (!highlight) return nil;
+    if (range) *range = highlightRange;
+    return highlight;
+}
+
+- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range {
+    return [self _getHighlightAtPoint:point range:range];
+    
+//    if (!self._innerLayout.containsHighlight) return nil;
+//    point = [self _convertPointToLayout:point];
+//    YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
+//    if (!textRange) return nil;
+//
+//    NSUInteger startIndex = textRange.start.offset;
+//    if (startIndex == _innerText.length) {
+//        if (startIndex > 0) {
+//            startIndex--;
+//        }
+//    }
+//    NSRange highlightRange = {0};
+//    YYTextHighlight *highlight = [_innerText attribute:YYTextHighlightAttributeName
+//                                               atIndex:startIndex
+//                                 longestEffectiveRange:&highlightRange
+//                                               inRange:NSMakeRange(0, _innerText.length)];
+//
+//    if (range) *range = highlightRange;
+//    return highlight;
 }
 
 - (void)_showHighlightAnimated:(BOOL)animated {
@@ -540,7 +564,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     UITouch *touch = touches.anyObject;
     CGPoint point = [touch locationInView:self];
     
-    _highlight = [self highlightAtPoint:point range:&_highlightRange];
+    _highlight = [self _getHighlightAtPoint:point range:&_highlightRange];
     _highlightLayout = nil;
     _shrinkHighlightLayout = nil;
     _state.hasTapAction = _textTapAction != nil;
@@ -583,7 +607,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             }
         }
         if (_state.touchMoved && _highlight) {
-            YYTextHighlight *highlight = [self highlightAtPoint:point range:NULL];
+            YYTextHighlight *highlight = [self _getHighlightAtPoint:point range:NULL];
             if (highlight == _highlight) {
                 [self _showHighlightAnimated:_fadeOnHighlight];
             } else {
@@ -618,7 +642,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         }
         
         if (_highlight) {
-            if (!_state.touchMoved || [self highlightAtPoint:point range:NULL] == _highlight) {
+            if (!_state.touchMoved || [self _getHighlightAtPoint:point range:NULL] == _highlight) {
                 YYTextAction tapAction = _highlight.tapAction ? _highlight.tapAction : _highlightTapAction;
                 if (tapAction) {
                     YYTextPosition *start = [YYTextPosition positionWithOffset:_highlightRange.location];
