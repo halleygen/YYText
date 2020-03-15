@@ -507,17 +507,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     [super traitCollectionDidChange:previousTraitCollection];
     if (previousTraitCollection) {
         if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle || self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory) {
-            _innerText = [_attributedText mutableCopy];
-            [_textParser parseText:_innerText selectedRange:NULL];
-            
-            if (!_ignoreCommonProperties) {
-                if (_displaysAsynchronously && _clearContentsBeforeAsynchronouslyDisplay) {
-                    [self _clearContents];
-                }
-                [self _updateOuterTextProperties];
-                [self _setLayoutNeedUpdate];
-                [self _endTouch];
-            }
+            _attributedText = _attributedText;
         }
     }
 }
