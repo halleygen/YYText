@@ -516,7 +516,8 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     [super traitCollectionDidChange:previousTraitCollection];
     if (previousTraitCollection && _innerLayout) {
         if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle || self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory) {
-            [self _setLayoutNeedRedraw];
+            [self _setLayoutNeedUpdate];
+            [self _updateIfNeeded];
         }
     }
 }
