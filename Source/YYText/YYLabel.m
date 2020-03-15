@@ -310,18 +310,14 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (UIFont *)_defaultFont {
-    return [UIFont systemFontOfSize:17];
+    return [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
 }
 
 - (NSShadow *)_shadowFromProperties {
     if (!_shadowColor || _shadowBlurRadius < 0) return nil;
     NSShadow *shadow = [NSShadow new];
     shadow.shadowColor = _shadowColor;
-#if !TARGET_INTERFACE_BUILDER
     shadow.shadowOffset = _shadowOffset;
-#else
-    shadow.shadowOffset = CGSizeMake(_shadowOffset.x, _shadowOffset.y);
-#endif
     shadow.shadowBlurRadius = _shadowBlurRadius;
     return shadow;
 }
@@ -355,12 +351,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     _lineBreakMode = _innerText.yy_lineBreakMode;
     NSShadow *shadow = _innerText.yy_shadow;
     _shadowColor = shadow.shadowColor;
-#if !TARGET_INTERFACE_BUILDER
     _shadowOffset = shadow.shadowOffset;
-#else
-    _shadowOffset = CGPointMake(shadow.shadowOffset.width, shadow.shadowOffset.height);
-#endif
-    
     _shadowBlurRadius = shadow.shadowBlurRadius;
     _attributedText = _innerText;
     [self _updateOuterLineBreakMode];
@@ -514,10 +505,19 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
-    if (previousTraitCollection && _innerLayout) {
+    if (previousTraitCollection && _attributedText) {
         if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle || self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory) {
-            [self _setLayoutNeedUpdate];
-            [self _updateIfNeeded];
+            _innerText = [_attributedText mutableCopy];
+            [_textParser parseText:_innerText selectedRange:NULL];
+            
+            if (!_ignoreCommonProperties) {
+                if (_displaysAsynchronously && _clearContentsBeforeAsynchronouslyDisplay) {
+                    [self _clearContents];
+                }
+                [self _updateOuterTextProperties];
+                [self _setLayoutNeedUpdate];
+                [self _endTouch];
+            }
         }
     }
 }
@@ -739,7 +739,6 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     }
 }
 
-#if !TARGET_INTERFACE_BUILDER
 - (void)setShadowOffset:(CGSize)shadowOffset {
     if (CGSizeEqualToSize(_shadowOffset, shadowOffset)) return;
     _shadowOffset = shadowOffset;
@@ -751,19 +750,6 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         [self _setLayoutNeedUpdate];
     }
 }
-#else
-- (void)setShadowOffset:(CGPoint)shadowOffset {
-    if (CGPointEqualToPoint(_shadowOffset, shadowOffset)) return;
-    _shadowOffset = shadowOffset;
-    _innerText.yy_shadow = [self _shadowFromProperties];
-    if (_innerText.length && !_ignoreCommonProperties) {
-        if (_displaysAsynchronously && _clearContentsBeforeAsynchronouslyDisplay) {
-            [self _clearContents];
-        }
-        [self _setLayoutNeedUpdate];
-    }
-}
-#endif
 
 - (void)setShadowBlurRadius:(CGFloat)shadowBlurRadius {
     if (_shadowBlurRadius == shadowBlurRadius) return;
