@@ -14,8 +14,6 @@
 #import "YYTextWeakProxy.h"
 #import "YYTextUtilities.h"
 #import "NSAttributedString+YYText.h"
-#import <libkern/OSAtomic.h>
-
 
 static dispatch_queue_t YYLabelGetReleaseQueue() {
     return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
@@ -512,6 +510,15 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (NSString *)accessibilityLabel {
     return [_innerLayout.text yy_plainTextForRange:_innerLayout.text.yy_rangeOfAll];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if (previousTraitCollection && _innerLayout) {
+        if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle || self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory) {
+            [self _setLayoutNeedRedraw];
+        }
+    }
 }
 
 #pragma mark - NSCoding

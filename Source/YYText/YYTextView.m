@@ -1557,6 +1557,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 - (void)_saveStateToUndoManager:(NSAttributedString *)string selectedRange:(NSRange)range {
     _YYTextViewUndoObject *object = [_YYTextViewUndoObject objectWithText:string.copy range:range];
     [_undoManager registerUndoWithTarget:self selector:@selector(_performUndoRedo:) object:object];
+    [_undoManager setActionName:@"Editing"];
 }
 
 - (void)_performUndoRedo:(_YYTextViewUndoObject *)undoObject {
@@ -3009,8 +3010,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         }
     }
 //    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
-//        [self _saveStateToUndoManager];
-//    }
+    //        [self _saveStateToUndoManager];
+    //    }
     [self replaceRange:[YYTextRange rangeWithRange:range] withText:@""];
 }
 

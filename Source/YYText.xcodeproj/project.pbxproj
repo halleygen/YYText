@@ -141,7 +141,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		352AE6782412E035008D470E /* Source */ = {
+		352AE6782412E035008D470E /* YYText */ = {
 			isa = PBXGroup;
 			children = (
 				D995E6F21F372ED100EBEE44 /* YYText.h */,
@@ -194,13 +194,13 @@
 				D995E6EE1F372ED100EBEE44 /* YYTextWeakProxy.h */,
 				D995E6EF1F372ED100EBEE44 /* YYTextWeakProxy.m */,
 			);
-			path = Source;
+			path = YYText;
 			sourceTree = "<group>";
 		};
 		D918BFCC1F372E3000106E14 = {
 			isa = PBXGroup;
 			children = (
-				352AE6782412E035008D470E /* Source */,
+				352AE6782412E035008D470E /* YYText */,
 				D918BFE11F372E6800106E14 /* Frameworks */,
 				D918BFD71F372E3000106E14 /* Products */,
 			);
