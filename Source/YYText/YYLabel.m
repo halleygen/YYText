@@ -505,7 +505,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
-    if (previousTraitCollection && _attributedText) {
+    if (previousTraitCollection) {
         if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle || self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory) {
             _innerText = [_attributedText mutableCopy];
             [_textParser parseText:_innerText selectedRange:NULL];
