@@ -248,7 +248,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (void)_endTouch {
     [self _endLongPressTimer];
-    [self _removeHighlightAnimated:YES];
+    [self _removeHighlightAnimated:_fadeOnHighlight];
     _state.trackingTouch = NO;
 }
 
@@ -348,8 +348,12 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     if (!_font) _font = [self _defaultFont];
     _textColor = _innerText.yy_color;
     if (!_textColor) _textColor = [UIColor labelColor];
-    _textAlignment = _innerText.yy_alignment;
-    _lineBreakMode = _innerText.yy_lineBreakMode;
+    
+    if (_innerText.length == 0) {
+        _textAlignment = _innerText.yy_alignment;
+        _lineBreakMode = _innerText.yy_lineBreakMode;
+    }
+    
     NSShadow *shadow = _innerText.yy_shadow;
     _shadowColor = shadow.shadowColor;
     _shadowOffset = shadow.shadowOffset;
@@ -473,7 +477,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         [self _updateIfNeeded];
         YYTextLayout *layout = self._innerLayout;
         BOOL contains = NO;
-        if (layout.container.maximumNumberOfRows == 0) {
+        if (layout.container && layout.container.maximumNumberOfRows == 0) {
             if (layout.truncatedLine == nil) {
                 contains = YES;
             }
@@ -502,6 +506,13 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (NSString *)accessibilityLabel {
     return [_innerLayout.text yy_plainTextForRange:_innerLayout.text.yy_rangeOfAll];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if ([previousTraitCollection hasDifferentColorAppearanceComparedToTraitCollection:self.traitCollection]) {
+        [[self layer] setNeedsDisplay];
+    }
 }
 
 #pragma mark - NSCoding
@@ -1009,6 +1020,12 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (CGSize)intrinsicContentSize {
+    if (_innerLayout) {
+        if (_preferredMaxLayoutWidth == 0 || _preferredMaxLayoutWidth >= _innerLayout.container.size.width) {
+            return [_innerLayout textBoundingSize];
+        }
+    }
+    
     if (_preferredMaxLayoutWidth == 0) {
         YYTextContainer *container = [_innerContainer copy];
         container.size = YYTextContainerMaxSize;
