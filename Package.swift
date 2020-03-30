@@ -13,6 +13,7 @@ let package = Package(
     targets: [
         .target(
             name: "YYText",
+            path: "Sources/YYText",
             cSettings: [
                 .headerSearchPath("Component"),
                 .headerSearchPath("String"),
