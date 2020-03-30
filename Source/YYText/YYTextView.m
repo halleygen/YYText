@@ -82,7 +82,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     UIImageView *_placeHolderView;
     
     NSMutableAttributedString *_innerText; ///< nonnull, inner attributed text
-    NSMutableAttributedString *_delectedText; ///< detected text for display
+    NSMutableAttributedString *_detectedText; ///< detected text for display
     YYTextContainer *_innerContainer; ///< nonnull, inner text container
     YYTextLayout *_innerLayout; ///< inner text layout, the text in this layout is longer than `_innerText` by appending '\n'
     
@@ -202,9 +202,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     NSMutableAttributedString *text = _innerText.mutableCopy;
     _placeHolderView.hidden = text.length > 0;
     if ([self _detectText:text]) {
-        _delectedText = text;
+        _detectedText = text;
     } else {
-        _delectedText = nil;
+        _detectedText = nil;
     }
     [text replaceCharactersInRange:NSMakeRange(text.length, 0) withString:@"\r"]; // add for nextline caret
     [text yy_removeDiscontinuousAttributesInRange:NSMakeRange(_innerText.length, 1)];
@@ -215,7 +215,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     }
     if (_selectedTextRange.end.offset == _innerText.length) {
         [_typingAttributesHolder.yy_attributes enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
-            [text yy_setAttribute:key value:value range:NSMakeRange(_innerText.length, 1)];
+            [text yy_setAttribute:key value:value range:NSMakeRange(self->_innerText.length, 1)];
         }];
     }
     [self willChangeValueForKey:@"textLayout"];
@@ -301,7 +301,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
          I can't find the reason. Here's a workaround.
          */
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.02 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [[YYTextEffectWindow sharedWindow] showSelectionDot:_selectionView];
+            [[YYTextEffectWindow sharedWindow] showSelectionDot:self->_selectionView];
         });
     }
     [[YYTextEffectWindow sharedWindow] showSelectionDot:_selectionView];
@@ -597,7 +597,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (self.isFirstResponder || _containerView.isFirstResponder) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             UIMenuController *menu = [UIMenuController sharedMenuController];
-            [menu showMenuFromView:_selectionView rect:CGRectStandardize(rect)];
+            [menu showMenuFromView:self->_selectionView rect:CGRectStandardize(rect)];
         });
     }
 }
@@ -622,7 +622,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     NSTimeInterval fadeDuration = animated ? kHighlightFadeDuration : 0;
     if (!_highlight) return;
     if (!_highlightLayout) {
-        NSMutableAttributedString *hiText = (_delectedText ? _delectedText : _innerText).mutableCopy;
+        NSMutableAttributedString *hiText = (_detectedText ? _detectedText : _innerText).mutableCopy;
         NSDictionary *newAttrs = _highlight.attributes;
         [newAttrs enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
             [hiText yy_setAttribute:key value:value range:_highlightRange];
@@ -729,8 +729,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         _insetModifiedByKeyboard = NO;
         if (animated) {
             [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationCurveEaseOut  animations:^{
-                [super setContentInset:_originalContentInset];
-                [super setScrollIndicatorInsets:_originalScrollIndicatorInsets];
+                [super setContentInset:self->_originalContentInset];
+                [super setScrollIndicatorInsets:self->_originalScrollIndicatorInsets];
             } completion:NULL];
         } else {
             [super setContentInset:_originalContentInset];
@@ -744,12 +744,12 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (!self.isFirstResponder) return;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if ([YYTextKeyboardManager defaultManager].keyboardVisible) {
-            [self _scrollRangeToVisible:_selectedTextRange];
+            [self _scrollRangeToVisible:self->_selectedTextRange];
         } else {
             [self _restoreInsetsAnimated:YES];
         }
         [self _updateMagnifier];
-        if (_state.showingMenu) {
+        if (self->_state.showingMenu) {
             [self _showMenu];
         }
     });
@@ -933,15 +933,15 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             [UIView animateWithDuration:kAutoScrollMinimumDuration delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction | UIViewAnimationOptionCurveLinear animations:^{
                 [self setContentOffset:offset];
             } completion:^(BOOL finished) {
-                if (_state.trackingTouch) {
-                    if (_state.trackingGrabber) {
+                if (self->_state.trackingTouch) {
+                    if (self->_state.trackingGrabber) {
                         [self _showMagnifierRanged];
                         [self _updateTextRangeByTrackingGrabber];
-                    } else if (_state.trackingPreSelect) {
+                    } else if (self->_state.trackingPreSelect) {
                         [self _showMagnifierCaret];
                         [self _updateTextRangeByTrackingPreSelect];
-                    } else if (_state.trackingCaret) {
-                        if (_markedTextRange) {
+                    } else if (self->_state.trackingCaret) {
+                        if (self->_markedTextRange) {
                             [self _showMagnifierRanged];
                         } else {
                             [self _showMagnifierCaret];
@@ -1094,7 +1094,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         else startIndex--;
     }
     NSRange highlightRange = {0};
-    NSAttributedString *text = _delectedText ? _delectedText : _innerText;
+    NSAttributedString *text = _detectedText ? _detectedText : _innerText;
     YYTextHighlight *highlight = [text attribute:YYTextHighlightAttributeName
                                          atIndex:startIndex
                            longestEffectiveRange:&highlightRange
@@ -1416,11 +1416,13 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             if (notify) [_inputDelegate selectionDidChange:self];
         }
     }
-    if (notify) [_inputDelegate textWillChange:self];
-    NSRange newRange = NSMakeRange(range.asRange.location, text.length);
-    [_innerText replaceCharactersInRange:range.asRange withString:text];
-    [_innerText yy_removeDiscontinuousAttributesInRange:newRange];
-    if (notify) [_inputDelegate textDidChange:self];
+    if (range.asRange.location + range.asRange.length <= _innerText.length) {
+        if (notify) [_inputDelegate textWillChange:self];
+        NSRange newRange = NSMakeRange(range.asRange.location, text.length);
+        [_innerText replaceCharactersInRange:range.asRange withString:text];
+        [_innerText yy_removeDiscontinuousAttributesInRange:newRange];
+        if (notify) [_inputDelegate textDidChange:self];
+    }
 }
 
 /// Save current typing attributes to the attributes holder.
@@ -3073,11 +3075,15 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (!markedText) markedText = @"";
     if (_markedTextRange == nil) {
         _markedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_selectedTextRange.end.offset, markedText.length)];
-        [_innerText replaceCharactersInRange:NSMakeRange(_selectedTextRange.end.offset, 0) withString:markedText];
+        if (_selectedTextRange.end.offset <= _innerText.length) {
+            [_innerText replaceCharactersInRange:NSMakeRange(_selectedTextRange.end.offset, 0) withString:markedText];
+        }
         _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_selectedTextRange.start.offset + selectedRange.location, selectedRange.length)];
     } else {
         _markedTextRange = [self _correctedTextRange:_markedTextRange];
-        [_innerText replaceCharactersInRange:_markedTextRange.asRange withString:markedText];
+        if (_markedTextRange.asRange.location + _markedTextRange.asRange.length <= _innerText.length) {
+            [_innerText replaceCharactersInRange:_markedTextRange.asRange withString:markedText];
+        }
         _markedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_markedTextRange.start.offset, markedText.length)];
         _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_markedTextRange.start.offset + selectedRange.location, selectedRange.length)];
     }

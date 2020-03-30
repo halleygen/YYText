@@ -171,6 +171,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             rect = textRect;
         }
         _textLongPressAction(self, _innerText, range, rect);
+        _state.trackingTouch = NO;
     }
     if (_highlight) {
         YYTextAction longPressAction = _highlight.longPressAction ? _highlight.longPressAction : _highlightLongPressAction;
@@ -216,7 +217,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         NSMutableAttributedString *hiText = _innerText.mutableCopy;
         NSDictionary *newAttrs = _highlight.attributes;
         [newAttrs enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
-            [hiText yy_setAttribute:key value:value range:_highlightRange];
+            [hiText yy_setAttribute:key value:value range:self->_highlightRange];
         }];
         _highlightLayout = [YYTextLayout layoutWithContainer:_innerContainer text:hiText];
         _shrinkHighlightLayout = [YYLabel _shrinkLayoutWithLayout:_highlightLayout];
@@ -615,7 +616,8 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
                 YYTextAction tapAction = _highlight.tapAction ? _highlight.tapAction : _highlightTapAction;
                 if (tapAction) {
                     YYTextPosition *start = [YYTextPosition positionWithOffset:_highlightRange.location];
-                    YYTextPosition *end = [YYTextPosition positionWithOffset:_highlightRange.location + _highlightRange.length affinity:YYTextAffinityBackward];
+                    NSInteger endOffset = MIN(_innerLayout.visibleRange.length, _highlightRange.location + _highlightRange.length);
+                     YYTextPosition *end = [YYTextPosition positionWithOffset:endOffset affinity:YYTextAffinityBackward];
                     YYTextRange *range = [YYTextRange rangeWithStart:start end:end];
                     CGRect rect = [self._innerLayout rectForRange:range];
                     rect = [self _convertRectFromLayout:rect];

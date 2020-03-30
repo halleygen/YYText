@@ -501,13 +501,15 @@ dispatch_semaphore_signal(_lock);
         
         if (constraintSizeIsExtended) {
             if (isVerticalForm) {
-                if (rect.origin.x + rect.size.width >
-                    constraintRectBeforeExtended.origin.x +
-                    constraintRectBeforeExtended.size.width) break;
+                if (!CGRectIntersectsRect(rect, constraintRectBeforeExtended)) {
+                    break;
+                }
             } else {
                 if (rect.origin.y + rect.size.height >
                     constraintRectBeforeExtended.origin.y +
-                    constraintRectBeforeExtended.size.height) break;
+                    constraintRectBeforeExtended.size.height) {
+                    break;
+                }
             }
         }
         
@@ -661,7 +663,7 @@ dispatch_semaphore_signal(_lock);
                 if (runCount > 0) {
                     CTRunRef run = CFArrayGetValueAtIndex(runs, runCount - 1);
                     attrs = (id)CTRunGetAttributes(run);
-                    attrs = attrs ? attrs.mutableCopy : [NSMutableArray new];
+                    attrs = attrs ? attrs.mutableCopy : [NSMutableDictionary new];
                     [attrs removeObjectsForKeys:[NSMutableAttributedString yy_allDiscontinuousAttributeKeys]];
                     CTFontRef font = (__bridge CFTypeRef)attrs[(id)kCTFontAttributeName];
                     CGFloat fontSize = font ? CTFontGetSize(font) : 12.0;
@@ -3079,7 +3081,10 @@ static void YYTextDrawInnerShadow(YYTextLayout *layout, CGContextRef context, CG
                 CTRunGetPositions(run, CFRangeMake(0, 1), &runPosition);
                 CGRect runImageBounds = CTRunGetImageBounds(run, context, CFRangeMake(0, 0));
                 runImageBounds.origin.x += runPosition.x;
-                if (runImageBounds.size.width < 0.1 || runImageBounds.size.height < 0.1) continue;
+                if (runImageBounds.size.width < 0.1 || runImageBounds.size.height < 0.1) {
+                    shadow = shadow.subShadow;
+                    continue;
+                }
                 
                 CFDictionaryRef runAttrs = CTRunGetAttributes(run);
                 NSValue *glyphTransformValue = CFDictionaryGetValue(runAttrs, (__bridge const void *)(YYTextGlyphTransformAttributeName));
