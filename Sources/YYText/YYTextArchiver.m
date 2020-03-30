@@ -210,14 +210,8 @@ static CFTypeID CTRubyAnnotationTypeID() {
     return [self unarchiveObjectWithData:data];
 }
 
-- (instancetype)init {
-    self = [super init];
-    self.delegate = self;
-    return self;
-}
-
-- (instancetype)initForReadingWithData:(NSData *)data {
-    self = [super initForReadingWithData:data];
+- (instancetype)initForReadingFromData:(NSData *)data error:(NSError * _Nullable *)error {
+    self = [super initForReadingFromData:data error:error];
     self.delegate = self;
     return self;
 }

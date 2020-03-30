@@ -963,7 +963,7 @@ return style. _attr_;
 }
 
 - (void)yy_setBaselineOffset:(NSNumber *)baselineOffset range:(NSRange)range {
-    [self yy_setAttribute:NSBaselineOffsetAttributeName value:baselineOffset range:range];
+    [self yy_setAttribute:(NSString *)kCTBaselineOffsetAttributeName value:baselineOffset range:range];
 }
 
 - (void)yy_setVerticalGlyphForm:(BOOL)verticalGlyphForm range:(NSRange)range {
