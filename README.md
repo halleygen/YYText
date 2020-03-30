@@ -1,11 +1,8 @@
 YYText
 ==============
-[![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/ibireme/YYText/master/LICENSE)&nbsp;
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)&nbsp;
-[![CocoaPods](http://img.shields.io/cocoapods/v/YYText.svg?style=flat)](http://cocoapods.org/pods/YYText)&nbsp;
-[![CocoaPods](http://img.shields.io/cocoapods/p/YYText.svg?style=flat)](http://cocoadocs.org/docsets/YYText)&nbsp;
-[![Support](https://img.shields.io/badge/support-iOS%206%2B%20-blue.svg?style=flat)](https://www.apple.com/nl/ios/)&nbsp;
-[![Build Status](https://travis-ci.org/ibireme/YYText.svg?branch=master)](https://travis-ci.org/ibireme/YYText)
+[![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/halleygen/YYText/master/LICENSE)&nbsp;
+![SPM](https://img.shields.io/badge/Swift%20Package%20Manager-Compatible-brightgreen)&nbsp;
+[![Support](https://img.shields.io/badge/Supports-iOS%2013-blue?style=flat)](https://www.apple.com/ios/)&nbsp;
 
 Powerful text framework for iOS to display and edit rich text.<br/>
 (It's a component of [YYKit](https://github.com/ibireme/YYKit))
@@ -110,7 +107,7 @@ Text Attributes
   </tbody>
 </table>
 
-### CoreText attributes which is supported by YYText
+### CoreText attributes which are supported by YYText
 <table>
   <thead>
     <tr>
@@ -489,23 +486,23 @@ debugOptions.CGGlyphBorderColor = [UIColor colorWithRed:1.000 green:0.524 blue:0
 Installation
 ==============
 
-### CocoaPods
+### Swift Package Manager
 
-1. Add `pod 'YYText'` to your Podfile.
-2. Run `pod install` or `pod update`.
-3. Import \<YYText/YYText.h\>.
+To use the YYText library in a SwiftPM project, add the following line to the dependencies in your `Package.swift` file:
 
+```swift
+.package(url: "https://github.com/halleygen/YYText", from: "1.1.0"),
+```
 
-### Carthage
+Finally, include "ArgumentParser" as a dependency for your executable target:
 
-1. Add `github "ibireme/YYText"` to your Cartfile.
-2. Run `carthage update --platform ios` and add the framework to your project.
-3. Import \<YYText/YYText.h\>.
-
+```swift
+.product(name: "YYText", package: "YYText"),
+```
 
 ### Manually
 
-1. Download all the files in the `YYText` subdirectory.
+1. Download all the files in the `Sources` subdirectory.
 2. Add the source files to your Xcode project.
 3. Link with required frameworks:
     * UIKit
@@ -513,12 +510,8 @@ Installation
     * CoreText
     * QuartzCore
     * Accelerate
-    * MobileCoreServices
+    * CoreServices
 4. Import `YYText.h`.
-
-
-### Notice
-You may add [YYImage](https://github.com/ibireme/YYImage) or [YYWebImage](https://github.com/ibireme/YYWebImage) to your project if you want to support animated image (GIF/APNG/WebP).
 
 
 Documentation
