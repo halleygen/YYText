@@ -295,7 +295,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  Key:   Same as CoreText/YYText Attribute Name.
  Value: Modify attribute value when highlight (NSNull for remove attribute).
  */
-@property (nullable, nonatomic, copy) NSDictionary<NSString *, id> *attributes;
+@property (nullable, nonatomic, copy) NSDictionary<NSAttributedStringKey, id> *attributes;
 
 /**
  Creates a highlight object with specified attributes.
