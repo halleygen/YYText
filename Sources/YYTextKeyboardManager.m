@@ -177,7 +177,7 @@ static int _YYTextKeyboardViewFrameObserverKey;
     for (window in app.windows) {
         if ([self _getKeyboardViewFromWindow:window]) return window;
     }
-    window = app.keyWindow;
+    window = [self _getKeyWindowOf:app];
     if ([self _getKeyboardViewFromWindow:window]) return window;
     
     NSMutableArray *kbWindows = nil;
@@ -209,7 +209,7 @@ static int _YYTextKeyboardViewFrameObserverKey;
         view = [self _getKeyboardViewFromWindow:window];
         if (view) return view;
     }
-    window = app.keyWindow;
+    window = [self _getKeyWindowOf:app];
     view = [self _getKeyboardViewFromWindow:window];
     if (view) return view;
     return nil;
@@ -368,7 +368,7 @@ static int _YYTextKeyboardViewFrameObserverKey;
     UIView *keyboard = self.keyboardView;
     UIWindow *window = keyboard.window;
     if (!window) {
-        window = app.keyWindow;
+        window = [self _getKeyWindowOf:app];
     }
     if (!window) {
         window = app.windows.firstObject;
@@ -425,7 +425,7 @@ static int _YYTextKeyboardViewFrameObserverKey;
     if (CGRectIsNull(rect)) return rect;
     if (CGRectIsInfinite(rect)) return rect;
     
-    UIWindow *mainWindow = app.keyWindow;
+    UIWindow *mainWindow = [self _getKeyWindowOf:app];
     if (!mainWindow) mainWindow = app.windows.firstObject;
     if (!mainWindow) { // no window ?!
         if (view) {
@@ -448,6 +448,15 @@ static int _YYTextKeyboardViewFrameObserverKey;
     rect = [toWindow convertRect:rect fromWindow:mainWindow];
     rect = [view convertRect:rect fromView:toWindow];
     return rect;
+}
+
+- (UIWindow * _Nullable)_getKeyWindowOf:(UIApplication *)app {
+    for (UIScene *scene in app.connectedScenes) {
+        if ([scene class] == [UIWindowScene class] && scene.activationState == UISceneActivationStateForegroundActive) {
+            return [[(UIWindowScene *)scene windows] firstObject];
+        }
+    }
+    return nil;
 }
 
 @end

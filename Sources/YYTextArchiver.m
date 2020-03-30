@@ -149,29 +149,14 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 @implementation YYTextArchiver
 
-+ (NSData *)archivedDataWithRootObject:(id)rootObject {
-    if (!rootObject) return nil;
-    NSMutableData *data = [NSMutableData data];
-    YYTextArchiver *archiver = [[[self class] alloc] initForWritingWithMutableData:data];
-    [archiver encodeRootObject:rootObject];
-    [archiver finishEncoding];
-    return data;
++ (NSData *)archivedDataWithRootObject:(id)object requiringSecureCoding:(BOOL)requiresSecureCoding error:(NSError *__autoreleasing  _Nullable *)error {
+    YYTextArchiver *archiver = [[[self class] alloc] initRequiringSecureCoding:YES];
+    [archiver encodeRootObject:object];
+    return [archiver encodedData];
 }
 
-+ (BOOL)archiveRootObject:(id)rootObject toFile:(NSString *)path {
-    NSData *data = [self archivedDataWithRootObject:rootObject];
-    if (!data) return NO;
-    return [data writeToFile:path atomically:YES];
-}
-
-- (instancetype)init {
-    self = [super init];
-    self.delegate = self;
-    return self;
-}
-
-- (instancetype)initForWritingWithMutableData:(NSMutableData *)data {
-    self = [super initForWritingWithMutableData:data];
+- (instancetype)initRequiringSecureCoding:(BOOL)requiresSecureCoding {
+    self = [super initRequiringSecureCoding:requiresSecureCoding];
     self.delegate = self;
     return self;
 }
@@ -199,15 +184,10 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 @implementation YYTextUnarchiver
 
-+ (id)unarchiveObjectWithData:(NSData *)data {
++ (id)unarchivedObjectOfClass:(Class)cls fromData:(NSData *)data error:(NSError *__autoreleasing  _Nullable *)error {
     if (data.length == 0) return nil;
-    YYTextUnarchiver *unarchiver = [[self alloc] initForReadingWithData:data];
+    YYTextUnarchiver *unarchiver = [[self alloc] initForReadingFromData:data error:error];
     return [unarchiver decodeObject];
-}
-
-+ (id)unarchiveObjectWithFile:(NSString *)path {
-    NSData *data = [NSData dataWithContentsOfFile:path];
-    return [self unarchiveObjectWithData:data];
 }
 
 - (instancetype)initForReadingFromData:(NSData *)data error:(NSError * _Nullable *)error {

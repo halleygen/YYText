@@ -73,10 +73,19 @@
     if (!app) return;
     
     UIWindow *top = app.windows.lastObject;
-    UIWindow *key = app.keyWindow;
+    UIWindow *key = [self _getKeyWindowOf:app];
     if (key && key.windowLevel > top.windowLevel) top = key;
     if (top == self) return;
     self.windowLevel = top.windowLevel + 1;
+}
+
+- (UIWindow * _Nullable)_getKeyWindowOf:(UIApplication *)app {
+    for (UIScene *scene in app.connectedScenes) {
+        if ([scene class] == [UIWindowScene class] && scene.activationState == UISceneActivationStateForegroundActive) {
+            return [[(UIWindowScene *)scene windows] firstObject];
+        }
+    }
+    return nil;
 }
 
 - (YYTextDirection)_keyboardDirection {
@@ -268,8 +277,8 @@
     CGContextRotateCTM(context, -rotation);
     CGContextTranslateCTM(context, tp.x - captureCenter.x, tp.y - captureCenter.y);
     
-    NSMutableArray *windows = app.windows.mutableCopy;
-    UIWindow *keyWindow = app.keyWindow;
+    NSMutableArray<UIWindow *> *windows = app.windows.mutableCopy;
+    UIWindow *keyWindow = [self _getKeyWindowOf:app];
     if (![windows containsObject:keyWindow]) [windows addObject:keyWindow];
     [windows sortUsingComparator:^NSComparisonResult(UIWindow *w1, UIWindow *w2) {
         if (w1.windowLevel < w2.windowLevel) return NSOrderedAscending;
