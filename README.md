@@ -486,16 +486,6 @@ debugOptions.CGGlyphBorderColor = [UIColor colorWithRed:1.000 green:0.524 blue:0
 [YYTextDebugOption setSharedDebugOption:debugOptions];
 ```
 
-### More examples
-See `Demo/YYTextDemo.xcodeproj` for more examples:
-
-<img src="https://raw.github.com/ibireme/YYText/master/Demo/DemoSnapshot/text_path.gif" width="320">
-<img src="https://raw.github.com/ibireme/YYText/master/Demo/DemoSnapshot/text_markdown.gif" width="320">
-<br/> <br/>
-<img src="https://raw.github.com/ibireme/YYText/master/Demo/DemoSnapshot/text_vertical.gif" width="320">
-<img src="https://raw.github.com/ibireme/YYText/master/Demo/DemoSnapshot/text_paste.gif" width="320">
-
-
 Installation
 ==============
 
