@@ -15,7 +15,6 @@
 		35B2EDCA24322F6800E2503A /* YYTextEffectWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 35B2ED9824322F6800E2503A /* YYTextEffectWindow.m */; };
 		35B2EDCB24322F6800E2503A /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 35B2ED9924322F6800E2503A /* YYTextView.m */; };
 		35B2EDCC24322F6800E2503A /* NSParagraphStyle+YYText.m in Sources */ = {isa = PBXBuildFile; fileRef = 35B2ED9A24322F6800E2503A /* NSParagraphStyle+YYText.m */; };
-		35B2EDCD24322F6800E2503A /* YYTextParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 35B2ED9B24322F6800E2503A /* YYTextParser.m */; };
 		35B2EDCE24322F6800E2503A /* YYTextSelectionView.h in Headers */ = {isa = PBXBuildFile; fileRef = 35B2ED9D24322F6800E2503A /* YYTextSelectionView.h */; };
 		35B2EDCF24322F6800E2503A /* YYTextLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 35B2ED9E24322F6800E2503A /* YYTextLine.h */; };
 		35B2EDD024322F6800E2503A /* YYTextLayout.h in Headers */ = {isa = PBXBuildFile; fileRef = 35B2ED9F24322F6800E2503A /* YYTextLayout.h */; };
@@ -73,7 +72,6 @@
 		35B2ED9824322F6800E2503A /* YYTextEffectWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextEffectWindow.m; sourceTree = "<group>"; };
 		35B2ED9924322F6800E2503A /* YYTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextView.m; sourceTree = "<group>"; };
 		35B2ED9A24322F6800E2503A /* NSParagraphStyle+YYText.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSParagraphStyle+YYText.m"; sourceTree = "<group>"; };
-		35B2ED9B24322F6800E2503A /* YYTextParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextParser.m; sourceTree = "<group>"; };
 		35B2ED9D24322F6800E2503A /* YYTextSelectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextSelectionView.h; sourceTree = "<group>"; };
 		35B2ED9E24322F6800E2503A /* YYTextLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextLine.h; sourceTree = "<group>"; };
 		35B2ED9F24322F6800E2503A /* YYTextLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextLayout.h; sourceTree = "<group>"; };
@@ -152,7 +150,6 @@
 				35B2ED9824322F6800E2503A /* YYTextEffectWindow.m */,
 				35B2ED9924322F6800E2503A /* YYTextView.m */,
 				35B2ED9A24322F6800E2503A /* NSParagraphStyle+YYText.m */,
-				35B2ED9B24322F6800E2503A /* YYTextParser.m */,
 				35B2EDB624322F6800E2503A /* NSAttributedString+YYText.m */,
 				35B2EDB724322F6800E2503A /* UIPasteboard+YYText.m */,
 				35B2EDB824322F6800E2503A /* YYTextInput.m */,
@@ -358,7 +355,6 @@
 				35B2EDE824322F6800E2503A /* UIPasteboard+YYText.m in Sources */,
 				35B2EDC824322F6800E2503A /* YYTextContainerView.m in Sources */,
 				35B2EDF224322F6800E2503A /* YYTextAsyncLayer.m in Sources */,
-				35B2EDCD24322F6800E2503A /* YYTextParser.m in Sources */,
 				35B2EDF524322F6800E2503A /* YYTextRubyAnnotation.m in Sources */,
 				35B2EDC724322F6800E2503A /* YYTextRunDelegate.m in Sources */,
 				35B2EDC924322F6800E2503A /* YYTextUtilities.m in Sources */,

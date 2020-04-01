@@ -853,7 +853,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since UIKit:7.0
  */
 @property (nullable, nonatomic, strong, readwrite) UIColor *yy_strikethroughColor;
-- (void)yy_setStrikethroughColor:(nullable UIColor *)strikethroughColor range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setStrikethroughColor:(nullable UIColor *)strikethroughColor range:(NSRange)range;
 
 /**
  The underline style.
@@ -903,7 +903,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since UIKit:7.0
  */
 @property (nullable, nonatomic, strong, readwrite) NSString *yy_textEffect;
-- (void)yy_setTextEffect:(nullable NSString *)textEffect range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setTextEffect:(nullable NSString *)textEffect range:(NSRange)range;
 
 /**
  The skew to be applied to glyphs. 
@@ -914,7 +914,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since UIKit:7.0
  */
 @property (nullable, nonatomic, strong, readwrite) NSNumber *yy_obliqueness;
-- (void)yy_setObliqueness:(nullable NSNumber *)obliqueness range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setObliqueness:(nullable NSNumber *)obliqueness range:(NSRange)range;
 
 /**
  The log of the expansion factor to be applied to glyphs.
@@ -925,7 +925,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since UIKit:7.0
  */
 @property (nullable, nonatomic, strong, readwrite) NSNumber *yy_expansion;
-- (void)yy_setExpansion:(nullable NSNumber *)expansion range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setExpansion:(nullable NSNumber *)expansion range:(NSRange)range;
 
 /**
  The character's offset from the baseline, in points. 
@@ -936,7 +936,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since UIKit:7.0
  */
 @property (nullable, nonatomic, strong, readwrite) NSNumber *yy_baselineOffset;
-- (void)yy_setBaselineOffset:(nullable NSNumber *)baselineOffset range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setBaselineOffset:(nullable NSNumber *)baselineOffset range:(NSRange)range;
 
 /**
  Glyph orientation control.
@@ -961,7 +961,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since CoreText:7.0  YYText:7.0
  */
 @property (nullable, nonatomic, strong, readwrite) NSString *yy_language;
-- (void)yy_setLanguage:(nullable NSString *)language range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setLanguage:(nullable NSString *)language range:(NSRange)range;
 
 /**
  Specifies a bidirectional override or embedding.
@@ -1185,7 +1185,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since CoreText:7.0  UIKit:7.0  YYText:7.0
  */
 @property (nonatomic, readwrite) CGFloat yy_defaultTabInterval;
-- (void)yy_setDefaultTabInterval:(CGFloat)defaultTabInterval range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setDefaultTabInterval:(CGFloat)defaultTabInterval range:(NSRange)range;
 
 /**
  An array of NSTextTab objects representing the receiver's tab stops.
@@ -1199,7 +1199,7 @@ NS_ASSUME_NONNULL_BEGIN
  @since CoreText:7.0  UIKit:7.0  YYText:7.0
  */
 @property (nullable, nonatomic, copy, readwrite) NSArray<NSTextTab *> *yy_tabStops;
-- (void)yy_setTabStops:(nullable NSArray<NSTextTab *> *)tabStops range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setTabStops:(nullable NSArray<NSTextTab *> *)tabStops range:(NSRange)range;
 
 #pragma mark - Set YYText attribute as property
 ///=============================================================================
@@ -1296,15 +1296,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)yy_setBaselineClass:(nullable CFStringRef)baselineClass range:(NSRange)range;
 - (void)yy_setBaselineInfo:(nullable CFDictionaryRef)baselineInfo range:(NSRange)range;
 - (void)yy_setBaselineReferenceInfo:(nullable CFDictionaryRef)referenceInfo range:(NSRange)range;
-- (void)yy_setRubyAnnotation:(nullable CTRubyAnnotationRef)ruby range:(NSRange)range NS_AVAILABLE_IOS(8_0);
-- (void)yy_setAttachment:(nullable NSTextAttachment *)attachment range:(NSRange)range NS_AVAILABLE_IOS(7_0);
-- (void)yy_setLink:(nullable id)link range:(NSRange)range NS_AVAILABLE_IOS(7_0);
+- (void)yy_setRubyAnnotation:(nullable CTRubyAnnotationRef)ruby range:(NSRange)range;
+- (void)yy_setAttachment:(nullable NSTextAttachment *)attachment range:(NSRange)range;
+- (void)yy_setLink:(nullable id)link range:(NSRange)range;
 - (void)yy_setTextBackedString:(nullable YYTextBackedString *)textBackedString range:(NSRange)range;
 - (void)yy_setTextBinding:(nullable YYTextBinding *)textBinding range:(NSRange)range;
 - (void)yy_setTextAttachment:(nullable YYTextAttachment *)textAttachment range:(NSRange)range;
 - (void)yy_setTextHighlight:(nullable YYTextHighlight *)textHighlight range:(NSRange)range;
 - (void)yy_setTextBlockBorder:(nullable YYTextBorder *)textBlockBorder range:(NSRange)range;
-- (void)yy_setTextRubyAnnotation:(nullable YYTextRubyAnnotation *)ruby range:(NSRange)range NS_AVAILABLE_IOS(8_0);
+- (void)yy_setTextRubyAnnotation:(nullable YYTextRubyAnnotation *)ruby range:(NSRange)range;
 
 
 #pragma mark - Convenience methods for text highlight
@@ -1378,21 +1378,6 @@ NS_ASSUME_NONNULL_BEGIN
  @param string  The string to append to the receiver, must not be nil.
  */
 - (void)yy_appendString:(NSString *)string;
-
-/**
- Set foreground color with [UIColor clearColor] in joined-emoji range.
- Emoji drawing will not be affected by the foreground color.
- 
- @discussion In iOS 8.3, Apple releases some new diversified emojis. 
- There's some single emoji which can be assembled to a new 'joined-emoji'.
- The joiner is unicode character 'ZERO WIDTH JOINER' (U+200D).
- For example: 👨👩👧👧 -> 👨‍👩‍👧‍👧.
- 
- When there are more than 5 'joined-emoji' in a same CTLine, CoreText may render some
- extra glyphs above the emoji. It's a bug in CoreText, try this method to avoid.
- This bug is fixed in iOS 9.
- */
-- (void)yy_setClearColorToJoinedEmoji;
 
 /**
  Removes all discontinuous attributes in a specified range.

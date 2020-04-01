@@ -59,7 +59,6 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 }
 - (_Atomic(int))increase {
     return atomic_fetch_add_explicit(&_value, 1, memory_order_relaxed);
-//    return OSAtomicIncrement32(&_value);
 }
 @end
 

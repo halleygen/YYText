@@ -37,23 +37,6 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     return one;
 }
 
-/**
- Sometimes CoreText may convert CGColor to UIColor for `kCTForegroundColorAttributeName`
- attribute in iOS7. This should be a bug of CoreText, and may cause crash. Here's a workaround.
- */
-static CGColorRef YYTextGetCGColor(CGColorRef color) {
-    static UIColor *defaultColor;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        defaultColor = [UIColor labelColor];
-    });
-    if (!color) return defaultColor.CGColor;
-    if ([((__bridge NSObject *)color) respondsToSelector:@selector(CGColor)]) {
-        return ((__bridge UIColor *)color).CGColor;
-    }
-    return color;
-}
-
 @implementation YYTextLinePositionSimpleModifier
 - (void)modifyLines:(NSArray *)lines fromText:(NSAttributedString *)text inContainer:(YYTextContainer *)container {
     if (container.verticalForm) {
@@ -1278,55 +1261,6 @@ fail:
     }
     CFIndex idx = CTLineGetStringIndexForPosition(line.CTLine, point);
     if (idx == kCFNotFound) return NSNotFound;
-    
-    /*
-     If the emoji contains one or more variant form (such as ☔️ "\u2614\uFE0F")
-     and the font size is smaller than 379/15, then each variant form ("\uFE0F")
-     will rendered as a single blank glyph behind the emoji glyph. Maybe it's a
-     bug in CoreText? Seems iOS8.3 fixes this problem.
-     
-     If the point hit the blank glyph, the CTLineGetStringIndexForPosition()
-     returns the position before the emoji glyph, but it should returns the
-     position after the emoji and variant form.
-     
-     Here's a workaround.
-     */
-    CFArrayRef runs = CTLineGetGlyphRuns(line.CTLine);
-    for (NSUInteger r = 0, max = CFArrayGetCount(runs); r < max; r++) {
-        CTRunRef run = CFArrayGetValueAtIndex(runs, r);
-        CFRange range = CTRunGetStringRange(run);
-        if (range.location <= idx && idx < range.location + range.length) {
-            NSUInteger glyphCount = CTRunGetGlyphCount(run);
-            if (glyphCount == 0) break;
-            CFDictionaryRef attrs = CTRunGetAttributes(run);
-            CTFontRef font = CFDictionaryGetValue(attrs, kCTFontAttributeName);
-            if (!YYTextCTFontContainsColorBitmapGlyphs(font)) break;
-            
-            CFIndex indices[glyphCount];
-            CGPoint positions[glyphCount];
-            CTRunGetStringIndices(run, CFRangeMake(0, glyphCount), indices);
-            CTRunGetPositions(run, CFRangeMake(0, glyphCount), positions);
-            for (NSUInteger g = 0; g < glyphCount; g++) {
-                NSUInteger gIdx = indices[g];
-                if (gIdx == idx && g + 1 < glyphCount) {
-                    CGFloat right = positions[g + 1].x;
-                    if (point.x < right) break;
-                    NSUInteger next = indices[g + 1];
-                    do {
-                        if (next == range.location + range.length) break;
-                        unichar c = [_text.string characterAtIndex:next];
-                        if ((c == 0xFE0E || c == 0xFE0F)) { // unicode variant form for emoji style
-                            next++;
-                        } else break;
-                    }
-                    while (1);
-                    if (next != indices[g + 1]) idx = next;
-                    break;
-                }
-            }
-            break;
-        }
-    }
     return idx;
 }
 
@@ -2227,7 +2161,7 @@ static void YYTextDrawRun(YYTextLine *line, CTRunRef run, CGContextRef context, 
         CTRunGetPositions(run, CFRangeMake(0, 0), glyphPositions);
         
         CGColorRef fillColor = (CGColorRef)CFDictionaryGetValue(runAttrs, kCTForegroundColorAttributeName);
-        fillColor = YYTextGetCGColor(fillColor);
+        fillColor = fillColor ?: [[UIColor labelColor] CGColor];
         NSNumber *strokeWidth = CFDictionaryGetValue(runAttrs, kCTStrokeWidthAttributeName);
         
         CGContextSaveGState(context); {
@@ -2880,7 +2814,7 @@ static void YYTextDrawDecoration(YYTextLayout *layout, CGContextRef context, CGS
                 CGColorRef color = underline.color.CGColor;
                 if (!color) {
                     color = (__bridge CGColorRef)(attrs[(id)kCTForegroundColorAttributeName]);
-                    color = YYTextGetCGColor(color);
+                    color = color ?: [[UIColor labelColor] CGColor];
                 }
                 CGFloat thickness = (underline.width != nil) ? underline.width.floatValue : lineThickness;
                 YYTextShadow *shadow = underline.shadow;
@@ -2909,7 +2843,7 @@ static void YYTextDrawDecoration(YYTextLayout *layout, CGContextRef context, CGS
                 CGColorRef color = strikethrough.color.CGColor;
                 if (!color) {
                     color = (__bridge CGColorRef)(attrs[(id)kCTForegroundColorAttributeName]);
-                    color = YYTextGetCGColor(color);
+                    color = color ?: [[UIColor labelColor] CGColor];
                 }
                 CGFloat thickness = (strikethrough.width != nil) ? strikethrough.width.floatValue : lineThickness;
                 YYTextShadow *shadow = underline.shadow;

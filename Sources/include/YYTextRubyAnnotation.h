@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return A ruby object, or nil when an error occurs.
  */
-+ (instancetype)rubyWithCTRubyRef:(CTRubyAnnotationRef)ctRuby NS_AVAILABLE_IOS(8_0);
++ (instancetype)rubyWithCTRubyRef:(CTRubyAnnotationRef)ctRuby;
 
 /**
  Create a CTRuby object from the instance.
@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A new CTRuby object, or NULL when an error occurs.
  The returned value should be release after used.
  */
-- (nullable CTRubyAnnotationRef)CTRubyAnnotation CF_RETURNS_RETAINED NS_AVAILABLE_IOS(8_0);
+- (nullable CTRubyAnnotationRef)CTRubyAnnotation CF_RETURNS_RETAINED;
 
 @end
 
