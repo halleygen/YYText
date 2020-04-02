@@ -1083,7 +1083,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 /// Try to get the highlight property. If exist, the range will be returnd by the range pointer.
 /// If the delegate ignore the highlight, returns nil.
 - (YYTextHighlight *)_getHighlightAtPoint:(CGPoint)point range:(NSRangePointer)range {
-    if (!_highlightable || !_innerLayout.containsHighlight) return nil;
+    if (!_highlightable || !_innerLayout.containsHighlights) return nil;
     point = [self _convertPointToLayout:point];
     YYTextRange *textRange = [_innerLayout textRangeAtPoint:point];
     textRange = [self _correctedTextRange:textRange];

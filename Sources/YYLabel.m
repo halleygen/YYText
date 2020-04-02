@@ -65,12 +65,20 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 #pragma mark - Context Menu Additions
 
-- (nullable UITargetedPreview *)targetedPreviewForHighlightAt:(NSRange)range {
-    if (!self._innerLayout.containsHighlight) { return nil; }
-    YYTextRange *textRange = [YYTextRange rangeWithRange:range affinity:YYTextAffinityForward];
-    UIPreviewParameters *previewParams = [self->_innerLayout previewParametersForRange:textRange];
-    previewParams.backgroundColor = [UIColor clearColor];
-    return [[UITargetedPreview alloc] initWithView:self parameters:previewParams];
+- (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range {
+    YYTextRange *yyRange = [YYTextRange rangeWithRange:range];
+    
+    UIPreviewParameters *previewParams = [self._innerLayout previewParametersForTextIn:yyRange];
+    previewParams.backgroundColor = self.backgroundColor;
+    if (!previewParams) { return nil; }
+
+    CGRect rect = [self._innerLayout rectForRange:yyRange];
+    CGPoint center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
+    UIPreviewTarget *target = [[UIPreviewTarget alloc] initWithContainer:self center:center];
+
+    UIView *snapshot = [self resizableSnapshotViewFromRect:rect afterScreenUpdates:YES withCapInsets:UIEdgeInsetsZero];
+    
+    return [[UITargetedPreview alloc] initWithView:snapshot parameters:previewParams target:target];
 }
 
 - (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range {
@@ -189,7 +197,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (YYTextHighlight *)_getHighlightAtPoint:(CGPoint)point range:(NSRangePointer)range {
-    if (!self._innerLayout.containsHighlight) return nil;
+    if (!self._innerLayout.containsHighlights) return nil;
     point = [self _convertPointToLayout:point];
     YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
     if (!textRange) return nil;

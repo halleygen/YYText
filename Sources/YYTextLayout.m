@@ -310,7 +310,7 @@ dispatch_semaphore_signal(_lock);
 @property (nonatomic, readwrite) CGRect textBoundingRect;
 @property (nonatomic, readwrite) CGSize textBoundingSize;
 
-@property (nonatomic, readwrite) BOOL containsHighlight;
+@property (nonatomic, readwrite) BOOL containsHighlights;
 @property (nonatomic, readwrite) BOOL needDrawBlockBorder;
 @property (nonatomic, readwrite) BOOL needDrawBackgroundBorder;
 @property (nonatomic, readwrite) BOOL needDrawShadow;
@@ -770,7 +770,7 @@ dispatch_semaphore_signal(_lock);
         layout.needDrawText = YES;
         
         void (^block)(NSDictionary *attrs, NSRange range, BOOL *stop) = ^(NSDictionary *attrs, NSRange range, BOOL *stop) {
-            if (attrs[YYTextHighlightAttributeName]) layout.containsHighlight = YES;
+            if (attrs[YYTextHighlightAttributeName]) layout.containsHighlights = YES;
             if (attrs[YYTextBlockBorderAttributeName]) layout.needDrawBlockBorder = YES;
             if (attrs[YYTextBackgroundBorderAttributeName]) layout.needDrawBackgroundBorder = YES;
             if (attrs[YYTextShadowAttributeName] || attrs[NSShadowAttributeName]) layout.needDrawShadow = YES;
@@ -907,12 +907,11 @@ fail:
 
 #pragma mark - Preview Parameters
 
-- (nullable UIPreviewParameters *)previewParametersForRange:(nonnull YYTextRange *)range {
+- (nullable UIPreviewParameters *)previewParametersForTextIn:(nonnull YYTextRange *)range {
     NSArray<YYTextSelectionRect *> *rects = [self selectionRectsForRange:range];
-    if (!rects || !rects.count) { return nil; }
+    if (rects.count == 0) { return nil; }
     
     NSMutableArray<NSValue *> *values = [[NSMutableArray alloc] initWithCapacity:rects.count];
-    
     for (YYTextSelectionRect *rect in rects) {
         NSValue *value = [NSValue valueWithCGRect:rect.rect];
         [values addObject:value];
@@ -1900,7 +1899,7 @@ fail:
     return rectUnion;
 }
 
-- (NSArray *)selectionRectsForRange:(YYTextRange *)range {
+- (nonnull NSArray<YYTextSelectionRect *> *)selectionRectsForRange:(YYTextRange *)range {
     range = [self _correctedRangeWithEdge:range];
     
     BOOL isVertical = _container.verticalForm;

@@ -152,7 +152,7 @@ extern const CGSize YYTextContainerMaxSize;
 
 #pragma mark - Context menu preview parameters
 
-- (nullable UIPreviewParameters *)previewParametersForRange:(nonnull YYTextRange *)range;
+- (nullable UIPreviewParameters *)previewParametersForTextIn:(nonnull YYTextRange *)range;
 
 #pragma mark - Generate text layout
 ///=============================================================================
@@ -253,7 +253,7 @@ extern const CGSize YYTextContainerMaxSize;
 ///< Bounding size (glyphs and insets, ceil to pixel)
 @property (nonatomic, readonly) CGSize textBoundingSize;
 ///< Has highlight attribute
-@property (nonatomic, readonly) BOOL containsHighlight;
+@property (nonatomic, readonly) BOOL containsHighlights;
 ///< Has block border attribute
 @property (nonatomic, readonly) BOOL needDrawBlockBorder;
 ///< Has background border attribute
