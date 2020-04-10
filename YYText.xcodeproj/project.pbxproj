@@ -295,6 +295,7 @@
 		D918BFCD1F372E3000106E14 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1140;
 				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = ibireme;
 				TargetAttributes = {

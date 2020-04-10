@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface YYTextEffectWindow : UIWindow
 
 /// Returns the shared instance (returns nil in App Extension).
-+ (nullable instancetype)sharedWindow;
+@property (nullable, class, nonatomic, readonly) YYTextEffectWindow *sharedWindow;
 
 /// Show the magnifier in this window with a 'popup' animation. @param mag A magnifier.
 - (void)showMagnifier:(YYTextMagnifier *)mag;

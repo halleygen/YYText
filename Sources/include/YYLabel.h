@@ -208,7 +208,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Getting the highlight at a point
 
-- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range __attribute__((objc_direct));
+- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range;
 
 #pragma mark - Interacting with Text Data
 ///=============================================================================

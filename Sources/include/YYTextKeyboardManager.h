@@ -51,7 +51,7 @@ typedef struct {
 + (instancetype)new UNAVAILABLE_ATTRIBUTE;
 
 /// Get the default manager (returns nil in App Extension).
-+ (nullable instancetype)defaultManager;
+@property (nullable, class, nonatomic, readonly) YYTextKeyboardManager *defaultManager;
 
 /// Get the keyboard window. nil if there's no keyboard window.
 @property (nullable, nonatomic, readonly) UIWindow *keyboardWindow;
