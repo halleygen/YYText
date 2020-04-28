@@ -69,10 +69,11 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     YYTextRange *yyRange = [YYTextRange rangeWithRange:range];
     
     UIPreviewParameters *previewParams = [self._innerLayout previewParametersForTextIn:yyRange];
-    previewParams.backgroundColor = self.backgroundColor ?: self.superview.backgroundColor ?: UIColor.clearColor;
+    previewParams.backgroundColor = self.superview.backgroundColor ?: self.backgroundColor;
     if (!previewParams) { return nil; }
 
-    CGRect rect = [self._innerLayout rectForRange:yyRange];
+    CGRect unconvertedRect = [self._innerLayout rectForRange:yyRange];
+    CGRect rect = [self _convertRectFromLayout:unconvertedRect];
     CGPoint center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
     UIPreviewTarget *target = [[UIPreviewTarget alloc] initWithContainer:self center:center];
 
