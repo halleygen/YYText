@@ -69,7 +69,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     YYTextRange *yyRange = [YYTextRange rangeWithRange:range];
     
     UIPreviewParameters *previewParams = [self._innerLayout previewParametersForTextIn:yyRange];
-    previewParams.backgroundColor = self.superview.backgroundColor ?: self.backgroundColor;
+    previewParams.backgroundColor = self.targetedPreviewBackgroundColor ?: self.backgroundColor;
     if (!previewParams) { return nil; }
 
     CGRect unconvertedRect = [self._innerLayout rectForRange:yyRange];

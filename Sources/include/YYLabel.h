@@ -204,6 +204,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Context Menu Additions
 
+@property (nullable, nonatomic, strong) UIColor *targetedPreviewBackgroundColor;
+
 - (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range;
 
 #pragma mark - Getting the highlight at a point
