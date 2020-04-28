@@ -146,7 +146,7 @@ CGAffineTransform YYTextCGAffineTransformGetFromViews(UIView *from, UIView *to) 
     return YYTextCGAffineTransformGetFromPoints(before, after);
 }
 
-UIViewContentMode YYTextCAGravityToUIViewContentMode(NSString *gravity) {
+UIViewContentMode YYTextCAGravityToUIViewContentMode(CALayerContentsGravity gravity) {
     static NSDictionary *dic;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -167,7 +167,7 @@ UIViewContentMode YYTextCAGravityToUIViewContentMode(NSString *gravity) {
     return (UIViewContentMode)((NSNumber *)dic[gravity]).integerValue;
 }
 
-NSString *YYTextUIViewContentModeToCAGravity(UIViewContentMode contentMode) {
+CALayerContentsGravity YYTextUIViewContentModeToCAGravity(UIViewContentMode contentMode) {
     switch (contentMode) {
         case UIViewContentModeScaleToFill: return kCAGravityResize;
         case UIViewContentModeScaleAspectFit: return kCAGravityResizeAspect;
