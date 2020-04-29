@@ -311,7 +311,7 @@ NS_ASSUME_NONNULL_BEGIN
     label.displaysAsynchronously = YES;
     label.ignoreCommonProperties = YES;
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
  
         // Create attributed string.
         NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:@"Some Text"];

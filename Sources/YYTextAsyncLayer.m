@@ -15,30 +15,21 @@
 
 /// Global display queue, used for content rendering.
 static dispatch_queue_t YYTextAsyncLayerGetDisplayQueue() {
-#define MAX_QUEUE_COUNT 16
-    static int queueCount;
-    static dispatch_queue_t queues[MAX_QUEUE_COUNT];
+    static dispatch_queue_t queue;
+
     static dispatch_once_t onceToken;
-    static _Atomic(int) counter = 0;
     dispatch_once(&onceToken, ^{
-        queueCount = (int)[NSProcessInfo processInfo].activeProcessorCount;
-        queueCount = queueCount < 1 ? 1 : queueCount > MAX_QUEUE_COUNT ? MAX_QUEUE_COUNT : queueCount;
-        for (NSUInteger i = 0; i < queueCount; i++) {
-            dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
-            queues[i] = dispatch_queue_create("com.ibireme.text.render", attr);
-        }
-        
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+        queue = dispatch_queue_create("com.ibireme.async-text-render", attr);
     });
-    _Atomic(int) cur = atomic_fetch_add_explicit(&counter, 1, memory_order_relaxed);
-    return queues[(cur) % queueCount];
-#undef MAX_QUEUE_COUNT
+    return queue;
 }
 
 static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 #ifdef YYDispatchQueuePool_h
     return YYDispatchQueueGetForQOS(NSQualityOfServiceDefault);
 #else
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
 #endif
 }
 
@@ -66,10 +57,6 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 @implementation YYTextAsyncLayerDisplayTask
 @end
 
-
-@interface YYTextAsyncLayer ()
-@property(nullable, nonatomic, strong) UIGraphicsImageRenderer *imageRenderer;
-@end
 
 @implementation YYTextAsyncLayer {
     _YYTextSentinel *_sentinel;
@@ -100,11 +87,6 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 
 - (void)dealloc {
     [_sentinel increase];
-}
-
-- (void)layoutSublayers {
-    [super layoutSublayers];
-    self.imageRenderer = nil;
 }
 
 - (void)setNeedsDisplay {
@@ -158,38 +140,39 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
                 CGColorRelease(backgroundColor);
                 return;
             }
-            
-            if (!self.imageRenderer) {
-                UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat new];
-                format.scale = scale;
-                format.opaque = opaque;
-                self.imageRenderer = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
-            }
-            
-            UIImage *image = [self.imageRenderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
-                if (opaque) {
-                    CGContextSaveGState(rendererContext.CGContext);
+            UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
+            CGContextRef context = UIGraphicsGetCurrentContext();
+            if (opaque && context) {
+                CGContextSaveGState(context); {
                     if (!backgroundColor || CGColorGetAlpha(backgroundColor) < 1) {
-                        [UIColor.whiteColor setFill];
-                        [rendererContext fillRect:CGRectMake(0, 0, size.width, size.height)];
+                        CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+                        CGContextAddRect(context, CGRectMake(0, 0, size.width * scale, size.height * scale));
+                        CGContextFillPath(context);
                     }
                     if (backgroundColor) {
-                        CGContextSetFillColorWithColor(rendererContext.CGContext, backgroundColor);
-                        [rendererContext fillRect:CGRectMake(0, 0, size.width, size.height)];
+                        CGContextSetFillColorWithColor(context, backgroundColor);
+                        CGContextAddRect(context, CGRectMake(0, 0, size.width * scale, size.height * scale));
+                        CGContextFillPath(context);
                     }
-                    CGContextRestoreGState(rendererContext.CGContext);
-                    CGColorRelease(backgroundColor);
-                }
-                task.display(rendererContext.CGContext, size, isCancelled);
-            }];
-            
+                } CGContextRestoreGState(context);
+                CGColorRelease(backgroundColor);
+            }
+            task.display(context, size, isCancelled);
+            if (isCancelled()) {
+                UIGraphicsEndImageContext();
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (task.didDisplay) task.didDisplay(self, NO);
+                });
+                return;
+            }
+            UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+            UIGraphicsEndImageContext();
             if (isCancelled()) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (task.didDisplay) task.didDisplay(self, NO);
                 });
                 return;
             }
-
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (isCancelled()) {
                     if (task.didDisplay) task.didDisplay(self, NO);
@@ -202,32 +185,28 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
     } else {
         [_sentinel increase];
         if (task.willDisplay) task.willDisplay(self);
-
-        CGSize size = self.bounds.size;
-
-        if (!self.imageRenderer) {
-            UIGraphicsImageRendererFormat *format = [UIGraphicsImageRendererFormat new];
-            format.scale = self.contentsScale;
-            format.opaque = self.opaque;
-            self.imageRenderer = [[UIGraphicsImageRenderer alloc] initWithSize:size format:format];
-        }
-        
-        UIImage *image = [self.imageRenderer imageWithActions:^(UIGraphicsImageRendererContext * _Nonnull rendererContext) {
-            if (self.opaque) {
-                CGContextSaveGState(rendererContext.CGContext);
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, self.opaque, self.contentsScale);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        if (self.opaque && context) {
+            CGSize size = self.bounds.size;
+            size.width *= self.contentsScale;
+            size.height *= self.contentsScale;
+            CGContextSaveGState(context); {
                 if (!self.backgroundColor || CGColorGetAlpha(self.backgroundColor) < 1) {
-                    [UIColor.whiteColor setFill];
-                    [rendererContext fillRect:CGRectMake(0, 0, size.width, size.height)];
+                    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+                    CGContextAddRect(context, CGRectMake(0, 0, size.width, size.height));
+                    CGContextFillPath(context);
                 }
                 if (self.backgroundColor) {
-                    CGContextSetFillColorWithColor(rendererContext.CGContext, self.backgroundColor);
-                    [rendererContext fillRect:CGRectMake(0, 0, size.width, size.height)];
+                    CGContextSetFillColorWithColor(context, self.backgroundColor);
+                    CGContextAddRect(context, CGRectMake(0, 0, size.width, size.height));
+                    CGContextFillPath(context);
                 }
-                CGContextRestoreGState(rendererContext.CGContext);
-            }
-            task.display(rendererContext.CGContext, size, ^{return NO;});
-        }];
-        
+            } CGContextRestoreGState(context);
+        }
+        task.display(context, self.bounds.size, ^{return NO;});
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
         self.contents = (__bridge id)(image.CGImage);
         if (task.didDisplay) task.didDisplay(self, YES);
     }

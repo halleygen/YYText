@@ -16,7 +16,7 @@
 #import "NSAttributedString+YYText.h"
 
 static dispatch_queue_t YYLabelGetReleaseQueue() {
-    return dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
+    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
 }
 
 
