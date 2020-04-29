@@ -12,26 +12,16 @@
 #import "YYTextAsyncLayer.h"
 #import <stdatomic.h>
 
+static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
+    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
+}
+
+@interface YYTextAsyncLayer ()
 
 /// Global display queue, used for content rendering.
-static dispatch_queue_t YYTextAsyncLayerGetDisplayQueue() {
-    static dispatch_queue_t queue;
+@property (nonnull, class, nonatomic, readonly) dispatch_queue_t displayQueue;
 
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
-        queue = dispatch_queue_create("com.ibireme.async-text-render", attr);
-    });
-    return queue;
-}
-
-static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
-#ifdef YYDispatchQueuePool_h
-    return YYDispatchQueueGetForQOS(NSQualityOfServiceDefault);
-#else
-    return dispatch_get_global_queue(QOS_CLASS_UTILITY, 0);
-#endif
-}
+@end
 
 
 /// a thread safe incrementing counter.
@@ -60,6 +50,18 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 
 @implementation YYTextAsyncLayer {
     _YYTextSentinel *_sentinel;
+}
+
+#pragma mark - Queue
+
++ (nonnull dispatch_queue_t)displayQueue {
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0);
+        queue = dispatch_queue_create("com.ibireme.async-text-render", attr);
+    });
+    return queue;
 }
 
 #pragma mark - Override
@@ -135,7 +137,7 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
             return;
         }
         
-        dispatch_async(YYTextAsyncLayerGetDisplayQueue(), ^{
+        dispatch_async(YYTextAsyncLayer.displayQueue, ^{
             if (isCancelled()) {
                 CGColorRelease(backgroundColor);
                 return;
