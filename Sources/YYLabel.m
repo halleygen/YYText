@@ -1029,10 +1029,9 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (CGSize)intrinsicContentSize {
-    if (_innerLayout) {
-        if (_preferredMaxLayoutWidth == 0 || _preferredMaxLayoutWidth >= _innerLayout.container.size.width) {
-            return [_innerLayout textBoundingSize];
-        }
+    BOOL canUseExistingLayout = _preferredMaxLayoutWidth == 0 || _ignoreCommonProperties;
+    if (_innerLayout && canUseExistingLayout) {
+        return [_innerLayout textBoundingSize];
     }
     
     if (_preferredMaxLayoutWidth == 0) {
