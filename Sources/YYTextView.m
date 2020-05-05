@@ -39,9 +39,9 @@
 #define kDefaultVerticalInset UIEdgeInsetsMake(4, 6, 4, 6)
 
 
-NSString *const YYTextViewTextDidBeginEditingNotification = @"YYTextViewTextDidBeginEditing";
-NSString *const YYTextViewTextDidChangeNotification = @"YYTextViewTextDidChange";
-NSString *const YYTextViewTextDidEndEditingNotification = @"YYTextViewTextDidEndEditing";
+NSNotificationName const YYTextViewTextDidBeginEditingNotification = @"YYTextViewTextDidBeginEditing";
+NSNotificationName const YYTextViewTextDidChangeNotification = @"YYTextViewTextDidChange";
+NSNotificationName const YYTextViewTextDidEndEditingNotification = @"YYTextViewTextDidEndEditing";
 
 
 typedef NS_ENUM (NSUInteger, YYTextGrabberDirection) {
@@ -56,6 +56,23 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     kBottom = 4,
 };
 
+@implementation UIResponder (YYText)
+
+- (nullable UIResponder *)nextResponderOfType:(Class)type {
+    UIResponder *next = self.nextResponder;
+    
+    while (next) {
+        if ([next class] == type) {
+            return next;
+        } else {
+            next = next.nextResponder;
+        }
+    }
+    
+    return nil;
+}
+
+@end
 
 /// An object that captures the state of the text view. Used for undo and redo.
 @interface _YYTextViewUndoObject : NSObject
@@ -1525,22 +1542,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     return detected;
 }
 
-/// Returns the `root` view controller (returns nil if not found).
-- (UIViewController *)_getRootViewController {
-    UIViewController *ctrl = nil;
-    UIApplication *app = YYTextSharedApplication();
-    if (!ctrl) ctrl = app.keyWindow.rootViewController;
-    if (!ctrl) ctrl = [app.windows.firstObject rootViewController];
-    if (!ctrl) ctrl = self.yy_viewController;
-    if (!ctrl) return nil;
-    
-    while (!ctrl.view.window && ctrl.presentedViewController) {
-        ctrl = ctrl.presentedViewController;
-    }
-    if (!ctrl.view.window) return nil;
-    return ctrl;
-}
-
 #pragma mark - Undo Management
 
 - (void)_resetUndoStack {
@@ -2638,7 +2639,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         }
         NSString *selString = NSStringFromSelector(action);
         if ([selString hasSuffix:@"define:"] && [selString hasPrefix:@"_"]) {
-            return [self _getRootViewController] != nil;
+            return [self nextResponderOfType:[UIViewController class]] != nil;
         }
     }
     return NO;
@@ -2796,8 +2797,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     #if !TARGET_OS_MACCATALYST
         UIReferenceLibraryViewController* ref = [[UIReferenceLibraryViewController alloc] initWithTerm:string];
-        ref.view.backgroundColor = [UIColor whiteColor];
-        [[self _getRootViewController] presentViewController:ref animated:YES completion:^{}];
+        ref.view.backgroundColor = [UIColor systemBackgroundColor];
+        UIViewController *viewController = (UIViewController *)[self nextResponderOfType:[UIViewController class]];
+        [viewController presentViewController:ref animated:YES completion:^{}];
     #endif
 }
 

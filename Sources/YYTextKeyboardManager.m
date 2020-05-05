@@ -90,8 +90,7 @@ static int _YYTextKeyboardViewFrameObserverKey;
     
     CGRect _fromFrame;
     BOOL _fromVisible;
-    UIInterfaceOrientation _fromOrientation;
-    
+
     CGRect _notificationFromFrame;
     CGRect _notificationToFrame;
     NSTimeInterval _notificationDuration;
@@ -415,7 +414,6 @@ static int _YYTextKeyboardViewFrameObserverKey;
     _hasObservedChange = NO;
     _fromFrame = trans.toFrame;
     _fromVisible = trans.toVisible;
-    _fromOrientation = app.statusBarOrientation;
 }
 
 - (CGRect)convertRect:(CGRect)rect toView:(UIView *)view {

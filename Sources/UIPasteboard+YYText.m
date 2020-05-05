@@ -80,7 +80,7 @@ NSString *const YYTextUTTypeWEBP = @"com.google.webp";
 }
 
 - (void)setYy_AttributedString:(NSAttributedString *)attributedString {
-    self.string = [attributedString yy_plainTextForRange:NSMakeRange(0, attributedString.length)];
+    self.string = [attributedString yy_plainTextForRange:[attributedString yy_rangeOfAll]];
     NSData *data = [attributedString yy_archiveToData];
     if (data) {
         NSDictionary *item = @{YYTextPasteboardTypeAttributedString : data};

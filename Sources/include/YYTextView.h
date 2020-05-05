@@ -346,8 +346,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 // Notifications, see UITextView's documentation for more information.
-UIKIT_EXTERN NSString *const YYTextViewTextDidBeginEditingNotification;
-UIKIT_EXTERN NSString *const YYTextViewTextDidChangeNotification;
-UIKIT_EXTERN NSString *const YYTextViewTextDidEndEditingNotification;
+UIKIT_EXTERN NSNotificationName const YYTextViewTextDidBeginEditingNotification;
+UIKIT_EXTERN NSNotificationName const YYTextViewTextDidChangeNotification;
+UIKIT_EXTERN NSNotificationName const YYTextViewTextDidEndEditingNotification;
 
 NS_ASSUME_NONNULL_END
