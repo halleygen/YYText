@@ -409,7 +409,7 @@ label.displaysAsynchronously = YES;
 // text layout with `YYTextLayout` class in background thread.
 YYLabel *label = [YYLabel new];
 label.displaysAsynchronously = YES;
-label.ignoreCommonProperties = YES;
+label.ignoresCommonProperties = YES;
     
 dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
    // Create attributed string.

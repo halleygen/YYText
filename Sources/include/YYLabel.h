@@ -204,12 +204,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Context Menu Additions
 
+/// The background color to use for targeted previews of the label.
+/// @discussion The default value is nil, which results in the label's background color being used.
 @property (nullable, nonatomic, strong) UIColor *targetedPreviewBackgroundColor;
 
+/// Returns a targeted preview that focuses on the text in a given range.
+/// @param range The range from which to create a targeted preview. It must lie within the bounds of the receiver.
 - (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range;
 
 #pragma mark - Getting the highlight at a point
 
+/// Returns the highlight, if any, in the label at a given point.
+/// @param point A point in the label's coordinate system.
+/// @param range Upon return, the range over which the highlight lies. This value is only valid when a non-nil highlight object is returned. If you don't need this value, pass NULL.
 - (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range;
 
 #pragma mark - Interacting with Text Data
@@ -266,7 +273,7 @@ NS_ASSUME_NONNULL_BEGIN
  for display. You may manually clear the content by set the layer.contents to nil 
  after you update the label's properties, or you can just set this property to YES.
  */
-@property (nonatomic) BOOL clearContentsBeforeAsynchronouslyDisplay;
+@property (nonatomic) BOOL clearsContentsBeforeAsynchronouslyDisplay;
 
 /**
  If the value is YES, and the layer is rendered asynchronously, then it will add 
@@ -274,7 +281,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  The default value is `YES`.
  */
-@property (nonatomic) BOOL fadeOnAsynchronouslyDisplay;
+@property (nonatomic) BOOL fadesOnAsynchronouslyDisplay;
 
 /**
  If the value is YES, then it will add a fade animation on layer when some range
@@ -282,7 +289,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  The default value is `YES`.
  */
-@property (nonatomic) BOOL fadeOnHighlight;
+@property (nonatomic) BOOL fadesOnHighlight;
 
 /**
  Ignore common properties (such as text, font, textColor, attributedText...) and
@@ -293,7 +300,7 @@ NS_ASSUME_NONNULL_BEGIN
  @discussion If you control the label content only through "textLayout", then
  you may set this value to YES for higher performance.
  */
-@property (nonatomic) BOOL ignoreCommonProperties;
+@property (nonatomic) BOOL ignoresCommonProperties;
 
 /*
  Tips:
@@ -309,7 +316,7 @@ NS_ASSUME_NONNULL_BEGIN
     
     YYLabel *label = [YYLabel new];
     label.displaysAsynchronously = YES;
-    label.ignoreCommonProperties = YES;
+    label.ignoresCommonProperties = YES;
     
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
  
