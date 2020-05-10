@@ -55,13 +55,29 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 #pragma mark - Queue
 
 + (nonnull dispatch_queue_t)displayQueue {
-    static dispatch_queue_t queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INTERACTIVE, 0);
-        queue = dispatch_queue_create("com.ibireme.async-text-render", attr);
-    });
-    return queue;
+    #ifdef TARGET_OS_MACCATALYST
+        #define MAX_QUEUE_COUNT 16
+    #else
+        #define MAX_QUEUE_COUNT 4
+    #endif
+        static int queueCount;
+        static dispatch_queue_t queues[MAX_QUEUE_COUNT];
+        static dispatch_once_t onceToken;
+        static _Atomic(int) counter = 0;
+    
+        dispatch_once(&onceToken, ^{
+            queueCount = (int)[NSProcessInfo processInfo].activeProcessorCount;
+            queueCount = MIN(MAX(queueCount, 1), MAX_QUEUE_COUNT);
+            for (NSUInteger i = 0; i < queueCount; i++) {
+                dispatch_queue_attr_t attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+                queues[i] = dispatch_queue_create("com.ibireme.text.render", attr);
+            }
+            
+        });
+
+        _Atomic(int) cur = atomic_fetch_add_explicit(&counter, 1, memory_order_relaxed);
+        return queues[(cur) % queueCount];
+    #undef MAX_QUEUE_COUNT
 }
 
 #pragma mark - Override
