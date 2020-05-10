@@ -36,6 +36,8 @@
         if (_CTLine) CFRelease(_CTLine);
         _CTLine = CTLine;
         if (_CTLine) {
+            CGRect lineRect = CTLineGetBoundsWithOptions(_CTLine, 0);
+            _descent = lineRect.size.height - _ascent;
             _lineWidth = CTLineGetTypographicBounds(_CTLine, &_ascent, &_descent, &_leading);
             CFRange range = CTLineGetStringRange(_CTLine);
             _range = NSMakeRange(range.location, range.length);

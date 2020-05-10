@@ -672,8 +672,28 @@ dispatch_semaphore_signal(_lock);
                 } else if (container.truncationType == YYTextTruncationTypeMiddle) {
                     type = kCTLineTruncationMiddle;
                 }
-                NSMutableAttributedString *lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
-                [lastLineText appendAttributedString:truncationToken];
+                
+                NSMutableAttributedString *lastLineText;
+                if (type == kCTLineTruncationEnd) {
+                    lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+                    [lastLineText appendAttributedString:truncationToken];
+                    
+                } else if (type == kCTLineTruncationMiddle) {
+                    lastLineText = [text attributedSubstringFromRange:lastLine.range].mutableCopy;
+                    NSUInteger lastLineTextCount = lastLine.range.length;
+                    NSUInteger lastLineTextMiddleIndex = lastLineTextCount / 2;
+                    NSMutableAttributedString *mutableTruncationToken = truncationToken.mutableCopy;
+                    NSAttributedString *newLastLineEndText = [text attributedSubstringFromRange:(NSRange){text.length-lastLineTextMiddleIndex, lastLineTextMiddleIndex}];
+                    [mutableTruncationToken appendAttributedString:newLastLineEndText];
+                    [lastLineText replaceCharactersInRange:NSMakeRange(lastLineTextCount - mutableTruncationToken.length, mutableTruncationToken.length)
+                                      withAttributedString:mutableTruncationToken];
+                    
+                } else if (type == kCTLineTruncationStart) {
+                    NSMutableAttributedString *newLastLineText = [text attributedSubstringFromRange:(NSRange){text.length - lastLine.range.length, lastLine.range.length}].mutableCopy;
+                    [newLastLineText replaceCharactersInRange:NSMakeRange(0, 1) withAttributedString:truncationToken];
+                    lastLineText = newLastLineText;
+                }
+
                 CTLineRef ctLastLineExtend = CTLineCreateWithAttributedString((CFAttributedStringRef)lastLineText);
                 if (ctLastLineExtend) {
                     CGFloat truncatedWidth = lastLine.width;

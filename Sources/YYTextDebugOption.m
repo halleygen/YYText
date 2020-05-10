@@ -12,9 +12,9 @@
 #import "YYTextDebugOption.h"
 #import "YYTextWeakProxy.h"
 #import <libkern/OSAtomic.h>
-#import <pthread.h>
+#import <os/lock.h>
 
-static pthread_mutex_t _sharedDebugLock;
+static os_unfair_lock _sharedDebugLock;
 static CFMutableSetRef _sharedDebugTargets = nil;
 static YYTextDebugOption *_sharedDebugOption = nil;
 
@@ -33,7 +33,7 @@ void _sharedDebugSetFunction(const void *value, void *context) {
 static void _initSharedDebug() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        pthread_mutex_init(&_sharedDebugLock, NULL);
+        _sharedDebugLock = OS_UNFAIR_LOCK_INIT;
         CFSetCallBacks callbacks = kCFTypeSetCallBacks;
         callbacks.retain = _sharedDebugSetRetain;
         callbacks.release = _sharedDebugSetRelease;
@@ -43,32 +43,32 @@ static void _initSharedDebug() {
 
 static void _setSharedDebugOption(YYTextDebugOption *option) {
     _initSharedDebug();
-    pthread_mutex_lock(&_sharedDebugLock);
+    os_unfair_lock_lock(&_sharedDebugLock);
     _sharedDebugOption = option.copy;
     CFSetApplyFunction(_sharedDebugTargets, _sharedDebugSetFunction, NULL);
-    pthread_mutex_unlock(&_sharedDebugLock);
+    os_unfair_lock_unlock(&_sharedDebugLock);
 }
 
 static YYTextDebugOption *_getSharedDebugOption() {
     _initSharedDebug();
-    pthread_mutex_lock(&_sharedDebugLock);
+    os_unfair_lock_lock(&_sharedDebugLock);
     YYTextDebugOption *op = _sharedDebugOption;
-    pthread_mutex_unlock(&_sharedDebugLock);
+    os_unfair_lock_unlock(&_sharedDebugLock);
     return op;
 }
 
 static void _addDebugTarget(id<YYTextDebugTarget> target) {
     _initSharedDebug();
-    pthread_mutex_lock(&_sharedDebugLock);
+    os_unfair_lock_lock(&_sharedDebugLock);
     CFSetAddValue(_sharedDebugTargets, (__bridge const void *)(target));
-    pthread_mutex_unlock(&_sharedDebugLock);
+    os_unfair_lock_unlock(&_sharedDebugLock);
 }
 
 static void _removeDebugTarget(id<YYTextDebugTarget> target) {
     _initSharedDebug();
-    pthread_mutex_lock(&_sharedDebugLock);
+    os_unfair_lock_lock(&_sharedDebugLock);
     CFSetRemoveValue(_sharedDebugTargets, (__bridge const void *)(target));
-    pthread_mutex_unlock(&_sharedDebugLock);
+    os_unfair_lock_unlock(&_sharedDebugLock);
 }
 
 
