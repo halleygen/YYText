@@ -238,7 +238,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self willChangeValueForKey:@"textLayout"];
     _innerLayout = [YYTextLayout layoutWithContainer:_innerContainer text:text];
     [self didChangeValueForKey:@"textLayout"];
-    CGSize size = [_innerLayout textBoundingSize];
+    CGSize size = [_innerLayout boundingSize];
     CGSize visibleSize = [self _getVisibleSize];
     if (_innerContainer.isVerticalForm) {
         size.height = visibleSize.height;
@@ -363,7 +363,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         container.truncationType = YYTextTruncationTypeEnd;
         container.truncationToken = nil;
         YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_placeholderAttributedText];
-        CGSize size = [layout textBoundingSize];
+        CGSize size = [layout boundingSize];
         BOOL needDraw = size.width > 1 && size.height > 1;
         if (needDraw) {
             UIGraphicsBeginImageContextWithOptions(size, NO, 0);
@@ -1321,9 +1321,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 /// Convert the point from this view to text layout.
 - (CGPoint)_convertPointToLayout:(CGPoint)point {
-    CGSize boundingSize = _innerLayout.textBoundingSize;
+    CGSize boundingSize = _innerLayout.boundingSize;
     if (_innerLayout.container.isVerticalForm) {
-        CGFloat w = _innerLayout.textBoundingSize.width;
+        CGFloat w = _innerLayout.boundingSize.width;
         if (w < self.bounds.size.width) w = self.bounds.size.width;
         point.x += _innerLayout.container.size.width - w;
         if (boundingSize.width < self.bounds.size.width) {
@@ -1348,9 +1348,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 /// Convert the point from text layout to this view.
 - (CGPoint)_convertPointFromLayout:(CGPoint)point {
-    CGSize boundingSize = _innerLayout.textBoundingSize;
+    CGSize boundingSize = _innerLayout.boundingSize;
     if (_innerLayout.container.isVerticalForm) {
-        CGFloat w = _innerLayout.textBoundingSize.width;
+        CGFloat w = _innerLayout.boundingSize.width;
         if (w < self.bounds.size.width) w = self.bounds.size.width;
         point.x -= _innerLayout.container.size.width - w;
         if (boundingSize.width < self.bounds.size.width) {
@@ -1776,7 +1776,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self addSubview:_selectionView];
     
     _undoManager = [NSUndoManager new];
-    _undoManager.levelsOfUndo = kDefaultUndoLevelMax
+    _undoManager.levelsOfUndo = kDefaultUndoLevelMax;
     _allowsUndoAndRedo = YES;
     
     self.debugOption = [YYTextDebugOption sharedDebugOption];
@@ -2261,7 +2261,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     container.size = size;
     
     YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
-    return layout.textBoundingSize;
+    return layout.boundingSize;
 }
 
 #pragma mark - Override UIResponder

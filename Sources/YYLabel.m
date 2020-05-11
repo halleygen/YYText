@@ -258,9 +258,9 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (CGPoint)_convertPointToLayout:(CGPoint)point {
-    CGSize boundingSize = self._innerLayout.textBoundingSize;
+    CGSize boundingSize = self._innerLayout.boundingSize;
     if (self._innerLayout.container.isVerticalForm) {
-        CGFloat w = self._innerLayout.textBoundingSize.width;
+        CGFloat w = self._innerLayout.boundingSize.width;
         if (w < self.bounds.size.width) w = self.bounds.size.width;
         point.x += self._innerLayout.container.size.width - w;
         if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
@@ -280,9 +280,9 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (CGPoint)_convertPointFromLayout:(CGPoint)point {
-    CGSize boundingSize = self._innerLayout.textBoundingSize;
+    CGSize boundingSize = self._innerLayout.boundingSize;
     if (self._innerLayout.container.isVerticalForm) {
-        CGFloat w = self._innerLayout.textBoundingSize.width;
+        CGFloat w = self._innerLayout.boundingSize.width;
         if (w < self.bounds.size.width) w = self.bounds.size.width;
         point.x -= self._innerLayout.container.size.width - w;
         if (boundingSize.width < self.bounds.size.width) {
@@ -471,7 +471,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (CGSize)sizeThatFits:(CGSize)size {
     if (_ignoresCommonProperties) {
-        return _innerLayout.textBoundingSize;
+        return _innerLayout.boundingSize;
     }
     
     if (!_verticalForm && size.width <= 0) size.width = YYTextContainerMaxSize.width;
@@ -492,7 +492,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             }
         }
         if (contains) {
-            return layout.textBoundingSize;
+            return layout.boundingSize;
         }
     }
     
@@ -506,7 +506,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     container.size = size;
     
     YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
-    return layout.textBoundingSize;
+    return layout.boundingSize;
 }
 
 - (NSString *)accessibilityLabel {
@@ -1026,7 +1026,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (CGSize)intrinsicContentSize {
     if (_innerLayout) {
-        CGSize currentBoundingSize = _innerLayout.textBoundingSize;
+        CGSize currentBoundingSize = _innerLayout.boundingSize;
         if (_ignoresCommonProperties || _preferredMaxLayoutWidth == 0 || currentBoundingSize.width == _preferredMaxLayoutWidth) {
             return currentBoundingSize;
         }
@@ -1037,7 +1037,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         container.size = YYTextContainerMaxSize;
         
         YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
-        return layout.textBoundingSize;
+        return layout.boundingSize;
     }
     
     CGSize containerSize = _innerContainer.size;
@@ -1055,7 +1055,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     container.size = containerSize;
     
     YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
-    return layout.textBoundingSize;
+    return layout.boundingSize;
 }
 
 #pragma mark - YYTextDebugTarget
@@ -1129,7 +1129,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             drawLayout = shrinkLayout ? shrinkLayout : layout;
         }
         
-        CGSize boundingSize = drawLayout.textBoundingSize;
+        CGSize boundingSize = drawLayout.boundingSize;
         CGPoint point = CGPointZero;
         if (verticalAlignment == YYTextVerticalAlignmentCenter) {
             if (drawLayout.container.isVerticalForm) {
@@ -1179,7 +1179,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         }
         
         CGSize size = layer.bounds.size;
-        CGSize boundingSize = drawLayout.textBoundingSize;
+        CGSize boundingSize = drawLayout.boundingSize;
         CGPoint point = CGPointZero;
         if (verticalAlignment == YYTextVerticalAlignmentCenter) {
             if (drawLayout.container.isVerticalForm) {

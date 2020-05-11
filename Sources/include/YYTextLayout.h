@@ -249,9 +249,9 @@ extern const CGSize YYTextContainerMaxSize;
 ///< Visible text range
 @property (nonatomic, readonly) NSRange visibleRange;
 ///< Bounding rect (glyphs)
-@property (nonatomic, readonly) CGRect textBoundingRect;
+@property (nonatomic, readonly) CGRect boundingRect;
 ///< Bounding size (glyphs and insets, ceil to pixel)
-@property (nonatomic, readonly) CGSize textBoundingSize;
+@property (nonatomic, readonly) CGSize boundingSize;
 ///< Has highlight attribute
 @property (nonatomic, readonly) BOOL containsHighlights;
 ///< Has block border attribute
