@@ -217,7 +217,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Returns the highlight, if any, in the label at a given point.
 /// @param point A point in the label's coordinate system.
 /// @param range Upon return, the range over which the highlight lies. This value is only valid when a non-nil highlight object is returned. If you don't need this value, pass NULL.
-- (nullable YYTextHighlight *)highlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range;
+- (nullable YYTextHighlight *)getHighlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range NS_SWIFT_NAME(highlight(at:range:));
 
 #pragma mark - Interacting with Text Data
 ///=============================================================================
