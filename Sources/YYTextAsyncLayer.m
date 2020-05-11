@@ -55,7 +55,7 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 #pragma mark - Queue
 
 + (nonnull dispatch_queue_t)displayQueue {
-    #ifdef TARGET_OS_MACCATALYST
+    #if TARGET_OS_MACCATALYST
         #define MAX_QUEUE_COUNT 16
     #else
         #define MAX_QUEUE_COUNT 4
