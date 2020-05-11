@@ -220,7 +220,7 @@
 }
 
 - (NSNumber *)yy_baselineOffsetAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSBaselineOffsetAttributeName atIndex:index];
+    return [self yy_attribute:(NSString *)kCTBaselineOffsetAttributeName atIndex:index];
 }
 
 - (BOOL)yy_verticalGlyphForm {

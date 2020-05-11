@@ -1387,16 +1387,22 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 /// Replace the range with the text, and change the `_selectTextRange`.
 /// The caller should make sure the `range` and `text` are valid before call this method.
-- (void)_replaceRange:(YYTextRange *)range withText:(NSString *)text notifyToDelegate:(BOOL)notify{
+- (void)_replaceRange:(YYTextRange *)range withText:(NSString *)text notifyingInputDelegate:(BOOL)notifiesDelegate {
+    if (notifiesDelegate) { [_inputDelegate textWillChange:self]; }
+    NSRange newRange = NSMakeRange(range.asRange.location, text.length);
+    [_innerText replaceCharactersInRange:range.asRange withString:text];
+    [_innerText yy_removeDiscontinuousAttributesInRange:newRange];
+    if (notifiesDelegate) { [_inputDelegate textDidChange:self]; }
+    
     if (NSEqualRanges(range.asRange, _selectedTextRange.asRange)) {
-        if (notify) [_inputDelegate selectionWillChange:self];
+        if (notifiesDelegate) [_inputDelegate selectionWillChange:self];
         NSRange newRange = NSMakeRange(0, 0);
         newRange.location = _selectedTextRange.start.offset + text.length;
         _selectedTextRange = [YYTextRange rangeWithRange:newRange];
-        if (notify) [_inputDelegate selectionDidChange:self];
+        if (notifiesDelegate) [_inputDelegate selectionDidChange:self];
     } else {
         if (range.asRange.length != text.length) {
-            if (notify) [_inputDelegate selectionWillChange:self];
+            if (notifiesDelegate) [_inputDelegate selectionWillChange:self];
             NSRange unionRange = NSIntersectionRange(_selectedTextRange.asRange, range.asRange);
             if (unionRange.length == 0) {
                 // no intersection
@@ -1430,15 +1436,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                 }
             }
             _selectedTextRange = [self _correctedTextRange:_selectedTextRange];
-            if (notify) [_inputDelegate selectionDidChange:self];
+            if (notifiesDelegate) [_inputDelegate selectionDidChange:self];
         }
-    }
-    if (range.asRange.location + range.asRange.length <= _innerText.length) {
-        if (notify) [_inputDelegate textWillChange:self];
-        NSRange newRange = NSMakeRange(range.asRange.location, text.length);
-        [_innerText replaceCharactersInRange:range.asRange withString:text];
-        [_innerText yy_removeDiscontinuousAttributesInRange:newRange];
-        if (notify) [_inputDelegate textDidChange:self];
     }
 }
 
@@ -1482,21 +1481,27 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 /// Parse text with `textParser` and update the _selectedTextRange.
 /// @return Whether changed (text or selection)
 - (BOOL)_parseText {
+    return [self _parseTextNotifyingInputDelegate:YES];
+}
+
+/// Parse text with `textParser` and update the _selectedTextRange.
+/// @return Whether changed (text or selection)
+- (BOOL)_parseTextNotifyingInputDelegate:(BOOL)notifiesDelegate {
     if (self.textParser) {
         YYTextRange *oldTextRange = _selectedTextRange;
         NSRange newRange = _selectedTextRange.asRange;
         
-        [_inputDelegate textWillChange:self];
+        if (notifiesDelegate) { [_inputDelegate textWillChange:self]; }
         BOOL textChanged = [self.textParser parseText:_innerText selectedRange:&newRange];
-        [_inputDelegate textDidChange:self];
+        if (notifiesDelegate) { [_inputDelegate textDidChange:self]; }
         
         YYTextRange *newTextRange = [YYTextRange rangeWithRange:newRange];
         newTextRange = [self _correctedTextRange:newTextRange];
         
         if (![oldTextRange isEqual:newTextRange]) {
-            [_inputDelegate selectionWillChange:self];
+            if (notifiesDelegate) { [_inputDelegate textWillChange:self]; }
             _selectedTextRange = newTextRange;
-            [_inputDelegate selectionDidChange:self];
+            if (notifiesDelegate) { [_inputDelegate textDidChange:self]; }
         }
         return textChanged;
     }
@@ -1771,8 +1776,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self addSubview:_selectionView];
     
     _undoManager = [NSUndoManager new];
+    _undoManager.levelsOfUndo = kDefaultUndoLevelMax
     _allowsUndoAndRedo = YES;
-    _maximumUndoLevel = kDefaultUndoLevelMax;
     
     self.debugOption = [YYTextDebugOption sharedDebugOption];
     [YYTextDebugOption addDebugTarget:self];
@@ -2443,6 +2448,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                     [self _showMenu];
                 } else {
                     [self performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0];
+                    [self _showMenu];
                 }
             } else if (_state.deleteConfirm || _markedTextRange) {
                 [self _updateTextRangeByTrackingCaret];
@@ -2974,7 +2980,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 - (void)insertText:(NSString *)text {
     if (text.length == 0) return;
-    [self replaceRange:_selectedTextRange withText:text];
+    [self replaceRange:_selectedTextRange withText:text notifyingInputDelegate:NO];
 }
 
 - (void)deleteBackward {
@@ -2989,10 +2995,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         YYTextBinding *binding = [_innerText attribute:YYTextBindingAttributeName atIndex:range.location - 1 longestEffectiveRange:&effectiveRange inRange:NSMakeRange(0, _innerText.length)];
         if (binding && binding.deleteConfirm) {
             _state.deleteConfirm = YES;
-            [_inputDelegate selectionWillChange:self];
             _selectedTextRange = [YYTextRange rangeWithRange:effectiveRange];
             _selectedTextRange = [self _correctedTextRange:_selectedTextRange];
-            [_inputDelegate selectionDidChange:self];
             
             [self _updateOuterProperties];
             [self _updateSelectionView];
@@ -3007,10 +3011,12 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             range = extendRange.asRange;
         }
     }
-//    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
-    //        [self _saveStateToUndoManager];
-    //    }
-    [self replaceRange:[YYTextRange rangeWithRange:range] withText:@""];
+    
+    if (!NSEqualRanges(_lastTypeRange, _selectedTextRange.asRange)) {
+        [self _saveStateToUndoManager:_innerText selectedRange:_innerText.yy_rangeOfAll];
+    }
+    
+    [self replaceRange:[YYTextRange rangeWithRange:range] withText:@"" notifyingInputDelegate:NO];
 }
 
 #pragma mark - @protocol UITextInput
@@ -3029,10 +3035,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     _state.deleteConfirm = NO;
     _state.typingAttributesOnce = NO;
     
-    [_inputDelegate selectionWillChange:self];
     _selectedTextRange = selectedTextRange;
     _lastTypeRange = _selectedTextRange.asRange;
-    [_inputDelegate selectionDidChange:self];
     
     [self _updateOuterProperties];
     [self _updateSelectionView];
@@ -3136,6 +3140,10 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 }
 
 - (void)replaceRange:(YYTextRange *)range withText:(NSString *)text {
+    [self replaceRange:range withText:text notifyingInputDelegate:YES];
+}
+
+- (void)replaceRange:(YYTextRange *)range withText:(NSString *)text notifyingInputDelegate:(BOOL)notifiesDelegate {
     if (!range) return;
     if (!text) text = @"";
     if (range.asRange.length == 0 && text.length == 0) return;
@@ -3173,7 +3181,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self _endTouchTracking];
     [self _hideMenu];
     
-    [self _replaceRange:range withText:text notifyToDelegate:YES];
+    [self _replaceRange:range withText:text notifyingInputDelegate:YES];
     if (useInnerAttributes) {
         [_innerText yy_setAttributes:_typingAttributesHolder.yy_attributes];
     } else if (applyTypingAttributes) {
@@ -3182,7 +3190,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             [_innerText yy_setAttribute:key value:obj range:newRange];
         }];
     }
-    [self _parseText];
+    [self _parseTextNotifyingInputDelegate:notifiesDelegate];
     [self _updateOuterProperties];
     [self _update];
     
