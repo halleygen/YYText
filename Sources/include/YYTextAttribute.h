@@ -172,7 +172,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  It may used for copy/paste plain text from attributed string.
  Example: If :) is replace by a custom emoji (such as😊), the backed string can be set to @":)".
  */
-@interface YYTextBackedString : NSObject <NSCoding, NSCopying>
+@interface YYTextBackedString : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)stringWithString:(nullable NSString *)string;
 @property (nullable, nonatomic, copy) NSString *string; ///< backed string
 @end
@@ -187,7 +187,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  YYTextView will treat the range of text as a single character during text 
  selection and edit.
  */
-@interface YYTextBinding : NSObject <NSCoding, NSCopying>
+@interface YYTextBinding : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm;
 @property (nonatomic) BOOL deleteConfirm; ///< confirm the range when delete in YYTextView
 @end
@@ -200,7 +200,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  
  It's similar to `NSShadow`, but offers more options.
  */
-@interface YYTextShadow : NSObject <NSCoding, NSCopying>
+@interface YYTextShadow : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)shadowWithColor:(nullable UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius;
 
 @property (nullable, nonatomic, strong) UIColor *color; ///< shadow color
@@ -222,7 +222,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  When it's used as underline, the line is drawn below text glyphs;
  when it's used as strikethrough, the line is drawn above text glyphs.
  */
-@interface YYTextDecoration : NSObject <NSCoding, NSCopying>
+@interface YYTextDecoration : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)decorationWithStyle:(YYTextLineStyle)style;
 + (instancetype)decorationWithStyle:(YYTextLineStyle)style width:(nullable NSNumber *)width color:(nullable UIColor *)color;
 @property (nonatomic) YYTextLineStyle style;                   ///< line style
@@ -245,7 +245,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
     │ Text │
     ╰──────╯
  */
-@interface YYTextBorder : NSObject <NSCoding, NSCopying>
+@interface YYTextBorder : NSObject <NSSecureCoding, NSCopying>
 + (instancetype)borderWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(nullable UIColor *)color;
 + (instancetype)borderWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius;
 @property (nonatomic) YYTextLineStyle lineStyle;              ///< border line style
@@ -269,7 +269,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  then it will be drawn to CGContext; if the content is `UIView` or `CALayer`, 
  then it will be added to the text container's view or layer.
  */
-@interface YYTextAttachment : NSObject<NSCoding, NSCopying>
+@interface YYTextAttachment : NSObject<NSSecureCoding, NSCopying>
 + (instancetype)attachmentWithContent:(nullable id)content;
 @property (nullable, nonatomic, strong) id content;             ///< Supported type: UIImage, UIView, CALayer
 @property (nonatomic) UIViewContentMode contentMode;            ///< Content display mode.
@@ -288,7 +288,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  highlighted state, the `attributes` in `YYTextHighlight` will be used to modify 
  (set or remove) the original attributes in the range for display.
  */
-@interface YYTextHighlight : NSObject <NSCoding, NSCopying>
+@interface YYTextHighlight : NSObject <NSSecureCoding, NSCopying>
 
 /**
  Attributes that you can apply to text in an attributed string when highlight.

@@ -105,6 +105,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 @implementation YYTextBackedString
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 + (instancetype)stringWithString:(NSString *)string {
     YYTextBackedString *one = [self new];
     one.string = string;
@@ -117,7 +121,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    _string = [aDecoder decodeObjectForKey:@"string"];
+    _string = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"string"];
     return self;
 }
 
@@ -132,6 +136,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 @implementation YYTextBinding
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 + (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm {
     YYTextBinding *one = [self new];
     one.deleteConfirm = deleteConfirm;
@@ -144,7 +152,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    _deleteConfirm = ((NSNumber *)[aDecoder decodeObjectForKey:@"deleteConfirm"]).boolValue;
+    _deleteConfirm = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"deleteConfirm"]).boolValue;
     return self;
 }
 
@@ -158,6 +166,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 
 @implementation YYTextShadow
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
 
 + (instancetype)shadowWithColor:(UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius {
     YYTextShadow *one = [self new];
@@ -201,10 +213,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    _color = [aDecoder decodeObjectForKey:@"color"];
-    _radius = ((NSNumber *)[aDecoder decodeObjectForKey:@"radius"]).floatValue;
-    _offset = ((NSValue *)[aDecoder decodeObjectForKey:@"offset"]).CGSizeValue;
-    _subShadow = [aDecoder decodeObjectForKey:@"subShadow"];
+    _color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
+    _radius = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"radius"]).floatValue;
+    _offset = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"offset"]).CGSizeValue;
+    _subShadow = [aDecoder decodeObjectOfClass:[YYTextShadow class] forKey:@"subShadow"];
     return self;
 }
 
@@ -221,6 +233,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 
 @implementation YYTextDecoration
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
 
 - (instancetype)init {
     self = [super init];
@@ -249,9 +265,9 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    self.style = ((NSNumber *)[aDecoder decodeObjectForKey:@"style"]).unsignedIntegerValue;
-    self.width = [aDecoder decodeObjectForKey:@"width"];
-    self.color = [aDecoder decodeObjectForKey:@"color"];
+    self.style = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"style"]).unsignedIntegerValue;
+    self.width = [aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"width"];
+    self.color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
     return self;
 }
 
@@ -267,6 +283,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 
 @implementation YYTextBorder
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
 
 + (instancetype)borderWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color {
     YYTextBorder *one = [self new];
@@ -303,14 +323,14 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    _lineStyle = ((NSNumber *)[aDecoder decodeObjectForKey:@"lineStyle"]).unsignedIntegerValue;
-    _strokeWidth = ((NSNumber *)[aDecoder decodeObjectForKey:@"strokeWidth"]).doubleValue;
-    _strokeColor = [aDecoder decodeObjectForKey:@"strokeColor"];
-    _lineJoin = (CGLineJoin)((NSNumber *)[aDecoder decodeObjectForKey:@"join"]).unsignedIntegerValue;
-    _insets = ((NSValue *)[aDecoder decodeObjectForKey:@"insets"]).UIEdgeInsetsValue;
-    _cornerRadius = ((NSNumber *)[aDecoder decodeObjectForKey:@"cornerRadius"]).doubleValue;
-    _shadow = [aDecoder decodeObjectForKey:@"shadow"];
-    _fillColor = [aDecoder decodeObjectForKey:@"fillColor"];
+    _lineStyle = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"lineStyle"]).unsignedIntegerValue;
+    _strokeWidth = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"strokeWidth"]).doubleValue;
+    _strokeColor = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"strokeColor"];
+    _lineJoin = (CGLineJoin)((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"join"]).unsignedIntegerValue;
+    _insets = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"insets"]).UIEdgeInsetsValue;
+    _cornerRadius = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"cornerRadius"]).doubleValue;
+    _shadow = [aDecoder decodeObjectOfClass: [YYTextShadow class] forKey:@"shadow"];
+    _fillColor = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"fillColor"];
     return self;
 }
 
@@ -332,6 +352,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 @implementation YYTextAttachment
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 + (instancetype)attachmentWithContent:(id)content {
     YYTextAttachment *one = [self new];
     one.content = content;
@@ -346,9 +370,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    _content = [aDecoder decodeObjectForKey:@"content"];
-    _contentInsets = ((NSValue *)[aDecoder decodeObjectForKey:@"contentInsets"]).UIEdgeInsetsValue;
-    _userInfo = [aDecoder decodeObjectForKey:@"userInfo"];
+    NSSet *contentClasses = [[NSSet alloc] initWithObjects:[UIImage class], [UIView class], [CALayer class], nil];
+    _content = [aDecoder decodeObjectOfClasses:contentClasses forKey:@"content"];
+    _contentInsets = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"contentInsets"]).UIEdgeInsetsValue;
+    _userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:@"userInfo"];
     return self;
 }
 
@@ -368,6 +393,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 
 @implementation YYTextHighlight
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
 
 + (instancetype)highlightWithAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
     YYTextHighlight *one = [self new];
@@ -397,7 +426,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
-    NSData *data = [aDecoder decodeObjectForKey:@"attributes"];
+    NSData *data = [aDecoder decodeObjectOfClass:[NSData class] forKey:@"attributes"];
     _attributes = [YYTextUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:data error:nil];
     return self;
 }
