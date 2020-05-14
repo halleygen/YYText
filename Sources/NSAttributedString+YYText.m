@@ -17,45 +17,32 @@
 #import <CoreFoundation/CoreFoundation.h>
 
 
-// Dummy class for category
-@interface NSAttributedString_YYText : NSObject @end
-@implementation NSAttributedString_YYText @end
-
 @implementation NSAttributedString (YYText)
 
-- (NSData *)yy_archiveToData {
-    NSData *data = nil;
-    @try {
-        data = [YYTextArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:nil];
+- (NSData *)yy_archiveToDataWithError:(NSError **)error {
+    NSData *data = [YYTextArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:error];
+    
+    if (*error) {
+        return nil;
+    } else {
+        return data;
     }
-    @catch (NSException *exception) {
-        NSLog(@"%@",exception);
-    }
-    return data;
 }
 
-+ (instancetype)yy_unarchiveFromData:(NSData *)data {
-    NSAttributedString *one = nil;
-    @try {
-        one = [YYTextUnarchiver unarchivedObjectOfClass:[NSAttributedString class] fromData:data error:nil];
++ (instancetype)yy_unarchiveFromData:(NSData *)data withError:(NSError *__autoreleasing  _Nullable *)error {
+    NSAttributedString *attributedString = [YYTextUnarchiver unarchivedObjectOfClass:[NSAttributedString class] fromData:data error:error];
+    
+    if (*error) {
+        return nil;
+    } else {
+        return attributedString;
     }
-    @catch (NSException *exception) {
-        NSLog(@"%@",exception);
-    }
-    return one;
 }
 
 - (NSDictionary *)yy_attributesAtIndex:(NSUInteger)index {
     if (index > self.length || self.length == 0) return nil;
     if (self.length > 0 && index == self.length) index--;
     return [self attributesAtIndex:index effectiveRange:NULL];
-}
-
-- (id)yy_attribute:(NSString *)attributeName atIndex:(NSUInteger)index {
-    if (!attributeName) return nil;
-    if (index > self.length || self.length == 0) return nil;
-    if (self.length > 0 && index == self.length) index--;
-    return [self attribute:attributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSDictionary *)yy_attributes {
@@ -76,7 +63,7 @@
      
      We use UIFont for both CoreText and UIKit.
      */
-    return [self yy_attribute:NSFontAttributeName atIndex:index];
+    return [self attribute:NSFontAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSNumber *)yy_kern {
@@ -84,7 +71,7 @@
 }
 
 - (NSNumber *)yy_kernAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSKernAttributeName atIndex:index];
+    return [self attribute:NSKernAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (UIColor *)yy_color {
@@ -92,19 +79,7 @@
 }
 
 - (UIColor *)yy_colorAtIndex:(NSUInteger)index {
-    UIColor *color = [self yy_attribute:NSForegroundColorAttributeName atIndex:index];
-    if (!color) {
-        CGColorRef ref = (__bridge CGColorRef)([self yy_attribute:(NSString *)kCTForegroundColorAttributeName atIndex:index]);
-        color = [UIColor colorWithCGColor:ref];
-    }
-    if (color && ![color isKindOfClass:[UIColor class]]) {
-        if (CFGetTypeID((__bridge CFTypeRef)(color)) == CGColorGetTypeID()) {
-            color = [UIColor colorWithCGColor:(__bridge CGColorRef)(color)];
-        } else {
-            color = nil;
-        }
-    }
-    return color;
+    return [self attribute:NSForegroundColorAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (UIColor *)yy_backgroundColor {
@@ -112,7 +87,7 @@
 }
 
 - (UIColor *)yy_backgroundColorAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSBackgroundColorAttributeName atIndex:index];
+    return [self attribute:NSBackgroundColorAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSNumber *)yy_strokeWidth {
@@ -120,7 +95,7 @@
 }
 
 - (NSNumber *)yy_strokeWidthAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSStrokeWidthAttributeName atIndex:index];
+    return [self attribute:NSStrokeWidthAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (UIColor *)yy_strokeColor {
@@ -128,12 +103,7 @@
 }
 
 - (UIColor *)yy_strokeColorAtIndex:(NSUInteger)index {
-    UIColor *color = [self yy_attribute:NSStrokeColorAttributeName atIndex:index];
-    if (!color) {
-        CGColorRef ref = (__bridge CGColorRef)([self yy_attribute:(NSString *)kCTStrokeColorAttributeName atIndex:index]);
-        color = [UIColor colorWithCGColor:ref];
-    }
-    return color;
+    return [self attribute:NSStrokeColorAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSShadow *)yy_shadow {
@@ -141,7 +111,7 @@
 }
 
 - (NSShadow *)yy_shadowAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSShadowAttributeName atIndex:index];
+    return [self attribute:NSShadowAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSUnderlineStyle)yy_strikethroughStyle {
@@ -149,7 +119,7 @@
 }
 
 - (NSUnderlineStyle)yy_strikethroughStyleAtIndex:(NSUInteger)index {
-    NSNumber *style = [self yy_attribute:NSStrikethroughStyleAttributeName atIndex:index];
+    NSNumber *style = [self attribute:NSStrikethroughStyleAttributeName atIndex:index effectiveRange:NULL];
     return style.integerValue;
 }
 
@@ -158,7 +128,7 @@
 }
 
 - (UIColor *)yy_strikethroughColorAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSStrikethroughColorAttributeName atIndex:index];
+    return [self attribute:NSStrikethroughColorAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSUnderlineStyle)yy_underlineStyle {
@@ -166,7 +136,7 @@
 }
 
 - (NSUnderlineStyle)yy_underlineStyleAtIndex:(NSUInteger)index {
-    NSNumber *style = [self yy_attribute:NSUnderlineStyleAttributeName atIndex:index];
+    NSNumber *style = [self attribute:NSUnderlineStyleAttributeName atIndex:index effectiveRange:NULL];
     return style.integerValue;
 }
 
@@ -175,12 +145,7 @@
 }
 
 - (UIColor *)yy_underlineColorAtIndex:(NSUInteger)index {
-    UIColor *color = [self yy_attribute:NSUnderlineColorAttributeName atIndex:index];
-    if (!color) {
-        CGColorRef ref = (__bridge CGColorRef)([self yy_attribute:(NSString *)kCTUnderlineColorAttributeName atIndex:index]);
-        color = [UIColor colorWithCGColor:ref];
-    }
-    return color;
+    return [self attribute:NSUnderlineColorAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSNumber *)yy_ligature {
@@ -188,7 +153,7 @@
 }
 
 - (NSNumber *)yy_ligatureAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSLigatureAttributeName atIndex:index];
+    return [self attribute:NSLigatureAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSString *)yy_textEffect {
@@ -196,7 +161,7 @@
 }
 
 - (NSString *)yy_textEffectAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSTextEffectAttributeName atIndex:index];
+    return [self attribute:NSTextEffectAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSNumber *)yy_obliqueness {
@@ -204,7 +169,7 @@
 }
 
 - (NSNumber *)yy_obliquenessAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSObliquenessAttributeName atIndex:index];
+    return [self attribute:NSObliquenessAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSNumber *)yy_expansion {
@@ -212,7 +177,7 @@
 }
 
 - (NSNumber *)yy_expansionAtIndex:(NSUInteger)index {
-    return [self yy_attribute:NSExpansionAttributeName atIndex:index];
+    return [self attribute:NSExpansionAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSNumber *)yy_baselineOffset {
@@ -220,7 +185,7 @@
 }
 
 - (NSNumber *)yy_baselineOffsetAtIndex:(NSUInteger)index {
-    return [self yy_attribute:(NSString *)kCTBaselineOffsetAttributeName atIndex:index];
+    return [self attribute:(NSString *)kCTBaselineOffsetAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (BOOL)yy_verticalGlyphForm {
@@ -228,7 +193,7 @@
 }
 
 - (BOOL)yy_verticalGlyphFormAtIndex:(NSUInteger)index {
-    NSNumber *num = [self yy_attribute:NSVerticalGlyphFormAttributeName atIndex:index];
+    NSNumber *num = [self attribute:NSVerticalGlyphFormAttributeName atIndex:index effectiveRange:NULL];
     return num.boolValue;
 }
 
@@ -237,7 +202,7 @@
 }
 
 - (NSString *)yy_languageAtIndex:(NSUInteger)index {
-    return [self yy_attribute:(id)kCTLanguageAttributeName atIndex:index];
+    return [self attribute:(NSString *)kCTLanguageAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSArray *)yy_writingDirection {
@@ -245,7 +210,7 @@
 }
 
 - (NSArray *)yy_writingDirectionAtIndex:(NSUInteger)index {
-    return [self yy_attribute:(id)kCTWritingDirectionAttributeName atIndex:index];
+    return [self attribute:(NSString *)kCTWritingDirectionAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (NSParagraphStyle *)yy_paragraphStyle {
@@ -261,7 +226,7 @@
      
      We use NSParagraphStyle in both CoreText and UIKit.
      */
-    NSParagraphStyle *style = [self yy_attribute:NSParagraphStyleAttributeName atIndex:index];
+    NSParagraphStyle *style = [self attribute:NSParagraphStyleAttributeName atIndex:index effectiveRange:NULL];
     if (style) {
         if (CFGetTypeID((__bridge CFTypeRef)(style)) == CTParagraphStyleGetTypeID()) { \
             style = [NSParagraphStyle yy_styleWithCTStyle:(__bridge CTParagraphStyleRef)(style)];
@@ -408,7 +373,7 @@ return style. _attr_;
 }
 
 - (YYTextShadow *)yy_textShadowAtIndex:(NSUInteger)index {
-    return [self yy_attribute:YYTextShadowAttributeName atIndex:index];
+    return [self attribute:YYTextShadowAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (YYTextShadow *)yy_textInnerShadow {
@@ -416,7 +381,7 @@ return style. _attr_;
 }
 
 - (YYTextShadow *)yy_textInnerShadowAtIndex:(NSUInteger)index {
-    return [self yy_attribute:YYTextInnerShadowAttributeName atIndex:index];
+    return [self attribute:YYTextInnerShadowAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (YYTextDecoration *)yy_textUnderline {
@@ -424,7 +389,7 @@ return style. _attr_;
 }
 
 - (YYTextDecoration *)yy_textUnderlineAtIndex:(NSUInteger)index {
-    return [self yy_attribute:YYTextUnderlineAttributeName atIndex:index];
+    return [self attribute:YYTextUnderlineAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (YYTextDecoration *)yy_textStrikethrough {
@@ -432,7 +397,7 @@ return style. _attr_;
 }
 
 - (YYTextDecoration *)yy_textStrikethroughAtIndex:(NSUInteger)index {
-    return [self yy_attribute:YYTextStrikethroughAttributeName atIndex:index];
+    return [self attribute:YYTextStrikethroughAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (YYTextBorder *)yy_textBorder {
@@ -440,7 +405,7 @@ return style. _attr_;
 }
 
 - (YYTextBorder *)yy_textBorderAtIndex:(NSUInteger)index {
-    return [self yy_attribute:YYTextBorderAttributeName atIndex:index];
+    return [self attribute:YYTextBorderAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (YYTextBorder *)yy_textBackgroundBorder {
@@ -448,7 +413,7 @@ return style. _attr_;
 }
 
 - (YYTextBorder *)yy_textBackgroundBorderAtIndex:(NSUInteger)index {
-    return [self yy_attribute:YYTextBackedStringAttributeName atIndex:index];
+    return [self attribute:YYTextBackedStringAttributeName atIndex:index effectiveRange:NULL];
 }
 
 - (CGAffineTransform)yy_textGlyphTransform {
@@ -456,7 +421,7 @@ return style. _attr_;
 }
 
 - (CGAffineTransform)yy_textGlyphTransformAtIndex:(NSUInteger)index {
-    NSValue *value = [self yy_attribute:YYTextGlyphTransformAttributeName atIndex:index];
+    NSValue *value = [self attribute:YYTextGlyphTransformAttributeName atIndex:index effectiveRange:NULL];
     if (!value) return CGAffineTransformIdentity;
     return [value CGAffineTransformValue];
 }
@@ -905,7 +870,6 @@ return style. _attr_;
 }
 
 - (void)yy_setColor:(UIColor *)color range:(NSRange)range {
-    [self yy_setAttribute:(id)kCTForegroundColorAttributeName value:(id)color.CGColor range:range];
     [self yy_setAttribute:NSForegroundColorAttributeName value:color range:range];
 }
 
@@ -918,7 +882,6 @@ return style. _attr_;
 }
 
 - (void)yy_setStrokeColor:(UIColor *)strokeColor range:(NSRange)range {
-    [self yy_setAttribute:(id)kCTStrokeColorAttributeName value:(id)strokeColor.CGColor range:range];
     [self yy_setAttribute:NSStrokeColorAttributeName value:strokeColor range:range];
 }
 
@@ -941,7 +904,6 @@ return style. _attr_;
 }
 
 - (void)yy_setUnderlineColor:(UIColor *)underlineColor range:(NSRange)range {
-    [self yy_setAttribute:(id)kCTUnderlineColorAttributeName value:(id)underlineColor.CGColor range:range];
     [self yy_setAttribute:NSUnderlineColorAttributeName value:underlineColor range:range];
 }
 

@@ -81,7 +81,7 @@ NSString *const YYTextUTTypeWEBP = @"com.google.webp";
 
 - (void)setYy_AttributedString:(NSAttributedString *)attributedString {
     self.string = [attributedString yy_plainTextForRange:[attributedString yy_rangeOfAll]];
-    NSData *data = [attributedString yy_archiveToData];
+    NSData *data = [attributedString yy_archiveToDataWithError: NULL];
     if (data) {
         NSDictionary *item = @{YYTextPasteboardTypeAttributedString : data};
         [self addItems:@[item]];
@@ -137,7 +137,7 @@ NSString *const YYTextUTTypeWEBP = @"com.google.webp";
     for (NSDictionary *items in self.items) {
         NSData *data = items[YYTextPasteboardTypeAttributedString];
         if (data) {
-            return [NSAttributedString yy_unarchiveFromData:data];
+            return [NSAttributedString yy_unarchiveFromData:data withError: NULL];
         }
     }
     return nil;

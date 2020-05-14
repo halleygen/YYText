@@ -2603,7 +2603,7 @@ static void YYTextDrawBlockBorder(YYTextLayout *layout, CGContextRef context, CG
                 if (lineContinueIndex + 1 == lMax) break;
                 YYTextLine *next = lines[lineContinueIndex + 1];
                 if (next.row != lineContinueRow) {
-                    YYTextBorder *nextBorder = [layout.text yy_attribute:YYTextBlockBorderAttributeName atIndex:next.range.location];
+                    YYTextBorder *nextBorder = [layout.text attribute:YYTextBlockBorderAttributeName atIndex:next.range.location effectiveRange:NULL];
                     if ([nextBorder isEqual:border]) {
                         lineContinueRow++;
                     } else {

@@ -391,25 +391,14 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
-    NSData *data = nil;
-    @try {
-        data = [YYTextArchiver archivedDataWithRootObject:self.attributes requiringSecureCoding:YES error:nil];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"%@",exception);
-    }
+    NSData *data = [YYTextArchiver archivedDataWithRootObject:self.attributes requiringSecureCoding:YES error:nil];
     [aCoder encodeObject:data forKey:@"attributes"];
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     NSData *data = [aDecoder decodeObjectForKey:@"attributes"];
-    @try {
-        _attributes = [YYTextUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:data error:nil];
-    }
-    @catch (NSException *exception) {
-        NSLog(@"%@",exception);
-    }
+    _attributes = [YYTextUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:data error:nil];
     return self;
 }
 
