@@ -157,12 +157,6 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 @implementation YYTextArchiver
 
-+ (NSData *)archivedDataWithRootObject:(id)object requiringSecureCoding:(BOOL)requiresSecureCoding error:(NSError *__autoreleasing  _Nullable *)error {
-    YYTextArchiver *archiver = [[[self class] alloc] initRequiringSecureCoding:YES];
-    [archiver encodeRootObject:object];
-    return [archiver encodedData];
-}
-
 - (instancetype)initRequiringSecureCoding:(BOOL)requiresSecureCoding {
     self = [super initRequiringSecureCoding:requiresSecureCoding];
     self.delegate = self;
@@ -191,6 +185,11 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 
 @implementation YYTextUnarchiver
+
+- (BOOL)requiresSecureCoding {
+    // Need to work out how to support encoding NSAttributedStrings with custom attributes. Currently only UIColors, NSParagraphStyles, UIFonts, and other objects associated with UIKit NSAttributedStringKeys can be decoded securely. An exception is raised when a YYText object is decoded.
+    return NO;
+}
 
 - (instancetype)initForReadingFromData:(NSData *)data error:(NSError *__autoreleasing  _Nullable *)error {
     self = [super initForReadingFromData:data error:error];
