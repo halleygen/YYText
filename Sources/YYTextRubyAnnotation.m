@@ -13,6 +13,10 @@
 
 @implementation YYTextRubyAnnotation
 
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 - (instancetype)init {
     self = super.init;
     self.alignment = kCTRubyAlignmentAuto;
@@ -70,13 +74,13 @@
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [self init];
-    _alignment = ((NSNumber *)[aDecoder decodeObjectForKey:@"alignment"]).intValue;
-    _overhang = ((NSNumber *)[aDecoder decodeObjectForKey:@"overhang"]).intValue;
-    _sizeFactor = ((NSNumber *)[aDecoder decodeObjectForKey:@"sizeFactor"]).intValue;
-    _textBefore = [aDecoder decodeObjectForKey:@"textBefore"];
-    _textAfter = [aDecoder decodeObjectForKey:@"textAfter"];
-    _textInterCharacter = [aDecoder decodeObjectForKey:@"textInterCharacter"];
-    _textInline = [aDecoder decodeObjectForKey:@"textInline"];
+    _alignment = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"alignment"]).intValue;
+    _overhang = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"overhang"]).intValue;
+    _sizeFactor = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"sizeFactor"]).intValue;
+    _textBefore = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"textBefore"];
+    _textAfter = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"textAfter"];
+    _textInterCharacter = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"textInterCharacter"];
+    _textInline = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"textInline"];
     return self;
 }
 

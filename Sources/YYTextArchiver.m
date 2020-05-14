@@ -52,12 +52,16 @@ static CFTypeID CTRubyAnnotationTypeID() {
 /**
  A wrapper for CGColorRef. Used for Archive/Unarchive/Copy.
  */
-@interface _YYCGColor : NSObject <NSCopying, NSCoding>
+@interface _YYCGColor : NSObject <NSCopying, NSSecureCoding>
 @property (nonatomic, assign) CGColorRef CGColor;
 + (instancetype)colorWithCGColor:(CGColorRef)CGColor;
 @end
 
 @implementation _YYCGColor
+
++ (BOOL) supportsSecureCoding {
+    return YES;
+}
 
 + (instancetype)colorWithCGColor:(CGColorRef)CGColor {
     _YYCGColor *color = [self new];
@@ -91,7 +95,7 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [self init];
-    UIColor *color = [aDecoder decodeObjectForKey:@"color"];
+    UIColor *color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
     self.CGColor = color.CGColor;
     return self;
 }
@@ -101,12 +105,16 @@ static CFTypeID CTRubyAnnotationTypeID() {
 /**
  A wrapper for CGImageRef. Used for Archive/Unarchive/Copy.
  */
-@interface _YYCGImage : NSObject <NSCoding, NSCopying>
+@interface _YYCGImage : NSObject <NSSecureCoding, NSCopying>
 @property (nonatomic, assign) CGImageRef CGImage;
 + (instancetype)imageWithCGImage:(CGImageRef)CGImage;
 @end
 
 @implementation _YYCGImage
+
++ (BOOL) supportsSecureCoding {
+    return YES;
+}
 
 + (instancetype)imageWithCGImage:(CGImageRef)CGImage {
     _YYCGImage *image = [self new];
@@ -139,7 +147,7 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [self init];
-    UIImage *image = [aDecoder decodeObjectForKey:@"image"];
+    UIImage *image = [aDecoder decodeObjectOfClass:[UIImage class] forKey:@"image"];
     self.CGImage = image.CGImage;
     return self;
 }
@@ -184,19 +192,13 @@ static CFTypeID CTRubyAnnotationTypeID() {
 
 @implementation YYTextUnarchiver
 
-+ (id)unarchivedObjectOfClass:(Class)cls fromData:(NSData *)data error:(NSError *__autoreleasing  _Nullable *)error {
-    if (data.length == 0) return nil;
-    YYTextUnarchiver *unarchiver = [[self alloc] initForReadingFromData:data error:error];
-    return [unarchiver decodeObject];
-}
-
-- (instancetype)initForReadingFromData:(NSData *)data error:(NSError * _Nullable *)error {
+- (instancetype)initForReadingFromData:(NSData *)data error:(NSError *__autoreleasing  _Nullable *)error {
     self = [super initForReadingFromData:data error:error];
     self.delegate = self;
     return self;
 }
 
-- (id)unarchiver:(NSKeyedUnarchiver *)unarchiver didDecodeObject:(id) NS_RELEASES_ARGUMENT object NS_RETURNS_RETAINED {
+- (id)unarchiver:(NSKeyedUnarchiver *)unarchiver didDecodeObject:(id)object {
     if ([object class] == [YYTextRunDelegate class]) {
         YYTextRunDelegate *runDelegate = object;
         CTRunDelegateRef ct = runDelegate.CTRunDelegate;
