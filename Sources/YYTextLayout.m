@@ -523,8 +523,9 @@ dispatch_semaphore_signal(_lock);
         rowCount = rowIdx + 1;
         lineCurrentIdx ++;
         
-        if (i == 0) textBoundingRect = rect;
-        else {
+        if (i == 0) {
+            textBoundingRect = rect;
+        } else {
             if (maximumNumberOfRows == 0 || rowIdx < maximumNumberOfRows) {
                 textBoundingRect = CGRectUnion(textBoundingRect, rect);
             }

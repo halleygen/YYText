@@ -11,11 +11,6 @@
 
 #import "UIView+YYText.h"
 
-// Dummy class for category
-@interface UIView_YYText : NSObject @end
-@implementation UIView_YYText @end
-
-
 @implementation UIView (YYText)
 
 - (UIViewController *)yy_viewController {

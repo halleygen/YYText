@@ -11,7 +11,7 @@
 
 #import "UIPasteboard+YYText.h"
 #import "NSAttributedString+YYText.h"
-#import <MobileCoreServices/MobileCoreServices.h>
+#import <CoreServices/CoreServices.h>
 
 
 #if __has_include("YYImage.h")
@@ -28,13 +28,8 @@
 #endif
 
 
-// Dummy class for category
-@interface UIPasteboard_YYText : NSObject @end
-@implementation UIPasteboard_YYText @end
-
-
-NSString *const YYTextPasteboardTypeAttributedString = @"com.ibireme.NSAttributedString";
-NSString *const YYTextUTTypeWEBP = @"com.google.webp";
+const CFStringRef kUTTypeYYTextAttributedString = CFSTR("com.ibireme.NSAttributedString");
+const CFStringRef kUTTypeYYTextWEBP = CFSTR("com.google.webp");
 
 @implementation UIPasteboard (YYText)
 
@@ -64,11 +59,11 @@ NSString *const YYTextUTTypeWEBP = @"com.google.webp";
 }
 
 - (void)setYy_WEBPData:(NSData *)WEBPData {
-    [self setData:WEBPData forPasteboardType:YYTextUTTypeWEBP];
+    [self setData:WEBPData forPasteboardType:(__bridge NSString *)kUTTypeYYTextWEBP];
 }
 
 - (NSData *)yy_WEBPData {
-    return [self dataForPasteboardType:YYTextUTTypeWEBP];
+    return [self dataForPasteboardType:(__bridge NSString *)kUTTypeYYTextWEBP];
 }
 
 - (void)setYy_ImageData:(NSData *)imageData {
@@ -83,7 +78,7 @@ NSString *const YYTextUTTypeWEBP = @"com.google.webp";
     self.string = [attributedString yy_plainTextForRange:[attributedString yy_rangeOfAll]];
     NSData *data = [attributedString yy_archiveToDataWithError: NULL];
     if (data) {
-        NSDictionary *item = @{YYTextPasteboardTypeAttributedString : data};
+        NSDictionary *item = @{(__bridge NSString *)kUTTypeYYTextAttributedString : data};
         [self addItems:@[item]];
     }
     [attributedString enumerateAttribute:YYTextAttachmentAttributeName inRange:NSMakeRange(0, attributedString.length) options:NSAttributedStringEnumerationLongestEffectiveRangeNotRequired usingBlock:^(YYTextAttachment *attachment, NSRange range, BOOL *stop) {
@@ -135,7 +130,7 @@ NSString *const YYTextUTTypeWEBP = @"com.google.webp";
 
 - (NSAttributedString *)yy_AttributedString {
     for (NSDictionary *items in self.items) {
-        NSData *data = items[YYTextPasteboardTypeAttributedString];
+        NSData *data = items[(__bridge NSString *)kUTTypeYYTextAttributedString];
         if (data) {
             return [NSAttributedString yy_unarchiveFromData:data withError: NULL];
         }

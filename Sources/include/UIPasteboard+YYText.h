@@ -32,10 +32,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 
-/// The name identifying the attributed string in pasteboard.
-UIKIT_EXTERN NSString *const YYTextPasteboardTypeAttributedString;
+/// The UTI Type identifying the attributed string in pasteboard.
+extern const CFStringRef _Nonnull kUTTypeYYTextAttributedString;
 
 /// The UTI Type identifying WebP data in pasteboard.
-UIKIT_EXTERN NSString *const YYTextUTTypeWEBP;
+extern const CFStringRef _Nonnull kUTTypeYYTextWEBP;
 
 NS_ASSUME_NONNULL_END

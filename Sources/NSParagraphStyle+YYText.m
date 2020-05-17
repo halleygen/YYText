@@ -13,10 +13,6 @@
 #import "YYTextAttribute.h"
 #import <CoreText/CoreText.h>
 
-// Dummy class for category
-@interface NSParagraphStyle_YYText : NSObject @end
-@implementation NSParagraphStyle_YYText @end
-
 
 @implementation NSParagraphStyle (YYText)
 

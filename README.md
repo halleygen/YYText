@@ -494,7 +494,7 @@ To use the YYText library in a SwiftPM project, add the following line to the de
 .package(url: "https://github.com/halleygen/YYText", from: "1.1.0"),
 ```
 
-Finally, include "ArgumentParser" as a dependency for your executable target:
+Finally, include "YYText" as a dependency for your executable target:
 
 ```swift
 .product(name: "YYText", package: "YYText"),
