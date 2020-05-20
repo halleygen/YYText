@@ -58,6 +58,9 @@ extern const CGSize YYTextContainerMaxSize;
  */
 @interface YYTextContainer : NSObject <NSCoding, NSCopying>
 
+/// The largest possible container size.
+@property (class, nonatomic, readonly) CGSize maxContainerSize;
+
 /// Creates a container with the specified size. @param size The size.
 + (instancetype)containerWithSize:(CGSize)size;
 

@@ -14,6 +14,7 @@
 #import "YYTextAttribute.h"
 #import "YYTextArchiver.h"
 #import "NSAttributedString+YYText.h"
+#import <os/lock.h>
 
 const CGSize YYTextContainerMaxSize = (CGSize){0x100000, 0x100000};
 
@@ -67,7 +68,7 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
 @implementation YYTextContainer {
     @package
     BOOL _readonly; ///< used only in YYTextLayout.implementation
-    dispatch_semaphore_t _lock;
+    os_unfair_lock _lock;
     
     CGSize _size;
     UIEdgeInsets _insets;
@@ -80,6 +81,10 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     YYTextTruncationType _truncationType;
     NSAttributedString *_truncationToken;
     id<YYTextLinePositionModifier> _linePositionModifier;
+}
+
++ (CGSize)maximumContainerSize {
+    return YYTextContainerMaxSize;
 }
 
 + (instancetype)containerWithSize:(CGSize)size {
@@ -102,14 +107,14 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
 - (instancetype)init {
     self = [super init];
     if (!self) return nil;
-    _lock = dispatch_semaphore_create(1);
+    _lock = OS_UNFAIR_LOCK_INIT;
     _pathFillEvenOdd = YES;
     return self;
 }
 
 - (id)copyWithZone:(NSZone *)zone {
     YYTextContainer *one = [self.class new];
-    dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER);
+    os_unfair_lock_lock(&_lock);
     one->_size = _size;
     one->_insets = _insets;
     one->_path = _path;
@@ -121,7 +126,7 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     one->_truncationType = _truncationType;
     one->_truncationToken = _truncationToken.copy;
     one->_linePositionModifier = [(NSObject *)_linePositionModifier copy];
-    dispatch_semaphore_signal(_lock);
+    os_unfair_lock_unlock(&_lock);
     return one;
 }
 
@@ -163,9 +168,9 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
 }
 
 #define Getter(...) \
-dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+os_unfair_lock_lock(&_lock); \
 __VA_ARGS__; \
-dispatch_semaphore_signal(_lock);
+os_unfair_lock_unlock(&_lock);
 
 #define Setter(...) \
 if (_readonly) { \
@@ -173,9 +178,9 @@ if (_readonly) { \
 reason:@"Cannot change the property of the 'container' in 'YYTextLayout'." userInfo:nil]; \
 return; \
 } \
-dispatch_semaphore_wait(_lock, DISPATCH_TIME_FOREVER); \
+os_unfair_lock_lock(&_lock); \
 __VA_ARGS__; \
-dispatch_semaphore_signal(_lock);
+os_unfair_lock_unlock(&_lock);
 
 - (CGSize)size {
     Getter(CGSize size = _size) return size;
