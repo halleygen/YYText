@@ -59,7 +59,7 @@ extern const CGSize YYTextContainerMaxSize;
 @interface YYTextContainer : NSObject <NSCoding, NSCopying>
 
 /// The largest possible container size.
-@property (class, nonatomic, readonly) CGSize maxContainerSize;
+@property (class, nonatomic, readonly) CGSize maximumContainerSize NS_SWIFT_NAME(maximumSize);
 
 /// Creates a container with the specified size. @param size The size.
 + (instancetype)containerWithSize:(CGSize)size;
@@ -70,7 +70,7 @@ extern const CGSize YYTextContainerMaxSize;
 /// Creates a container with the specified path. @param path The path.
 + (instancetype)containerWithPath:(nullable UIBezierPath *)path;
 
-/// The constrained size. (if the size is larger than YYTextContainerMaxSize, it will be clipped)
+/// The constrained size. (if the size is larger than YYTextContainer.maximumContainerSize, it will be clipped)
 @property CGSize size;
 
 /// The insets for constrained size. The inset value should not be negative. Default is UIEdgeInsetsZero.
