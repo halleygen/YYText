@@ -148,7 +148,7 @@
 }
 
 - (NSString *)description {
-    NSMutableString *desc = @"".mutableCopy;
+    NSMutableString *desc = [NSMutableString new];
     NSRange range = self.range;
     [desc appendFormat:@"<YYTextLine: %p> row:%zd range:%tu,%tu",self, self.row, range.location, range.length];
     [desc appendFormat:@" position:%@",NSStringFromCGPoint(self.position)];

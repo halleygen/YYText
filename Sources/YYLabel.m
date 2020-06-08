@@ -77,7 +77,10 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     CGPoint center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
     UIPreviewTarget *target = [[UIPreviewTarget alloc] initWithContainer:self center:center];
 
-    UIView *snapshot = [self resizableSnapshotViewFromRect:rect afterScreenUpdates:YES withCapInsets:UIEdgeInsetsZero];
+    UIView *snapshot = [UIView new];
+    snapshot.layer.contents = self.layer.contents;
+    snapshot.layer.contentsGravity = snapshot.layer.contentsAreFlipped ? kCAGravityBottomLeft : kCAGravityTopLeft;
+    snapshot.layer.contentsScale = self.layer.contentsScale;
     
     return [[UITargetedPreview alloc] initWithView:snapshot parameters:previewParams target:target];
 }
@@ -515,8 +518,12 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
+
     if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-        [[self layer] setNeedsDisplay];
+        [self.layer setNeedsDisplay];
+    } else if (self.adjustsFontForContentSizeCategory && (self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory)) {
+        [self _setLayoutNeedUpdate];
+        [self invalidateIntrinsicContentSize];
     }
 }
 

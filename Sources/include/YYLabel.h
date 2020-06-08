@@ -60,6 +60,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (null_resettable, nonatomic, strong) UIFont *font;
 
 /**
+ A Boolean that indicates whether the object automatically updates its font when the device's content size category changes.
+ 
+ @discussion Set the value of this property to `YES` to allow the element to update its font when the size category changes. Set the value to `NO` to ignore the size category changes.
+
+ For this property to take effect, the element’s font must be vended one of the following ways:
+
+   * It must be vended using the `preferredFontForTextStyle:` or `preferredFontForTextStyle:compatibleWithTraitCollection:` method with a valid text style.
+   * It must be vended using one of the scaling methods from `UIFontMetrics`.
+
+ Because fonts are immutable, any element that adjusts for an updated content size category does not modify the font itself. Instead, the element replaces the assigned font with a new instance based on the original settings.
+
+ If you set this property to `YES`, the element adjusts for a new content size category on a `UIContentSizeCategoryDidChangeNotification`.
+ */
+@property (nonatomic) BOOL adjustsFontForContentSizeCategory;
+
+/**
  The color of the text. Default is black.
  Set a new value to this property also causes the new color to be applied to the entire `attributedText`.
  Get the value returns the color at the head of `attributedText`.
