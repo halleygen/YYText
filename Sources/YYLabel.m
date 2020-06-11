@@ -518,12 +518,14 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
-
-    if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
-        [self.layer setNeedsDisplay];
-    } else if (self.adjustsFontForContentSizeCategory && (self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory)) {
+    
+    if (self.adjustsFontForContentSizeCategory && (self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory)) {
+        [self _clearContents];
         [self _setLayoutNeedUpdate];
+        [self _endTouch];
         [self invalidateIntrinsicContentSize];
+    } else if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        [self.layer setNeedsDisplay];
     }
 }
 
