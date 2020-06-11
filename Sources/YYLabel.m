@@ -519,14 +519,16 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
     [super traitCollectionDidChange:previousTraitCollection];
     
-    if (self.adjustsFontForContentSizeCategory && (self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory)) {
-        [self _clearContents];
-        [self _setLayoutNeedUpdate];
-        [self _endTouch];
-        [self invalidateIntrinsicContentSize];
-    } else if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+    if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
         [self.layer setNeedsDisplay];
     }
+}
+
+- (void)_preferredContentSizeCategoryDidChange:(NSNotification *)notification {
+    [self _clearContents];
+    [self _setLayoutNeedUpdate];
+    [self _endTouch];
+    [self invalidateIntrinsicContentSize];
 }
 
 #pragma mark - NSCoding
@@ -664,6 +666,15 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 #pragma mark - Properties
+
+- (void)setAdjustsFontForContentSizeCategory:(BOOL)adjustsFontForContentSizeCategory {
+    _adjustsFontForContentSizeCategory = adjustsFontForContentSizeCategory;
+    if (adjustsFontForContentSizeCategory) {
+        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(_preferredContentSizeCategoryDidChange:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+    } else {
+        [NSNotificationCenter.defaultCenter removeObserver:self name:UIContentSizeCategoryDidChangeNotification object:nil];
+    }
+}
 
 - (void)setText:(NSString *)text {
     if (_text == text || [_text isEqualToString:text]) return;

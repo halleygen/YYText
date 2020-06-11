@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
  See NSAttributedString+YYText.h for more convenience methods to set the attributes.
  See YYTextAttribute.h and YYTextLayout.h for more information.
  */
-@interface YYLabel : UIView <NSCoding>
+@interface YYLabel : UIView <NSCoding, UIContentSizeCategoryAdjusting>
 
 #pragma mark - Accessing the Text Attributes
 ///=============================================================================
@@ -58,22 +58,6 @@ NS_ASSUME_NONNULL_BEGIN
  Get the value returns the font at the head of `attributedText`.
  */
 @property (null_resettable, nonatomic, strong) UIFont *font;
-
-/**
- A Boolean that indicates whether the object automatically updates its font when the device's content size category changes.
- 
- @discussion Set the value of this property to `YES` to allow the element to update its font when the size category changes. Set the value to `NO` to ignore the size category changes.
-
- For this property to take effect, the element’s font must be vended one of the following ways:
-
-   * It must be vended using the `preferredFontForTextStyle:` or `preferredFontForTextStyle:compatibleWithTraitCollection:` method with a valid text style.
-   * It must be vended using one of the scaling methods from `UIFontMetrics`.
-
- Because fonts are immutable, any element that adjusts for an updated content size category does not modify the font itself. Instead, the element replaces the assigned font with a new instance based on the original settings.
-
- If you set this property to `YES`, the element adjusts for a new content size category on a `UIContentSizeCategoryDidChangeNotification`.
- */
-@property (nonatomic) BOOL adjustsFontForContentSizeCategory;
 
 /**
  The color of the text. Default is black.
@@ -217,6 +201,19 @@ NS_ASSUME_NONNULL_BEGIN
      form, this value will match to text height.
  */
 @property (nonatomic) CGFloat preferredMaxLayoutWidth;
+
+# pragma mark - UIContentSizeCategoryAdjusting
+
+/*!
+Indicates whether the corresponding element should automatically update its font when the device’s UIContentSizeCategory is changed.
+
+ @discussion For this property to take effect, the element’s font must be one of the following:
+ 
+ - a font vended using +preferredFontForTextStyle: or +preferredFontForTextStyle:compatibleWithTraitCollection: with a valid UIFontTextStyle
+ 
+ - a font vended using -[UIFontMetrics scaledFontForFont:] or one of its variants
+*/
+@property (nonatomic) BOOL adjustsFontForContentSizeCategory;
 
 #pragma mark - Context Menu Additions
 
