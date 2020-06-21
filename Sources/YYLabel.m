@@ -1127,7 +1127,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         [attachmentLayers removeAllObjects];
     };
 
-    task.display = ^(CGContextRef context, CGSize size, BOOL (^isCancelled)(void)) {
+    task.display = ^(UIGraphicsImageRendererContext * _Nonnull context, CGSize size, BOOL (^isCancelled)(void)) {
         if (isCancelled()) return;
         if (text.length == 0) return;
         
@@ -1156,7 +1156,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             }
         }
         point = YYTextCGPointPixelRound(point);
-        [drawLayout drawInContext:context size:size point:point view:nil layer:nil debug:debug cancel:isCancelled];
+        [drawLayout drawInContext:context.CGContext size:size point:point view:nil layer:nil debug:debug cancel:isCancelled];
     };
 
     task.didDisplay = ^(CALayer *layer, BOOL finished) {

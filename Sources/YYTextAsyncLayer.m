@@ -152,7 +152,6 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
         };
         CGSize size = self.bounds.size;
         BOOL opaque = self.opaque;
-        CGFloat scale = self.contentsScale;
         CGColorRef backgroundColor = (opaque && self.backgroundColor) ? CGColorRetain(self.backgroundColor) : NULL;
         if (size.width < 1 || size.height < 1) {
             CGImageRef image = (__bridge_retained CGImageRef)(self.contents);
@@ -213,7 +212,7 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
             }
             CGColorRelease(backgroundColor);
         }
-        task.display(rendererContext.CGContext, size, isCancelled);
+        task.display(rendererContext, size, isCancelled);
     }];
 }
 

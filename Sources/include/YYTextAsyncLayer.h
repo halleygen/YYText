@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
  block param isCancelled:  If this block returns `YES`, the method should cancel the
  drawing process and return as quickly as possible.
  */
-@property (nullable, nonatomic, copy) void (^display)(CGContextRef context, CGSize size, BOOL(^isCancelled)(void));
+@property (nullable, nonatomic, copy) void (^display)(UIGraphicsImageRendererContext * _Nonnull context, CGSize size, BOOL(^isCancelled)(void));
 
 /**
  This block will be called after the asynchronous drawing finished.
