@@ -15,11 +15,11 @@
 
 
 #ifndef YYTEXT_CLAMP // return the clamped value
-#define YYTEXT_CLAMP(_x_, _low_, _high_)  (((_x_) > (_high_)) ? (_high_) : (((_x_) < (_low_)) ? (_low_) : (_x_)))
+#define YYTEXT_CLAMP(x, min, max)  MIN(max, MAX(x, min))
 #endif
 
 #ifndef YYTEXT_SWAP // swap two value
-#define YYTEXT_SWAP(_a_, _b_)  do { __typeof__(_a_) _tmp_ = (_a_); (_a_) = (_b_); (_b_) = _tmp_; } while (0)
+#define YYTEXT_SWAP(a, b) ({ __typeof__(a) SWAP_tmp = (a); (a) = (b); (b) = SWAP_tmp; })
 #endif
 
 NS_ASSUME_NONNULL_BEGIN

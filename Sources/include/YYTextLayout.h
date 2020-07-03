@@ -67,6 +67,8 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
 /// Creates a container with the specified path. @param path The path.
 - (instancetype)initWithPath:(nonnull UIBezierPath *)path;
 
+- (instancetype)init NS_UNAVAILABLE;
+
 /// The constrained size. (if the size is larger than YYTextContainer.maximumContainerSize, it will be clipped)
 @property CGSize size;
 
