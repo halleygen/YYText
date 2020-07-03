@@ -83,10 +83,6 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     id<YYTextLinePositionModifier> _linePositionModifier;
 }
 
-+ (CGSize)maximumContainerSize {
-    return YYTextContainerMaxSize;
-}
-
 - (instancetype)initWithSize:(CGSize)size {
     return [self initWithSize:size insets:UIEdgeInsetsZero];
 }
@@ -2976,7 +2972,7 @@ static void YYTextDrawShadow(YYTextLayout *layout, CGContextRef context, CGSize 
                 CGContextSetTextPosition(context, linePosX, linePosY);
                 NSDictionary *attrs = (id)CTRunGetAttributes(run);
                 YYTextShadow *shadow = attrs[YYTextShadowAttributeName];
-                YYTextShadow *nsShadow = [YYTextShadow shadowWithNSShadow:attrs[NSShadowAttributeName]]; // NSShadow compatible
+                YYTextShadow *nsShadow = [[YYTextShadow alloc] initWithNSShadow:attrs[NSShadowAttributeName]]; // NSShadow compatible
                 if (nsShadow) {
                     nsShadow.subShadow = shadow;
                     shadow = nsShadow;

@@ -1138,7 +1138,7 @@ return style. _attr_;
                         userInfo:(NSDictionary *)userInfo
                        tapAction:(YYTextAction)tapAction
                  longPressAction:(YYTextAction)longPressAction {
-    YYTextHighlight *highlight = [YYTextHighlight highlightWithBackgroundColor:backgroundColor];
+    YYTextHighlight *highlight = [[YYTextHighlight alloc] initWithBackgroundColor:backgroundColor];
     highlight.userInfo = userInfo;
     highlight.tapAction = tapAction;
     highlight.longPressAction = longPressAction;

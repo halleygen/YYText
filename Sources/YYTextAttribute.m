@@ -32,8 +32,8 @@ NSString *const YYTextAttachmentToken = @"\uFFFC";
 NSString *const YYTextTruncationToken = @"\u2026";
 
 
-YYTextAttributeType YYTextAttributeGetType(NSString *name){
-    if (name.length == 0) return YYTextAttributeTypeNone;
+YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
+    if (attribute.length == 0) return YYTextAttributeTypeNone;
     
     static NSMutableDictionary *dic;
     static dispatch_once_t onceToken;
@@ -97,7 +97,7 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
         dic[YYTextHighlightAttributeName] = YYText;
         dic[YYTextGlyphTransformAttributeName] = YYText;
     });
-    NSNumber *num = dic[name];
+    NSNumber *num = dic[attribute];
     if (num != nil) return num.integerValue;
     return YYTextAttributeTypeNone;
 }
@@ -109,10 +109,14 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-+ (instancetype)stringWithString:(NSString *)string {
-    YYTextBackedString *one = [self new];
-    one.string = string;
-    return one;
+- (instancetype)initWithString:(NSString *)string {
+    self = [super init];
+    self.string = string;
+    return self;
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -120,9 +124,8 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
-    _string = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"string"];
-    return self;
+    NSString *string = [aDecoder decodeObjectOfClass:[NSString class] forKey:@"string"];
+    return [self initWithString:string];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -140,10 +143,14 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-+ (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm {
-    YYTextBinding *one = [self new];
-    one.deleteConfirm = deleteConfirm;
-    return one;
+- (instancetype)initWithDeleteConfirm:(BOOL)deleteConfirm {
+    self = [super init];
+    self.deleteConfirm = deleteConfirm;
+    return self;
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -151,9 +158,8 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
-    _deleteConfirm = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"deleteConfirm"]).boolValue;
-    return self;
+    BOOL deleteConfirm = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"deleteConfirm"]).boolValue;
+    return [self initWithDeleteConfirm:deleteConfirm];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -171,29 +177,27 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-+ (instancetype)shadowWithColor:(UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius {
-    YYTextShadow *one = [self new];
-    one.color = color;
-    one.offset = offset;
-    one.radius = radius;
-    return one;
+- (instancetype)initWithColor:(UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius {
+    self = [super init];
+    self.color = color;
+    self.offset = offset;
+    self.radius = radius;
+    return self;
 }
 
-+ (instancetype)shadowWithNSShadow:(NSShadow *)nsShadow {
-    if (!nsShadow) return nil;
-    YYTextShadow *shadow = [self new];
-    shadow.offset = nsShadow.shadowOffset;
-    shadow.radius = nsShadow.shadowBlurRadius;
+- (instancetype)initWithNSShadow:(NSShadow *)nsShadow {
     id color = nsShadow.shadowColor;
     if (color) {
         if (CGColorGetTypeID() == CFGetTypeID((__bridge CFTypeRef)(color))) {
             color = [UIColor colorWithCGColor:(__bridge CGColorRef)(color)];
         }
-        if ([color isKindOfClass:[UIColor class]]) {
-            shadow.color = color;
-        }
     }
-    return shadow;
+    
+    return [self initWithColor:color offset:nsShadow.shadowOffset radius:nsShadow.shadowBlurRadius];
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (NSShadow *)nsShadow {
@@ -212,11 +216,11 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
-    _color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
-    _radius = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"radius"]).floatValue;
-    _offset = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"offset"]).CGSizeValue;
-    _subShadow = [aDecoder decodeObjectOfClass:[YYTextShadow class] forKey:@"subShadow"];
+    UIColor *color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
+    CGFloat radius = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"radius"]).floatValue;
+    CGSize offset = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"offset"]).CGSizeValue;
+    self = [self initWithColor:color offset:offset radius:radius];
+    self.subShadow = [aDecoder decodeObjectOfClass:[YYTextShadow class] forKey:@"subShadow"];
     return self;
 }
 
@@ -238,23 +242,20 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-- (instancetype)init {
+- (instancetype)initWithStyle:(YYTextLineStyle)style {
+    return [self initWithStyle:style width:nil color:nil];
+}
+
+- (instancetype)initWithStyle:(YYTextLineStyle)style width:(NSNumber *)width color:(UIColor *)color {
     self = [super init];
-    _style = YYTextLineStyleSingle;
+    self.style = style;
+    self.width = width;
+    self.color = color;
     return self;
 }
 
-+ (instancetype)decorationWithStyle:(YYTextLineStyle)style {
-    YYTextDecoration *one = [self new];
-    one.style = style;
-    return one;
-}
-+ (instancetype)decorationWithStyle:(YYTextLineStyle)style width:(NSNumber *)width color:(UIColor *)color {
-    YYTextDecoration *one = [self new];
-    one.style = style;
-    one.width = width;
-    one.color = color;
-    return one;
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -264,11 +265,10 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
-    self.style = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"style"]).unsignedIntegerValue;
-    self.width = [aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"width"];
-    self.color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
-    return self;
+    NSUInteger style = ((NSNumber *)[aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"style"]).unsignedIntegerValue;
+    NSNumber *width = [aDecoder decodeObjectOfClass:[NSNumber class] forKey:@"width"];
+    UIColor *color = [aDecoder decodeObjectOfClass:[UIColor class] forKey:@"color"];
+    return [self initWithStyle:style width:width color:color];
 }
 
 - (id)copyWithZone:(NSZone *)zone {
@@ -288,26 +288,25 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-+ (instancetype)borderWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color {
-    YYTextBorder *one = [self new];
-    one.lineStyle = lineStyle;
-    one.strokeWidth = width;
-    one.strokeColor = color;
-    return one;
+- (instancetype)initWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color {
+    self = [super init];
+    self.lineStyle = lineStyle;
+    self.strokeWidth = width;
+    self.strokeColor = color;
+    return self;
 }
 
-+ (instancetype)borderWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius {
-    YYTextBorder *one = [self new];
-    one.fillColor = color;
-    one.cornerRadius = cornerRadius;
-    one.insets = UIEdgeInsetsMake(-2, 0, 0, -2);
-    return one;
+- (instancetype)initWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius {
+    self = [super init];
+    self.lineStyle = YYTextLineStyleSingle;
+    self.fillColor = color;
+    self.cornerRadius = cornerRadius;
+    self.insets = UIEdgeInsetsMake(-2, 0, 0, -2);
+    return self;
 }
 
 - (instancetype)init {
-    self = [super init];
-    self.lineStyle = YYTextLineStyleSingle;
-    return self;
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -356,10 +355,14 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-+ (instancetype)attachmentWithContent:(id)content {
-    YYTextAttachment *one = [self new];
-    one.content = content;
-    return one;
+- (instancetype)initWithContent:(id)content {
+    self = [super init];
+    self.content = content;
+    return self;
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -369,11 +372,11 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
     NSSet *contentClasses = [[NSSet alloc] initWithObjects:[UIImage class], [UIView class], [CALayer class], nil];
-    _content = [aDecoder decodeObjectOfClasses:contentClasses forKey:@"content"];
-    _contentInsets = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"contentInsets"]).UIEdgeInsetsValue;
-    _userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:@"userInfo"];
+    id content = [aDecoder decodeObjectOfClasses:contentClasses forKey:@"content"];
+    self = [self initWithContent:content];
+    self.contentInsets = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"contentInsets"]).UIEdgeInsetsValue;
+    self.userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:@"userInfo"];
     return self;
 }
 
@@ -398,21 +401,23 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
     return YES;
 }
 
-+ (instancetype)highlightWithAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
-    YYTextHighlight *one = [self new];
-    one.attributes = attributes;
-    return one;
+- (instancetype)initWithAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
+    self = [super init];
+    self.attributes = attributes;
+    return self;
 }
 
-+ (instancetype)highlightWithBackgroundColor:(UIColor *)color {
+- (instancetype)initWithBackgroundColor:(UIColor *)color {
     YYTextBorder *highlightBorder = [YYTextBorder new];
     highlightBorder.insets = UIEdgeInsetsMake(-2, -1, -2, -1);
     highlightBorder.cornerRadius = 3;
     highlightBorder.fillColor = color;
     
-    YYTextHighlight *one = [self new];
-    [one setBackgroundBorder:highlightBorder];
-    return one;
+    return [self initWithAttributes:@{ YYTextBackgroundBorderAttributeName: highlightBorder }];
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
 }
 
 - (void)setAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
@@ -425,10 +430,13 @@ YYTextAttributeType YYTextAttributeGetType(NSString *name){
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super init];
     NSData *data = [aDecoder decodeObjectOfClass:[NSData class] forKey:@"attributes"];
-    _attributes = [YYTextUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:data error:nil];
-    return self;
+    NSDictionary *attributes = [YYTextUnarchiver unarchivedObjectOfClass:[NSDictionary class] fromData:data error:nil];
+    if (attributes) {
+        return [self initWithAttributes:attributes];
+    } else {
+        return nil;
+    }
 }
 
 - (id)copyWithZone:(NSZone *)zone {

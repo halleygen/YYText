@@ -1531,7 +1531,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             case NSTextCheckingTypePhoneNumber: {
                 detected = YES;
                 if (_highlightTextAttributes.count) {
-                    YYTextHighlight *highlight = [YYTextHighlight highlightWithAttributes:_highlightTextAttributes];
+                    YYTextHighlight *highlight = [[YYTextHighlight alloc] initWithAttributes:_highlightTextAttributes];
                     [text yy_setTextHighlight:highlight range:result.range];
                 }
                 if (_linkTextAttributes.count) {

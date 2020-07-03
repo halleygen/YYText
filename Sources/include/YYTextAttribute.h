@@ -24,7 +24,7 @@ typedef NS_OPTIONS(NSInteger, YYTextAttributeType) {
 };
 
 /// Get the attribute type from an attribute name.
-extern YYTextAttributeType YYTextAttributeGetType(NSString *attributeName);
+extern YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attributeName) NS_SWIFT_NAME(YYText.type(of:));
 
 /**
  Line style in YYText (similar to NSUnderlineStyle).
@@ -146,8 +146,8 @@ UIKIT_EXTERN NSAttributedStringKey const YYTextGlyphTransformAttributeName NS_SW
 
 #pragma mark - String Token Define
 
-UIKIT_EXTERN NSString *const YYTextAttachmentToken; ///< Object replacement character (U+FFFC), used for text attachment.
-UIKIT_EXTERN NSString *const YYTextTruncationToken; ///< Horizontal ellipsis (U+2026), used for text truncation  "…".
+UIKIT_EXTERN NSString *const YYTextAttachmentToken NS_SWIFT_NAME(YYText.attachmentToken); ///< Object replacement character (U+FFFC), used for text attachment.
+UIKIT_EXTERN NSString *const YYTextTruncationToken NS_SWIFT_NAME(YYText.truncationToken); ///< Horizontal ellipsis (U+2026), used for text truncation  "…".
 
 
 
@@ -173,7 +173,8 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  Example: If :) is replace by a custom emoji (such as😊), the backed string can be set to @":)".
  */
 @interface YYTextBackedString : NSObject <NSSecureCoding, NSCopying>
-+ (instancetype)stringWithString:(nullable NSString *)string;
+- (instancetype)initWithString:(nullable NSString *)string NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 @property (nullable, nonatomic, copy) NSString *string; ///< backed string
 @end
 
@@ -188,7 +189,8 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  selection and edit.
  */
 @interface YYTextBinding : NSObject <NSSecureCoding, NSCopying>
-+ (instancetype)bindingWithDeleteConfirm:(BOOL)deleteConfirm;
+- (instancetype)initWithDeleteConfirm:(BOOL)deleteConfirm NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 @property (nonatomic) BOOL deleteConfirm; ///< confirm the range when delete in YYTextView
 @end
 
@@ -201,7 +203,8 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  It's similar to `NSShadow`, but offers more options.
  */
 @interface YYTextShadow : NSObject <NSSecureCoding, NSCopying>
-+ (instancetype)shadowWithColor:(nullable UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius;
+- (instancetype)initWithColor:(nullable UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 
 @property (nullable, nonatomic, strong) UIColor *color; ///< shadow color
 @property (nonatomic) CGSize offset;                    ///< shadow offset
@@ -209,7 +212,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 @property (nonatomic) CGBlendMode blendMode;            ///< shadow blend mode
 @property (nullable, nonatomic, strong) YYTextShadow *subShadow;  ///< a sub shadow which will be added above the parent shadow
 
-+ (instancetype)shadowWithNSShadow:(NSShadow *)nsShadow; ///< convert NSShadow to YYTextShadow
+- (instancetype)initWithNSShadow:(NSShadow *)nsShadow; ///< convert NSShadow to YYTextShadow
 - (NSShadow *)nsShadow; ///< convert YYTextShadow to NSShadow
 @end
 
@@ -223,8 +226,9 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  when it's used as strikethrough, the line is drawn above text glyphs.
  */
 @interface YYTextDecoration : NSObject <NSSecureCoding, NSCopying>
-+ (instancetype)decorationWithStyle:(YYTextLineStyle)style;
-+ (instancetype)decorationWithStyle:(YYTextLineStyle)style width:(nullable NSNumber *)width color:(nullable UIColor *)color;
+- (instancetype)initWithStyle:(YYTextLineStyle)style;
+- (instancetype)initWithStyle:(YYTextLineStyle)style width:(nullable NSNumber *)width color:(nullable UIColor *)color NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 @property (nonatomic) YYTextLineStyle style;                   ///< line style
 @property (nullable, nonatomic, strong) NSNumber *width;       ///< line width (nil means automatic width)
 @property (nullable, nonatomic, strong) UIColor *color;        ///< line color (nil means automatic color)
@@ -246,8 +250,9 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
     ╰──────╯
  */
 @interface YYTextBorder : NSObject <NSSecureCoding, NSCopying>
-+ (instancetype)borderWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(nullable UIColor *)color;
-+ (instancetype)borderWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius;
+- (instancetype)initWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(nullable UIColor *)color;
+- (instancetype)initWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius;
+- (instancetype)init NS_UNAVAILABLE;
 @property (nonatomic) YYTextLineStyle lineStyle;              ///< border line style
 @property (nonatomic) CGFloat strokeWidth;                    ///< border line width
 @property (nullable, nonatomic, strong) UIColor *strokeColor; ///< border line color
@@ -270,7 +275,8 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  then it will be added to the text container's view or layer.
  */
 @interface YYTextAttachment : NSObject<NSSecureCoding, NSCopying>
-+ (instancetype)attachmentWithContent:(nullable id)content;
+- (instancetype)initWithContent:(id)content;
+- (instancetype)init NS_UNAVAILABLE;
 @property (nullable, nonatomic, strong) id content;             ///< Supported type: UIImage, UIView, CALayer
 @property (nonatomic) UIViewContentMode contentMode;            ///< Content display mode.
 @property (nonatomic) UIEdgeInsets contentInsets;               ///< The insets when drawing content.
@@ -303,14 +309,16 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  @param attributes The attributes which will replace original attributes when highlight,
         If the value is NSNull, it will removed when highlight.
  */
-+ (instancetype)highlightWithAttributes:(nullable NSDictionary<NSString *, id> *)attributes;
+- (instancetype)initWithAttributes:(nullable NSDictionary<NSString *, id> *)attributes NS_DESIGNATED_INITIALIZER;
 
 /**
  Convenience methods to create a default highlight with the specifeid background color.
  
  @param color The background border color.
  */
-+ (instancetype)highlightWithBackgroundColor:(nullable UIColor *)color;
+- (instancetype)initWithBackgroundColor:(nullable UIColor *)color;
+
+- (instancetype)init NS_UNAVAILABLE;
 
 // Convenience methods below to set the `attributes`.
 - (void)setFont:(nullable UIFont *)font;

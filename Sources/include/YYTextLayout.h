@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The max text container size in layout.
  */
-extern const CGSize YYTextContainerMaxSize;
+extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize);
 
 /**
  The YYTextContainer class defines a region in which text is laid out.
@@ -57,9 +57,6 @@ extern const CGSize YYTextContainerMaxSize;
      └─────────────────────────────┘
  */
 @interface YYTextContainer : NSObject <NSCoding, NSCopying>
-
-/// The largest possible container size.
-@property (class, nonatomic, readonly) CGSize maximumContainerSize NS_SWIFT_NAME(maximumSize);
 
 /// Creates a container with the specified size. @param size The size.
 - (instancetype)initWithSize:(CGSize)size;
