@@ -22,20 +22,20 @@
 - (NSData *)yy_archiveToDataWithError:(NSError **)error {
     NSData *data = [YYTextArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:error];
     
-    if (*error) {
-        return nil;
-    } else {
+    if (data) {
         return data;
+    } else {
+        return nil;
     }
 }
 
 + (instancetype)yy_unarchiveFromData:(NSData *)data withError:(NSError *__autoreleasing  _Nullable *)error {
     NSAttributedString *attributedString = [YYTextUnarchiver unarchivedObjectOfClass:[NSAttributedString class] fromData:data error:error];
     
-    if (*error) {
-        return nil;
-    } else {
+    if (attributedString) {
         return attributedString;
+    } else {
+        return nil;
     }
 }
 
