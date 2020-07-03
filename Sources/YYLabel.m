@@ -119,7 +119,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 }
 
 - (void)_updateLayout {
-    _innerLayout = [YYTextLayout layoutWithContainer:_innerContainer text:_innerText];
+    _innerLayout = [[YYTextLayout alloc] initWithContainer:_innerContainer text:_innerText];
     _shrinkInnerLayout = [YYLabel _shrinkLayoutWithLayout:_innerLayout];
 }
 
@@ -167,7 +167,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             containerSize.width = YYTextContainerMaxSize.width;
         }
         container.size = containerSize;
-        return [YYTextLayout layoutWithContainer:container text:layout.text];
+        return [[YYTextLayout alloc] initWithContainer:container text:layout.text];
     } else {
         return nil;
     }
@@ -227,7 +227,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         [newAttrs enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
             [hiText yy_setAttribute:key value:value range:self->_highlightRange];
         }];
-        _highlightLayout = [YYTextLayout layoutWithContainer:_innerContainer text:hiText];
+        _highlightLayout = [[YYTextLayout alloc] initWithContainer:_innerContainer text:hiText];
         _shrinkHighlightLayout = [YYLabel _shrinkLayoutWithLayout:_highlightLayout];
         if (!_highlightLayout) _highlight = nil;
     }
@@ -508,7 +508,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     YYTextContainer *container = [_innerContainer copy];
     container.size = size;
     
-    YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
+    YYTextLayout *layout = [[YYTextLayout alloc] initWithContainer:container text:_innerText];
     return layout.boundingSize;
 }
 
@@ -850,10 +850,12 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     }
 }
 
-- (void)setNumberOfLines:(NSUInteger)numberOfLines {
-    if (_numberOfLines == numberOfLines) return;
-    _numberOfLines = numberOfLines;
-    _innerContainer.maximumNumberOfRows = numberOfLines;
+- (void)setNumberOfLines:(NSInteger)numberOfLines {
+    NSInteger positiveNumberOfLines = MAX(numberOfLines, 0);
+
+    if (_numberOfLines == positiveNumberOfLines) return;
+    _numberOfLines = positiveNumberOfLines;
+    _innerContainer.maximumNumberOfRows = positiveNumberOfLines;
     if (_innerText.length && !_ignoresCommonProperties) {
         if (_displaysAsynchronously && _clearsContentsBeforeAsynchronouslyDisplay) {
             [self _clearContents];
@@ -1047,7 +1049,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         YYTextContainer *container = [_innerContainer copy];
         container.size = YYTextContainerMaxSize;
         
-        YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
+        YYTextLayout *layout = [[YYTextLayout alloc] initWithContainer:container text:_innerText];
         return layout.boundingSize;
     }
     
@@ -1065,7 +1067,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     YYTextContainer *container = [_innerContainer copy];
     container.size = containerSize;
     
-    YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
+    YYTextLayout *layout = [[YYTextLayout alloc] initWithContainer:container text:_innerText];
     return layout.boundingSize;
 }
 
@@ -1133,7 +1135,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         
         YYTextLayout *drawLayout = layout;
         if (layoutNeedUpdate) {
-            layout = [YYTextLayout layoutWithContainer:container text:text];
+            layout = [[YYTextLayout alloc] initWithContainer:container text:text];
             shrinkLayout = [YYLabel _shrinkLayoutWithLayout:layout];
             if (isCancelled()) return;
             layoutUpdated = YES;

@@ -236,7 +236,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         }];
     }
     [self willChangeValueForKey:@"textLayout"];
-    _innerLayout = [YYTextLayout layoutWithContainer:_innerContainer text:text];
+    _innerLayout = [[YYTextLayout alloc] initWithContainer:_innerContainer text:text];
     [self didChangeValueForKey:@"textLayout"];
     CGSize size = [_innerLayout boundingSize];
     CGSize visibleSize = [self _getVisibleSize];
@@ -362,7 +362,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         container.size = self.bounds.size;
         container.truncationType = YYTextTruncationTypeEnd;
         container.truncationToken = nil;
-        YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_placeholderAttributedText];
+        YYTextLayout *layout = [[YYTextLayout alloc] initWithContainer:container text:_placeholderAttributedText];
         CGSize size = [layout boundingSize];
         BOOL needDraw = size.width > 1 && size.height > 1;
         if (needDraw) {
@@ -644,7 +644,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         [newAttrs enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
             [hiText yy_setAttribute:key value:value range:_highlightRange];
         }];
-        _highlightLayout = [YYTextLayout layoutWithContainer:_innerContainer text:hiText];
+        _highlightLayout = [[YYTextLayout alloc] initWithContainer:_innerContainer text:hiText];
         if (!_highlightLayout) _highlight = nil;
     }
     
@@ -2260,7 +2260,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     YYTextContainer *container = [_innerContainer copy];
     container.size = size;
     
-    YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:_innerText];
+    YYTextLayout *layout = [[YYTextLayout alloc] initWithContainer:container text:_innerText];
     return layout.boundingSize;
 }
 

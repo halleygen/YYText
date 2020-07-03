@@ -125,7 +125,7 @@ NS_ASSUME_NONNULL_BEGIN
  The maximum number of lines to use for rendering text. Default value is 1.
  0 means no limit.
  */
-@property (nonatomic) NSUInteger numberOfLines;
+@property (nonatomic) NSInteger numberOfLines;
 
 /**
  When `text` or `attributedText` is changed, the parser will be called to modify the text.
@@ -345,7 +345,7 @@ Indicates whether the corresponding element should automatically update its font
         container.maximumNumberOfRows = 0;
         
         // Generate a text layout.
-        YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:text];
+        YYTextLayout *layout = [YYTextLayout initWithContainer:container text:text];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             label.size = layout.textBoundingSize;

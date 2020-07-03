@@ -62,13 +62,13 @@ extern const CGSize YYTextContainerMaxSize;
 @property (class, nonatomic, readonly) CGSize maximumContainerSize NS_SWIFT_NAME(maximumSize);
 
 /// Creates a container with the specified size. @param size The size.
-+ (instancetype)containerWithSize:(CGSize)size;
+- (instancetype)initWithSize:(CGSize)size;
 
 /// Creates a container with the specified size and insets. @param size The size. @param insets The text insets.
-+ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets;
+- (instancetype)initWithSize:(CGSize)size insets:(UIEdgeInsets)insets;
 
 /// Creates a container with the specified path. @param path The path.
-+ (instancetype)containerWithPath:(nullable UIBezierPath *)path;
+- (instancetype)initWithPath:(nonnull UIBezierPath *)path;
 
 /// The constrained size. (if the size is larger than YYTextContainer.maximumContainerSize, it will be clipped)
 @property CGSize size;
@@ -94,7 +94,7 @@ extern const CGSize YYTextContainerMaxSize;
 @property (getter=isVerticalForm) BOOL verticalForm;
 
 /// Maximum number of rows, 0 means no limit. Default is 0.
-@property NSUInteger maximumNumberOfRows;
+@property NSInteger maximumNumberOfRows;
 
 /// The line truncation type, default is none.
 @property YYTextTruncationType truncationType;
@@ -169,7 +169,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param text The text (if nil, returns nil).
  @return A new layout, or nil when an error occurs.
 */
-+ (nullable YYTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text;
+- (nullable instancetype)initWithContainerSize:(CGSize)size text:(NSAttributedString *)text;
 
 /**
  Generate a layout with the given container and text.
@@ -178,7 +178,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param text      The text (if nil, returns nil).
  @return A new layout, or nil when an error occurs.
  */
-+ (nullable YYTextLayout *)layoutWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text;
+- (nullable instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text;
 
 /**
  Generate a layout with the given container and text.
@@ -189,7 +189,7 @@ extern const CGSize YYTextContainerMaxSize;
     length of the range is 0, it means the length is no limit.
  @return A new layout, or nil when an error occurs.
  */
-+ (nullable YYTextLayout *)layoutWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range;
+- (nullable instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range NS_DESIGNATED_INITIALIZER;
 
 /**
  Generate layouts with the given containers and text.
@@ -199,7 +199,7 @@ extern const CGSize YYTextContainerMaxSize;
  @return An array of YYTextLayout object (the count is same as containers),
     or nil when an error occurs.
  */
-+ (nullable NSArray<YYTextLayout *> *)layoutWithContainers:(NSArray<YYTextContainer *> *)containers
++ (nonnull NSArray<YYTextLayout *> *)layoutWithContainers:(NSArray<YYTextContainer *> *)containers
                                                       text:(NSAttributedString *)text;
 
 /**
@@ -212,8 +212,8 @@ extern const CGSize YYTextContainerMaxSize;
  @return An array of YYTextLayout object (the count is same as containers),
     or nil when an error occurs.
  */
-+ (nullable NSArray<YYTextLayout *> *)layoutWithContainers:(NSArray<YYTextContainer *> *)containers
-                                                      text:(NSAttributedString *)text
++ (nonnull NSArray<YYTextLayout *> *)layoutWithContainers:(nonnull NSArray<YYTextContainer *> *)containers
+                                                      text:(nonnull NSAttributedString *)text
                                                      range:(NSRange)range;
 
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
@@ -248,7 +248,7 @@ extern const CGSize YYTextContainerMaxSize;
 ///< Set of Attachment (UIImage/UIView/CALayer)
 @property (nullable, nonatomic, strong, readonly) NSSet *attachmentContentsSet;
 ///< Number of rows
-@property (nonatomic, readonly) NSUInteger rowCount;
+@property (nonatomic, readonly) NSInteger rowCount;
 ///< Visible text range
 @property (nonatomic, readonly) NSRange visibleRange;
 ///< Bounding rect (glyphs)
@@ -288,7 +288,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param row  A row index.
  @return The line index, or NSNotFound if not found.
  */
-- (NSUInteger)lineIndexForRow:(NSUInteger)row;
+- (NSInteger)lineIndexForRow:(NSInteger)row;
 
 /**
  The number of lines for row.
@@ -296,7 +296,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param row  A row index.
  @return The number of lines, or NSNotFound when an error occurs.
  */
-- (NSUInteger)lineCountForRow:(NSUInteger)row;
+- (NSInteger)lineCountForRow:(NSInteger)row;
 
 /**
  The row index for line.
@@ -305,7 +305,7 @@ extern const CGSize YYTextContainerMaxSize;
  
  @return The row index, or NSNotFound if not found.
  */
-- (NSUInteger)rowIndexForLine:(NSUInteger)line;
+- (NSInteger)rowIndexForLine:(NSInteger)line;
 
 /**
  The line index for a specified point.
@@ -315,7 +315,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param point  A point in the container.
  @return The line index, or NSNotFound if not found.
  */
-- (NSUInteger)lineIndexForPoint:(CGPoint)point;
+- (NSInteger)lineIndexForPoint:(CGPoint)point;
 
 /**
  The line index closest to a specified point.
@@ -323,7 +323,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param point  A point in the container.
  @return The line index, or NSNotFound if no line exist in layout.
  */
-- (NSUInteger)closestLineIndexForPoint:(CGPoint)point;
+- (NSInteger)closestLineIndexForPoint:(CGPoint)point;
 
 /**
  The offset in container for a text position in a specified line.
@@ -335,7 +335,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param lineIndex  The line index.
  @return The offset in container, or CGFLOAT_MAX if not found.
  */
-- (CGFloat)offsetForTextPosition:(NSUInteger)position lineIndex:(NSUInteger)lineIndex;
+- (CGFloat)offsetForTextPosition:(NSInteger)position lineIndex:(NSInteger)lineIndex;
 
 /**
  The text position for a point in a specified line.
@@ -347,7 +347,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param lineIndex  The line index.
  @return The text position, or NSNotFound if not found.
  */
-- (NSUInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSUInteger)lineIndex;
+- (NSInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSInteger)lineIndex;
 
 /**
  The closest text position to a specified point.
@@ -436,7 +436,7 @@ extern const CGSize YYTextContainerMaxSize;
  @param position A text-position object that identifies a location in layout.
  @return The line index, or NSNotFound if not found.
  */
-- (NSUInteger)lineIndexForPosition:(YYTextPosition *)position;
+- (NSInteger)lineIndexForPosition:(YYTextPosition *)position;
 
 /**
  Returns the baseline position for a given text position.

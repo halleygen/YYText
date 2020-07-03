@@ -87,21 +87,21 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     return YYTextContainerMaxSize;
 }
 
-+ (instancetype)containerWithSize:(CGSize)size {
-    return [self containerWithSize:size insets:UIEdgeInsetsZero];
+- (instancetype)initWithSize:(CGSize)size {
+    return [self initWithSize:size insets:UIEdgeInsetsZero];
 }
 
-+ (instancetype)containerWithSize:(CGSize)size insets:(UIEdgeInsets)insets {
-    YYTextContainer *one = [self new];
-    one.size = YYTextClipCGSize(size);
-    one.insets = insets;
-    return one;
+- (instancetype)initWithSize:(CGSize)size insets:(UIEdgeInsets)insets {
+    self = [self init];
+    self.size = YYTextClipCGSize(size);
+    self.insets = insets;
+    return self;
 }
 
-+ (instancetype)containerWithPath:(UIBezierPath *)path {
-    YYTextContainer *one = [self new];
-    one.path = path;
-    return one;
+- (instancetype)initWithPath:(UIBezierPath *)path {
+    self = [self init];
+    self.path = path;
+    return self;
 }
 
 - (instancetype)init {
@@ -257,11 +257,11 @@ os_unfair_lock_unlock(&_lock);
     Setter(_verticalForm = verticalForm);
 }
 
-- (NSUInteger)maximumNumberOfRows {
-    Getter(NSUInteger num = _maximumNumberOfRows) return num;
+- (NSInteger)maximumNumberOfRows {
+    Getter(NSInteger num = _maximumNumberOfRows) return num;
 }
 
-- (void)setMaximumNumberOfRows:(NSUInteger)maximumNumberOfRows {
+- (void)setMaximumNumberOfRows:(NSInteger)maximumNumberOfRows {
     Setter(_maximumNumberOfRows = maximumNumberOfRows);
 }
 
@@ -310,7 +310,7 @@ os_unfair_lock_unlock(&_lock);
 @property (nonatomic, readwrite) NSArray *attachmentRanges;
 @property (nonatomic, readwrite) NSArray *attachmentRects;
 @property (nonatomic, readwrite) NSSet *attachmentContentsSet;
-@property (nonatomic, readwrite) NSUInteger rowCount;
+@property (nonatomic, readwrite) NSInteger rowCount;
 @property (nonatomic, readwrite) NSRange visibleRange;
 @property (nonatomic, readwrite) CGRect boundingRect;
 @property (nonatomic, readwrite) CGSize boundingSize;
@@ -337,21 +337,16 @@ os_unfair_lock_unlock(&_lock);
 
 #pragma mark - Layout
 
-- (instancetype)_init {
-    self = [super init];
-    return self;
+- (instancetype)initWithContainerSize:(CGSize)size text:(NSAttributedString *)text {
+    YYTextContainer *container = [[YYTextContainer alloc] initWithSize:size];
+    return [self initWithContainer:container text:text];
 }
 
-+ (YYTextLayout *)layoutWithContainerSize:(CGSize)size text:(NSAttributedString *)text {
-    YYTextContainer *container = [YYTextContainer containerWithSize:size];
-    return [self layoutWithContainer:container text:text];
+- (instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text {
+    return [self initWithContainer:container text:text range:NSMakeRange(0, text.length)];
 }
 
-+ (YYTextLayout *)layoutWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text {
-    return [self layoutWithContainer:container text:text range:NSMakeRange(0, text.length)];
-}
-
-+ (YYTextLayout *)layoutWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
+- (instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
     YYTextLayout *layout = NULL;
     CGPathRef cgPath = nil;
     CGRect cgPathBox = {0};
@@ -385,7 +380,7 @@ os_unfair_lock_unlock(&_lock);
     container->_readonly = YES;
     maximumNumberOfRows = container.maximumNumberOfRows;
     
-    layout = [[YYTextLayout alloc] _init];
+    layout = [super init];
     layout.text = text;
     layout.container = container;
     layout.range = range;
@@ -870,13 +865,16 @@ fail:
 }
 
 + (NSArray *)layoutWithContainers:(NSArray *)containers text:(NSAttributedString *)text range:(NSRange)range {
-    if (!containers || !text) return nil;
-    if (range.location + range.length > text.length) return nil;
+    if (range.location + range.length > text.length) {
+        NSException *e = [[NSException alloc] initWithName:NSRangeException reason:@"Range must not exceed the bounds of the attributed text." userInfo:nil];
+        [e raise];
+    }
+
     NSMutableArray *layouts = [NSMutableArray array];
     for (NSUInteger i = 0, max = containers.count; i < max; i++) {
         YYTextContainer *container = containers[i];
-        YYTextLayout *layout = [self layoutWithContainer:container text:text range:range];
-        if (!layout) return nil;
+        YYTextLayout *layout = [[YYTextLayout alloc] initWithContainer:container text:text range:range];
+        if (!layout) continue;
         NSInteger length = (NSInteger)range.length - (NSInteger)layout.visibleRange.length;
         if (length <= 0) {
             range.length = 0;
@@ -927,8 +925,7 @@ fail:
     NSAttributedString *text = [YYTextUnarchiver unarchivedObjectOfClass:[NSAttributedString class] fromData:textData error:nil];
     YYTextContainer *container = [aDecoder decodeObjectForKey:@"container"];
     NSRange range = ((NSValue *)[aDecoder decodeObjectForKey:@"range"]).rangeValue;
-    self = [self.class layoutWithContainer:container text:text range:range];
-    return self;
+    return [self initWithContainer:container text:text range:range];
 }
 
 #pragma mark - Preview Parameters
@@ -1187,13 +1184,13 @@ fail:
     return range;
 }
 
-- (NSUInteger)lineIndexForRow:(NSUInteger)row {
-    if (row >= _rowCount) return NSNotFound;
+- (NSInteger)lineIndexForRow:(NSInteger)row {
+    if (row >= _rowCount || row < 0) return NSNotFound;
     return _lineRowsIndex[row];
 }
 
-- (NSUInteger)lineCountForRow:(NSUInteger)row {
-    if (row >= _rowCount) return NSNotFound;
+- (NSInteger)lineCountForRow:(NSInteger)row {
+    if (row >= _rowCount || row < 0) return NSNotFound;
     if (row == _rowCount - 1) {
         return _lines.count - _lineRowsIndex[row];
     } else {
@@ -1201,19 +1198,19 @@ fail:
     }
 }
 
-- (NSUInteger)rowIndexForLine:(NSUInteger)line {
-    if (line >= _lines.count) return NSNotFound;
+- (NSInteger)rowIndexForLine:(NSInteger)line {
+    if (line >= _lines.count || line < 0) return NSNotFound;
     return ((YYTextLine *)_lines[line]).row;
 }
 
-- (NSUInteger)lineIndexForPoint:(CGPoint)point {
+- (NSInteger)lineIndexForPoint:(CGPoint)point {
     if (_lines.count == 0 || _rowCount == 0) return NSNotFound;
-    NSUInteger rowIdx = [self _rowIndexForEdge:_container.verticalForm ? point.x : point.y];
+    NSInteger rowIdx = [self _rowIndexForEdge:_container.verticalForm ? point.x : point.y];
     if (rowIdx == NSNotFound) return NSNotFound;
     
-    NSUInteger lineIdx0 = _lineRowsIndex[rowIdx];
-    NSUInteger lineIdx1 = rowIdx == _rowCount - 1 ? _lines.count - 1 : _lineRowsIndex[rowIdx + 1] - 1;
-    for (NSUInteger i = lineIdx0; i <= lineIdx1; i++) {
+    NSInteger lineIdx0 = _lineRowsIndex[rowIdx];
+    NSInteger lineIdx1 = rowIdx == _rowCount - 1 ? _lines.count - 1 : _lineRowsIndex[rowIdx + 1] - 1;
+    for (NSInteger i = lineIdx0; i <= lineIdx1; i++) {
         CGRect bounds = ((YYTextLine *)_lines[i]).bounds;
         if (CGRectContainsPoint(bounds, point)) return i;
     }
@@ -1221,19 +1218,19 @@ fail:
     return NSNotFound;
 }
 
-- (NSUInteger)closestLineIndexForPoint:(CGPoint)point {
+- (NSInteger)closestLineIndexForPoint:(CGPoint)point {
     BOOL isVertical = _container.verticalForm;
     if (_lines.count == 0 || _rowCount == 0) return NSNotFound;
-    NSUInteger rowIdx = [self _closestRowIndexForEdge:isVertical ? point.x : point.y];
+    NSInteger rowIdx = [self _closestRowIndexForEdge:isVertical ? point.x : point.y];
     if (rowIdx == NSNotFound) return NSNotFound;
     
-    NSUInteger lineIdx0 = _lineRowsIndex[rowIdx];
-    NSUInteger lineIdx1 = rowIdx == _rowCount - 1 ? _lines.count - 1 : _lineRowsIndex[rowIdx + 1] - 1;
+    NSInteger lineIdx0 = _lineRowsIndex[rowIdx];
+    NSInteger lineIdx1 = rowIdx == _rowCount - 1 ? _lines.count - 1 : _lineRowsIndex[rowIdx + 1] - 1;
     if (lineIdx0 == lineIdx1) return lineIdx0;
     
     CGFloat minDistance = CGFLOAT_MAX;
-    NSUInteger minIndex = lineIdx0;
-    for (NSUInteger i = lineIdx0; i <= lineIdx1; i++) {
+    NSInteger minIndex = lineIdx0;
+    for (NSInteger i = lineIdx0; i <= lineIdx1; i++) {
         CGRect bounds = ((YYTextLine *)_lines[i]).bounds;
         if (isVertical) {
             if (bounds.origin.y <= point.y && point.y <= bounds.origin.y + bounds.size.height) return i;
@@ -1264,7 +1261,7 @@ fail:
     return minIndex;
 }
 
-- (CGFloat)offsetForTextPosition:(NSUInteger)position lineIndex:(NSUInteger)lineIndex {
+- (CGFloat)offsetForTextPosition:(NSInteger)position lineIndex:(NSInteger)lineIndex {
     if (lineIndex >= _lines.count) return CGFLOAT_MAX;
     YYTextLine *line = _lines[lineIndex];
     CFRange range = CTLineGetStringRange(line.CTLine);
@@ -1274,8 +1271,8 @@ fail:
     return _container.verticalForm ? (offset + line.position.y) : (offset + line.position.x);
 }
 
-- (NSUInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSUInteger)lineIndex {
-    if (lineIndex >= _lines.count) return NSNotFound;
+- (NSInteger)textPositionForPoint:(CGPoint)point lineIndex:(NSInteger)lineIndex {
+    if (lineIndex >= _lines.count || lineIndex < 0) return NSNotFound;
     YYTextLine *line = _lines[lineIndex];
     if (_container.verticalForm) {
         point.x = point.y - line.position.y;
@@ -1785,10 +1782,10 @@ fail:
     }
 }
 
-- (NSUInteger)lineIndexForPosition:(YYTextPosition *)position {
+- (NSInteger)lineIndexForPosition:(YYTextPosition *)position {
     if (!position) return NSNotFound;
     if (_lines.count == 0) return NSNotFound;
-    NSUInteger location = position.offset;
+    NSInteger location = position.offset;
     NSInteger lo = 0, hi = _lines.count - 1, mid = 0;
     if (position.affinity == YYTextAffinityBackward) {
         while (lo <= hi) {
@@ -2231,7 +2228,7 @@ static void YYTextDrawRun(YYTextLine *line, CTRunRef run, CGContextRef context, 
                             if (mode) { // CJK glyph, need rotated
                                 CGFloat ofs = (ascent - descent) * 0.5;
                                 CGFloat w = glyphAdvances[g].width * 0.5;
-                                CGFloat x = x = line.position.x + verticalOffset + glyphPositions[g].y + (ofs - w);
+                                CGFloat x = line.position.x + verticalOffset + glyphPositions[g].y + (ofs - w);
                                 CGFloat y = -line.position.y + size.height - glyphPositions[g].x - (ofs + w);
                                 if (mode == YYTextRunGlyphDrawModeVerticalRotateMove) {
                                     x += w;
