@@ -74,7 +74,7 @@ static void _removeDebugTarget(id<YYTextDebugTarget> target) {
 
 @implementation YYTextDebugOption
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     YYTextDebugOption *op = [self.class new];
     op.baselineColor = self.baselineColor;
     op.CTFrameBorderColor = self.CTFrameBorderColor;

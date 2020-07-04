@@ -59,7 +59,7 @@ static CGFloat GetWidthCallback(void *ref) {
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.ascent = self.ascent;
     one.descent = self.descent;

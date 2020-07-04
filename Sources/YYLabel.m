@@ -66,7 +66,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 #pragma mark - Context Menu Additions
 
 - (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range {
-    YYTextRange *yyRange = [YYTextRange rangeWithRange:range];
+    YYTextRange *yyRange = [[YYTextRange alloc] initWithRange:range];
     
     UIPreviewParameters *previewParams = [self._innerLayout previewParametersForTextIn:yyRange];
     previewParams.backgroundColor = self.targetedPreviewBackgroundColor ?: self.backgroundColor;
@@ -207,9 +207,9 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     if (_highlight) {
         YYTextAction longPressAction = _highlight.longPressAction ? _highlight.longPressAction : _highlightLongPressAction;
         if (longPressAction) {
-            YYTextPosition *start = [YYTextPosition positionWithOffset:_highlightRange.location];
-            YYTextPosition *end = [YYTextPosition positionWithOffset:_highlightRange.location + _highlightRange.length affinity:YYTextAffinityBackward];
-            YYTextRange *range = [YYTextRange rangeWithStart:start end:end];
+            YYTextPosition *start = [[YYTextPosition alloc] initWithOffset:_highlightRange.location];
+            YYTextPosition *end = [[YYTextPosition alloc] initWithOffset:_highlightRange.location + _highlightRange.length affinity:YYTextAffinityBackward];
+            YYTextRange *range = [[YYTextRange alloc] initWithStart:start end:end];
             CGRect rect = [self._innerLayout rectForRange:range];
             rect = [self _convertRectFromLayout:rect];
             longPressAction(self, _innerText, _highlightRange, rect);
@@ -642,10 +642,10 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
             if (!_state.touchMoved || [self getHighlightAtPoint:point range:NULL] == _highlight) {
                 YYTextAction tapAction = _highlight.tapAction ? _highlight.tapAction : _highlightTapAction;
                 if (tapAction) {
-                    YYTextPosition *start = [YYTextPosition positionWithOffset:_highlightRange.location];
+                    YYTextPosition *start = [[YYTextPosition alloc] initWithOffset:_highlightRange.location];
                     NSInteger endOffset = MIN(_innerLayout.visibleRange.length, _highlightRange.location + _highlightRange.length);
-                     YYTextPosition *end = [YYTextPosition positionWithOffset:endOffset affinity:YYTextAffinityBackward];
-                    YYTextRange *range = [YYTextRange rangeWithStart:start end:end];
+                     YYTextPosition *end = [[YYTextPosition alloc] initWithOffset:endOffset affinity:YYTextAffinityBackward];
+                    YYTextRange *range = [[YYTextRange alloc] initWithStart:start end:end];
                     CGRect rect = [self._innerLayout rectForRange:range];
                     rect = [self _convertRectFromLayout:rect];
                     tapAction(self, _innerText, _highlightRange, rect);

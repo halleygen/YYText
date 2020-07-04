@@ -15,19 +15,24 @@
 
 @implementation YYTextPosition
 
-+ (instancetype)positionWithOffset:(NSInteger)offset {
-    return [self positionWithOffset:offset affinity:YYTextAffinityForward];
+- (instancetype)initWithOffset:(NSInteger)offset {
+    return [self initWithOffset:offset affinity:YYTextAffinityForward];
 }
 
-+ (instancetype)positionWithOffset:(NSInteger)offset affinity:(YYTextAffinity)affinity {
-    YYTextPosition *p = [self new];
-    p->_offset = offset;
-    p->_affinity = affinity;
-    return p;
+- (instancetype)initWithOffset:(NSInteger)offset affinity:(YYTextAffinity)affinity {
+    self = [super init];
+    self->_offset = offset;
+    self->_affinity = affinity;
+    return self;
 }
 
-- (instancetype)copyWithZone:(NSZone *)zone {
-    return [self.class positionWithOffset:_offset affinity:_affinity];
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
+    return [[self.class alloc] initWithOffset:_offset affinity:_affinity];
 }
 
 - (NSString *)description {
@@ -62,11 +67,33 @@
 }
 
 - (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
+- (instancetype)initWithRange:(NSRange)range {
+    return [self initWithRange:range affinity:YYTextAffinityForward];
+}
+
+- (instancetype)initWithRange:(NSRange)range affinity:(YYTextAffinity)affinity {
+    YYTextPosition *start = [[YYTextPosition alloc] initWithOffset:range.location affinity:affinity];
+    YYTextPosition *end = [[YYTextPosition alloc] initWithOffset:range.location + range.length affinity:affinity];
+    return [self initWithStart:start end:end];
+}
+
+- (instancetype)initWithStart:(YYTextPosition *)start end:(YYTextPosition *)end {
+    if (!start || !end) return nil;
+    if ([start compare:end] == NSOrderedDescending) {
+        YYTEXT_SWAP(start, end);
+    }
     self = [super init];
-    if (!self) return nil;
-    _start = [YYTextPosition positionWithOffset:0];
-    _end = [YYTextPosition positionWithOffset:0];
+    _start = start;
+    _end = end;
     return self;
+}
+
++ (instancetype)defaultRange {
+    return [[YYTextRange alloc] initWithStart:[[YYTextPosition alloc] initWithOffset:0] end:[[YYTextPosition alloc] initWithOffset:0]];
 }
 
 - (YYTextPosition *)start {
@@ -85,33 +112,8 @@
     return NSMakeRange(_start.offset, _end.offset - _start.offset);
 }
 
-+ (instancetype)rangeWithRange:(NSRange)range {
-    return [self rangeWithRange:range affinity:YYTextAffinityForward];
-}
-
-+ (instancetype)rangeWithRange:(NSRange)range affinity:(YYTextAffinity)affinity {
-    YYTextPosition *start = [YYTextPosition positionWithOffset:range.location affinity:affinity];
-    YYTextPosition *end = [YYTextPosition positionWithOffset:range.location + range.length affinity:affinity];
-    return [self rangeWithStart:start end:end];
-}
-
-+ (instancetype)rangeWithStart:(YYTextPosition *)start end:(YYTextPosition *)end {
-    if (!start || !end) return nil;
-    if ([start compare:end] == NSOrderedDescending) {
-        YYTEXT_SWAP(start, end);
-    }
-    YYTextRange *range = [YYTextRange new];
-    range->_start = start;
-    range->_end = end;
-    return range;
-}
-
-+ (instancetype)defaultRange {
-    return [self new];
-}
-
-- (instancetype)copyWithZone:(NSZone *)zone {
-    return [self.class rangeWithStart:_start end:_end];
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
+    return [[self.class alloc] initWithStart:_start end:_end];
 }
 
 - (NSString *)description {
@@ -139,7 +141,7 @@
 @synthesize containsEnd = _containsEnd;
 @synthesize isVertical = _isVertical;
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     YYTextSelectionRect *one = [self.class new];
     one.rect = _rect;
     one.writingDirection = _writingDirection;

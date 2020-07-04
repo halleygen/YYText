@@ -197,7 +197,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 /// Update layout and selection before runloop sleep/end.
 - (void)_commitUpdate {
     _state.needUpdate = YES;
-    [[YYTextTransaction transactionWithTarget:self selector:@selector(_updateIfNeeded)] commit];
+    [[[YYTextTransaction alloc] initWithTarget:self selector:@selector(_updateIfNeeded)] commit];
 }
 
 /// Update layout and selection view if needed.
@@ -341,7 +341,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 /// Update placeholder before runloop sleep/end.
 - (void)_commitPlaceholderUpdate {
     _state.placeholderNeedUpdate = YES;
-    [[YYTextTransaction transactionWithTarget:self selector:@selector(_updatePlaceholderIfNeeded)] commit];
+    [[[YYTextTransaction alloc] initWithTarget:self selector:@selector(_updatePlaceholderIfNeeded)] commit];
 }
 
 /// Update placeholder if needed.
@@ -398,7 +398,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                 newPos = _markedTextRange.end;
             }
         }
-        YYTextRange *newRange = [YYTextRange rangeWithRange:NSMakeRange(newPos.offset, 0) affinity:newPos.affinity];
+        YYTextRange *newRange = [[YYTextRange alloc] initWithRange:NSMakeRange(newPos.offset, 0) affinity:newPos.affinity];
         _trackingRange = newRange;
     }
 }
@@ -417,9 +417,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (position) {
         position = [self _correctedTextPosition:position];
         if ((NSUInteger)position.offset > _innerText.length) {
-            position = [YYTextPosition positionWithOffset:_innerText.length];
+            position = [[YYTextPosition alloc] initWithOffset:_innerText.length];
         }
-        YYTextRange *newRange = [YYTextRange rangeWithStart:(isStart ? position : _selectedTextRange.start)
+        YYTextRange *newRange = [[YYTextRange alloc] initWithStart:(isStart ? position : _selectedTextRange.start)
                                                         end:(isStart ? _selectedTextRange.end : position)];
         _trackingRange = newRange;
     }
@@ -799,7 +799,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         
         if (_highlight.longPressAction) {
             dealLongPressAction = YES;
-            CGRect rect = [_innerLayout rectForRange:[YYTextRange rangeWithRange:_highlightRange]];
+            CGRect rect = [_innerLayout rectForRange:[[YYTextRange alloc] initWithRange:_highlightRange]];
             rect = [self _convertRectFromLayout:rect];
             _highlight.longPressAction(self, _innerText, _highlightRange, rect);
             [self _endTouchTracking];
@@ -810,7 +810,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             }
             if (shouldHighlight && [self.delegate respondsToSelector:@selector(textView:didLongPressHighlight:inRange:rect:)]) {
                 dealLongPressAction = YES;
-                CGRect rect = [_innerLayout rectForRange:[YYTextRange rangeWithRange:_highlightRange]];
+                CGRect rect = [_innerLayout rectForRange:[[YYTextRange alloc] initWithRange:_highlightRange]];
                 rect = [self _convertRectFromLayout:rect];
                 [self.delegate textView:self didLongPressHighlight:_highlight inRange:_highlightRange rect:rect];
                 [self _endTouchTracking];
@@ -840,7 +840,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                             newPos = _markedTextRange.end;
                         }
                     }
-                    _trackingRange = [YYTextRange rangeWithRange:NSMakeRange(newPos.offset, 0) affinity:newPos.affinity];
+                    _trackingRange = [[YYTextRange alloc] initWithRange:NSMakeRange(newPos.offset, 0) affinity:newPos.affinity];
                     [self _updateSelectionView];
                 }
                 [self _hideMenu];
@@ -1052,13 +1052,13 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         YYTextRange *extEnd = [_innerLayout textRangeByExtendingPosition:range.end];
         if (extStart && extEnd) {
             NSArray *arr = [@[extStart.start, extStart.end, extEnd.start, extEnd.end] sortedArrayUsingSelector:@selector(compare:)];
-            range = [YYTextRange rangeWithStart:arr.firstObject end:arr.lastObject];
+            range = [[YYTextRange alloc] initWithStart:arr.firstObject end:arr.lastObject];
         }
     }
     
     range = [self _correctedTextRange:range];
     if (range.asRange.length == 0) {
-        range = [YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)];
+        range = [[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)];
     }
     
     return [self _correctedTextRange:range];
@@ -1075,7 +1075,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         YYTextRange *encStart = (id)[_tokenizer rangeEnclosingPosition:touchRange.start withGranularity:UITextGranularityWord inDirection:UITextStorageDirectionForward];
         if (encEnd && encStart) {
             NSArray *arr = [@[encEnd.start, encEnd.end, encStart.start, encStart.end] sortedArrayUsingSelector:@selector(compare:)];
-            touchRange = [YYTextRange rangeWithStart:arr.firstObject end:arr.lastObject];
+            touchRange = [[YYTextRange alloc] initWithStart:arr.firstObject end:arr.lastObject];
         }
     }
     
@@ -1084,14 +1084,14 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         YYTextRange *extEnd = [_innerLayout textRangeByExtendingPosition:touchRange.end];
         if (extStart && extEnd) {
             NSArray *arr = [@[extStart.start, extStart.end, extEnd.start, extEnd.end] sortedArrayUsingSelector:@selector(compare:)];
-            touchRange = [YYTextRange rangeWithStart:arr.firstObject end:arr.lastObject];
+            touchRange = [[YYTextRange alloc] initWithStart:arr.firstObject end:arr.lastObject];
         }
     }
     
     if (!touchRange) touchRange = [YYTextRange defaultRange];
     
     if (_innerText.length && touchRange.asRange.length == 0) {
-        touchRange = [YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)];
+        touchRange = [[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)];
     }
     
     return touchRange;
@@ -1296,16 +1296,16 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (!position) return nil;
     if ([self _isTextPositionValid:position]) return position;
     if (position.offset < 0) {
-        return [YYTextPosition positionWithOffset:0];
+        return [[YYTextPosition alloc] initWithOffset:0];
     }
     if (position.offset > _innerText.length) {
-        return [YYTextPosition positionWithOffset:_innerText.length];
+        return [[YYTextPosition alloc] initWithOffset:_innerText.length];
     }
     if (position.offset == 0 && position.affinity == YYTextAffinityBackward) {
-        return [YYTextPosition positionWithOffset:position.offset];
+        return [[YYTextPosition alloc] initWithOffset:position.offset];
     }
     if (position.offset == _innerText.length && position.affinity == YYTextAffinityBackward) {
-        return [YYTextPosition positionWithOffset:position.offset];
+        return [[YYTextPosition alloc] initWithOffset:position.offset];
     }
     return position;
 }
@@ -1316,7 +1316,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if ([self _isTextRangeValid:range]) return range;
     YYTextPosition *start = [self _correctedTextPosition:range.start];
     YYTextPosition *end = [self _correctedTextPosition:range.end];
-    return [YYTextRange rangeWithStart:start end:end];
+    return [[YYTextRange alloc] initWithStart:start end:end];
 }
 
 /// Convert the point from this view to text layout.
@@ -1398,7 +1398,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         if (notifiesDelegate) [_inputDelegate selectionWillChange:self];
         NSRange newRange = NSMakeRange(0, 0);
         newRange.location = _selectedTextRange.start.offset + text.length;
-        _selectedTextRange = [YYTextRange rangeWithRange:newRange];
+        _selectedTextRange = [[YYTextRange alloc] initWithRange:newRange];
         if (notifiesDelegate) [_inputDelegate selectionDidChange:self];
     } else {
         if (range.asRange.length != text.length) {
@@ -1410,29 +1410,29 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                     NSInteger ofs = (NSInteger)text.length - (NSInteger)range.asRange.length;
                     NSRange newRange = _selectedTextRange.asRange;
                     newRange.location += ofs;
-                    _selectedTextRange = [YYTextRange rangeWithRange:newRange];
+                    _selectedTextRange = [[YYTextRange alloc] initWithRange:newRange];
                 }
             } else if (unionRange.length == _selectedTextRange.asRange.length) {
                 // target range contains selected range
-                _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(range.start.offset + text.length, 0)];
+                _selectedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(range.start.offset + text.length, 0)];
             } else if (range.start.offset >= _selectedTextRange.start.offset &&
                        range.end.offset <= _selectedTextRange.end.offset) {
                 // target range inside selected range
                 NSInteger ofs = (NSInteger)text.length - (NSInteger)range.asRange.length;
                 NSRange newRange = _selectedTextRange.asRange;
                 newRange.length += ofs;
-                _selectedTextRange = [YYTextRange rangeWithRange:newRange];
+                _selectedTextRange = [[YYTextRange alloc] initWithRange:newRange];
             } else {
                 // interleaving
                 if (range.start.offset < _selectedTextRange.start.offset) {
                     NSRange newRange = _selectedTextRange.asRange;
                     newRange.location = range.start.offset + text.length;
                     newRange.length -= unionRange.length;
-                    _selectedTextRange = [YYTextRange rangeWithRange:newRange];
+                    _selectedTextRange = [[YYTextRange alloc] initWithRange:newRange];
                 } else {
                     NSRange newRange = _selectedTextRange.asRange;
                     newRange.length -= unionRange.length;
-                    _selectedTextRange = [YYTextRange rangeWithRange:newRange];
+                    _selectedTextRange = [[YYTextRange alloc] initWithRange:newRange];
                 }
             }
             _selectedTextRange = [self _correctedTextRange:_selectedTextRange];
@@ -1495,7 +1495,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         BOOL textChanged = [self.textParser parseText:_innerText selectedRange:&newRange];
         if (notifiesDelegate) { [_inputDelegate textDidChange:self]; }
         
-        YYTextRange *newTextRange = [YYTextRange rangeWithRange:newRange];
+        YYTextRange *newTextRange = [[YYTextRange alloc] initWithRange:newRange];
         newTextRange = [self _correctedTextRange:newTextRange];
         
         if (![oldTextRange isEqual:newTextRange]) {
@@ -1816,7 +1816,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 }
 
 - (void)scrollRangeToVisible:(NSRange)range {
-    YYTextRange *textRange = [YYTextRange rangeWithRange:range];
+    YYTextRange *textRange = [[YYTextRange alloc] initWithRange:range];
     textRange = [self _correctedTextRange:textRange];
     [self _scrollRangeToVisible:textRange];
 }
@@ -1831,7 +1831,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     _state.deleteConfirm = NO;
     [self _endTouchTracking];
     [self _hideMenu];
-    [self replaceRange:[YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)] withText:text];
+    [self replaceRange:[[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)] withText:text];
     [self _resetUndoStack];
 }
 
@@ -1896,7 +1896,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (_textParser == textParser || [_textParser isEqual:textParser]) return;
     [self _setTextParser:textParser];
     if (textParser && _text.length) {
-        [self replaceRange:[YYTextRange rangeWithRange:NSMakeRange(0, _text.length)] withText:_text];
+        [self replaceRange:[[YYTextRange alloc] initWithRange:NSMakeRange(0, _text.length)] withText:_text];
     }
     [self _resetUndoStack];
     [self _commitUpdate];
@@ -1918,7 +1918,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     NSMutableAttributedString *text = attributedText.mutableCopy;
     if (text.length == 0) {
-        [self replaceRange:[YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)] withText:@""];
+        [self replaceRange:[[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)] withText:@""];
         return;
     }
     if ([self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementText:)]) {
@@ -1935,7 +1935,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [_inputDelegate textWillChange:self];
      _innerText = text;
     [self _parseText];
-    _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)];
+    _selectedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)];
     [_inputDelegate textDidChange:self];
     [_inputDelegate selectionDidChange:self];
     
@@ -2035,7 +2035,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (_markedTextRange) return;
     _state.typingAttributesOnce = NO;
     
-    YYTextRange *range = [YYTextRange rangeWithRange:selectedRange];
+    YYTextRange *range = [[YYTextRange alloc] initWithRange:selectedRange];
     range = [self _correctedTextRange:range];
     [self _endTouchTracking];
     _selectedTextRange = range;
@@ -2413,7 +2413,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         if (_highlight) {
             if (_state.showingHighlight) {
                 if (_highlight.tapAction) {
-                    CGRect rect = [_innerLayout rectForRange:[YYTextRange rangeWithRange:_highlightRange]];
+                    CGRect rect = [_innerLayout rectForRange:[[YYTextRange alloc] initWithRange:_highlightRange]];
                     rect = [self _convertRectFromLayout:rect];
                     _highlight.tapAction(self, _innerText, _highlightRange, rect);
                 } else {
@@ -2422,7 +2422,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                         shouldTap = [self.delegate textView:self shouldTapHighlight:_highlight inRange:_highlightRange];
                     }
                     if (shouldTap && [self.delegate respondsToSelector:@selector(textView:didTapHighlight:inRange:rect:)]) {
-                        CGRect rect = [_innerLayout rectForRange:[YYTextRange rangeWithRange:_highlightRange]];
+                        CGRect rect = [_innerLayout rectForRange:[[YYTextRange alloc] initWithRange:_highlightRange]];
                         rect = [self _convertRectFromLayout:rect];
                         [self.delegate textView:self didTapHighlight:_highlight inRange:_highlightRange rect:rect];
                     }
@@ -2472,7 +2472,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                             [self _hideMenu];
                             if (_state.clearsOnInsertionOnce) {
                                 _state.clearsOnInsertionOnce = NO;
-                                _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)];
+                                _selectedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)];
                                 [self _setSelectedRange:_selectedTextRange.asRange];
                             } else {
                                 [self _updateTextRangeByTrackingCaret];
@@ -2746,7 +2746,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         NSMutableAttributedString *text = _innerText.mutableCopy;
         [text replaceCharactersInRange:_selectedTextRange.asRange withAttributedString:atr];
         self.attributedText = text;
-        YYTextPosition *pos = [self _correctedTextPosition:[YYTextPosition positionWithOffset:endPosition]];
+        YYTextPosition *pos = [self _correctedTextPosition:[[YYTextPosition alloc] initWithOffset:endPosition]];
         YYTextRange *range = [_innerLayout textRangeByExtendingPosition:pos];
         range = [self _correctedTextRange:range];
         if (range) {
@@ -2783,7 +2783,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 - (void)selectAll:(id)sender {
     _trackingRange = nil;
     [_inputDelegate selectionWillChange:self];
-    _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(0, _innerText.length)];
+    _selectedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(0, _innerText.length)];
     [_inputDelegate selectionDidChange:self];
     
     [self _updateIfNeeded];
@@ -2995,7 +2995,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         YYTextBinding *binding = [_innerText attribute:YYTextBindingAttributeName atIndex:range.location - 1 longestEffectiveRange:&effectiveRange inRange:NSMakeRange(0, _innerText.length)];
         if (binding && binding.deleteConfirm) {
             _state.deleteConfirm = YES;
-            _selectedTextRange = [YYTextRange rangeWithRange:effectiveRange];
+            _selectedTextRange = [[YYTextRange alloc] initWithRange:effectiveRange];
             _selectedTextRange = [self _correctedTextRange:_selectedTextRange];
             
             [self _updateOuterProperties];
@@ -3016,7 +3016,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         [self _saveStateToUndoManager:_innerText selectedRange:_innerText.yy_rangeOfAll];
     }
     
-    [self replaceRange:[YYTextRange rangeWithRange:range] withText:@"" notifyingInputDelegate:NO];
+    [self replaceRange:[[YYTextRange alloc] initWithRange:range] withText:@"" notifyingInputDelegate:NO];
 }
 
 #pragma mark - @protocol UITextInput
@@ -3082,18 +3082,18 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     if (!markedText) markedText = @"";
     if (_markedTextRange == nil) {
-        _markedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_selectedTextRange.end.offset, markedText.length)];
+        _markedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(_selectedTextRange.end.offset, markedText.length)];
         if (_selectedTextRange.end.offset <= _innerText.length) {
             [_innerText replaceCharactersInRange:NSMakeRange(_selectedTextRange.end.offset, 0) withString:markedText];
         }
-        _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_selectedTextRange.start.offset + selectedRange.location, selectedRange.length)];
+        _selectedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(_selectedTextRange.start.offset + selectedRange.location, selectedRange.length)];
     } else {
         _markedTextRange = [self _correctedTextRange:_markedTextRange];
         if (_markedTextRange.asRange.location + _markedTextRange.asRange.length <= _innerText.length) {
             [_innerText replaceCharactersInRange:_markedTextRange.asRange withString:markedText];
         }
-        _markedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_markedTextRange.start.offset, markedText.length)];
-        _selectedTextRange = [YYTextRange rangeWithRange:NSMakeRange(_markedTextRange.start.offset + selectedRange.location, selectedRange.length)];
+        _markedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(_markedTextRange.start.offset, markedText.length)];
+        _selectedTextRange = [[YYTextRange alloc] initWithRange:NSMakeRange(_markedTextRange.start.offset + selectedRange.location, selectedRange.length)];
     }
     
     _selectedTextRange = [self _correctedTextRange:_selectedTextRange];
@@ -3241,11 +3241,11 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 }
 
 - (YYTextPosition *)beginningOfDocument {
-    return [YYTextPosition positionWithOffset:0];
+    return [[YYTextPosition alloc] initWithOffset:0];
 }
 
 - (YYTextPosition *)endOfDocument {
-    return [YYTextPosition positionWithOffset:_innerText.length];
+    return [[YYTextPosition alloc] initWithOffset:_innerText.length];
 }
 
 - (YYTextPosition *)positionFromPosition:(YYTextPosition *)position offset:(NSInteger)offset {
@@ -3258,7 +3258,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (newLocation != 0 && newLocation != _innerText.length) {
         // fix emoji
         [self _updateIfNeeded];
-        YYTextRange *extendRange = [_innerLayout textRangeByExtendingPosition:[YYTextPosition positionWithOffset:newLocation]];
+        YYTextRange *extendRange = [_innerLayout textRangeByExtendingPosition:[[YYTextPosition alloc] initWithOffset:newLocation]];
         if (extendRange.asRange.length > 0) {
             if (offset < 0) {
                 newLocation = extendRange.start.offset;
@@ -3268,7 +3268,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         }
     }
     
-    YYTextPosition *p = [YYTextPosition positionWithOffset:newLocation];
+    YYTextPosition *p = [[YYTextPosition alloc] initWithOffset:newLocation];
     return [self _correctedTextPosition:p];
 }
 
@@ -3288,14 +3288,14 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     YYTextPosition *newPosition = forward ? range.end : range.start;
     if (newPosition.offset > _innerText.length) {
-        newPosition = [YYTextPosition positionWithOffset:_innerText.length affinity:YYTextAffinityBackward];
+        newPosition = [[YYTextPosition alloc] initWithOffset:_innerText.length affinity:YYTextAffinityBackward];
     }
     
     return [self _correctedTextPosition:newPosition];
 }
 
 - (YYTextRange *)textRangeFromPosition:(YYTextPosition *)fromPosition toPosition:(YYTextPosition *)toPosition {
-    return [YYTextRange rangeWithStart:fromPosition end:toPosition];
+    return [[YYTextRange alloc] initWithStart:fromPosition end:toPosition];
 }
 
 - (NSComparisonResult)comparePosition:(YYTextPosition *)position toPosition:(YYTextPosition *)other {
@@ -3309,9 +3309,9 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 - (YYTextPosition *)positionWithinRange:(YYTextRange *)range farthestInDirection:(UITextLayoutDirection)direction {
     NSRange nsRange = range.asRange;
     if (direction == UITextLayoutDirectionLeft | direction == UITextLayoutDirectionUp) {
-        return [YYTextPosition positionWithOffset:nsRange.location];
+        return [[YYTextPosition alloc] initWithOffset:nsRange.location];
     } else {
-        return [YYTextPosition positionWithOffset:nsRange.location + nsRange.length affinity:YYTextAffinityBackward];
+        return [[YYTextPosition alloc] initWithOffset:nsRange.location + nsRange.length affinity:YYTextAffinityBackward];
     }
 }
 
@@ -3407,7 +3407,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 }
 
 - (void)setSelectionAffinity:(UITextStorageDirection)selectionAffinity {
-    _selectedTextRange = [YYTextRange rangeWithRange:_selectedTextRange.asRange affinity:selectionAffinity == UITextStorageDirectionForward ? YYTextAffinityForward : YYTextAffinityBackward];
+    _selectedTextRange = [[YYTextRange alloc] initWithRange:_selectedTextRange.asRange affinity:selectionAffinity == UITextStorageDirectionForward ? YYTextAffinityForward : YYTextAffinityBackward];
     [self _updateSelectionView];
 }
 
@@ -3431,7 +3431,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (offset < range.start.offset || offset > range.end.offset) return nil;
     if (offset == range.start.offset) return range.start;
     else if (offset == range.end.offset) return range.end;
-    else return [YYTextPosition positionWithOffset:offset];
+    else return [[YYTextPosition alloc] initWithOffset:offset];
 }
 
 - (NSInteger)characterOffsetOfPosition:(YYTextPosition *)position withinRange:(YYTextRange *)range {

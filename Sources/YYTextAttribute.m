@@ -117,6 +117,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -128,7 +129,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     return [self initWithString:string];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.string = self.string;
     return one;
@@ -151,6 +152,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -162,7 +164,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     return [self initWithDeleteConfirm:deleteConfirm];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.deleteConfirm = self.deleteConfirm;
     return one;
@@ -198,6 +200,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (NSShadow *)nsShadow {
@@ -224,7 +227,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.color = self.color;
     one.radius = self.radius;
@@ -256,6 +259,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -271,7 +275,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     return [self initWithStyle:style width:width color:color];
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.style = self.style;
     one.width = self.width;
@@ -307,6 +311,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -333,7 +338,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.lineStyle = self.lineStyle;
     one.strokeWidth = self.strokeWidth;
@@ -363,6 +368,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
@@ -380,7 +386,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     if ([self.content respondsToSelector:@selector(copy)]) {
         one.content = [self.content copy];
@@ -418,6 +424,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)init {
     [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)setAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
@@ -439,7 +446,7 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     }
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     typeof(self) one = [self.class new];
     one.attributes = self.attributes.mutableCopy;
     return one;

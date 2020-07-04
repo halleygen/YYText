@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface YYTextLine : NSObject
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical;
+- (instancetype)initWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical;
+- (instancetype)init NS_UNAVAILABLE;
 
 @property (nonatomic) NSUInteger index;     ///< line index
 @property (nonatomic) NSUInteger row;       ///< line row
@@ -78,7 +79,8 @@ typedef NS_ENUM(NSUInteger, YYTextRunGlyphDrawMode) {
 @interface YYTextRunGlyphRange : NSObject
 @property (nonatomic) NSRange glyphRangeInRun;
 @property (nonatomic) YYTextRunGlyphDrawMode drawMode;
-+ (instancetype)rangeWithRange:(NSRange)range drawMode:(YYTextRunGlyphDrawMode)mode;
+- (instancetype)initWithRange:(NSRange)range drawMode:(YYTextRunGlyphDrawMode)mode;
+- (instancetype)init NS_UNAVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END

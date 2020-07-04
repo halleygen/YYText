@@ -36,8 +36,9 @@ typedef NS_ENUM(NSInteger, YYTextAffinity) {
 @property (nonatomic, readonly) NSInteger offset;
 @property (nonatomic, readonly) YYTextAffinity affinity;
 
-+ (instancetype)positionWithOffset:(NSInteger)offset;
-+ (instancetype)positionWithOffset:(NSInteger)offset affinity:(YYTextAffinity) affinity;
+- (instancetype)initWithOffset:(NSInteger)offset;
+- (instancetype)initWithOffset:(NSInteger)offset affinity:(YYTextAffinity) affinity NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 
 - (NSComparisonResult)compare:(id)otherPosition;
 
@@ -57,9 +58,10 @@ typedef NS_ENUM(NSInteger, YYTextAffinity) {
 @property (nonatomic, readonly) YYTextPosition *end;
 @property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
-+ (instancetype)rangeWithRange:(NSRange)range;
-+ (instancetype)rangeWithRange:(NSRange)range affinity:(YYTextAffinity) affinity;
-+ (instancetype)rangeWithStart:(YYTextPosition *)start end:(YYTextPosition *)end;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithRange:(NSRange)range;
+- (instancetype)initWithRange:(NSRange)range affinity:(YYTextAffinity) affinity;
+- (instancetype)initWithStart:(YYTextPosition *)start end:(YYTextPosition *)end NS_DESIGNATED_INITIALIZER;
 + (instancetype)defaultRange; ///< <{0,0} Forward>
 
 - (NSRange)asRange;

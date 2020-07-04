@@ -57,7 +57,7 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     }
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     YYTextLinePositionSimpleModifier *one = [self.class new];
     one.fixedLineHeight = _fixedLineHeight;
     return one;
@@ -108,7 +108,7 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     YYTextContainer *one = [self.class new];
     os_unfair_lock_lock(&_lock);
     one->_size = _size;
@@ -126,7 +126,7 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
     return one;
 }
 
-- (id)mutableCopyWithZone:(nullable NSZone *)zone {
+- (nonnull id)mutableCopyWithZone:(nullable NSZone *)zone {
     return [self copyWithZone:zone];
 }
 
@@ -475,7 +475,7 @@ os_unfair_lock_unlock(&_lock);
         position.x = cgPathBox.origin.x + ctLineOrigin.x;
         position.y = cgPathBox.size.height + cgPathBox.origin.y - ctLineOrigin.y;
         
-        YYTextLine *line = [YYTextLine lineWithCTLine:ctLine position:position vertical:isVerticalForm];
+        YYTextLine *line = [[YYTextLine alloc] initWithCTLine:ctLine position:position vertical:isVerticalForm];
         CGRect rect = line.bounds;
         
         if (constraintSizeIsExtended) {
@@ -705,7 +705,7 @@ os_unfair_lock_unlock(&_lock);
                     CTLineRef ctTruncatedLine = CTLineCreateTruncatedLine(ctLastLineExtend, truncatedWidth, type, truncationTokenLine);
                     CFRelease(ctLastLineExtend);
                     if (ctTruncatedLine) {
-                        truncatedLine = [YYTextLine lineWithCTLine:ctTruncatedLine position:lastLine.position vertical:isVerticalForm];
+                        truncatedLine = [[YYTextLine alloc] initWithCTLine:ctTruncatedLine position:lastLine.position vertical:isVerticalForm];
                         truncatedLine.index = lastLine.index;
                         truncatedLine.row = lastLine.row;
                         CFRelease(ctTruncatedLine);
@@ -764,14 +764,14 @@ os_unfair_lock_unlock(&_lock);
                     if (g == 0) {
                         prevMode = mode;
                     } else if (mode != prevMode) {
-                        YYTextRunGlyphRange *aRange = [YYTextRunGlyphRange rangeWithRange:NSMakeRange(prevIdx, g - prevIdx) drawMode:prevMode];
+                        YYTextRunGlyphRange *aRange = [[YYTextRunGlyphRange alloc] initWithRange:NSMakeRange(prevIdx, g - prevIdx) drawMode:prevMode];
                         [runRanges addObject:aRange];
                         prevIdx = g;
                         prevMode = mode;
                     }
                 }
                 if (prevIdx < glyphCount) {
-                    YYTextRunGlyphRange *aRange = [YYTextRunGlyphRange rangeWithRange:NSMakeRange(prevIdx, glyphCount - prevIdx) drawMode:prevMode];
+                    YYTextRunGlyphRange *aRange = [[YYTextRunGlyphRange alloc] initWithRange:NSMakeRange(prevIdx, glyphCount - prevIdx) drawMode:prevMode];
                     [runRanges addObject:aRange];
                 }
                 
@@ -941,7 +941,7 @@ fail:
 
 #pragma mark - Copying
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     return self; // readonly object
 }
 
@@ -1167,15 +1167,15 @@ fail:
     YYTextPosition *end = range.end;
     
     if (start.offset == visibleRange.location && start.affinity == YYTextAffinityBackward) {
-        start = [YYTextPosition positionWithOffset:start.offset affinity:YYTextAffinityForward];
+        start = [[YYTextPosition alloc] initWithOffset:start.offset affinity:YYTextAffinityForward];
     }
     
     if (end.offset == visibleRange.location + visibleRange.length && start.affinity == YYTextAffinityForward) {
-        end = [YYTextPosition positionWithOffset:end.offset affinity:YYTextAffinityBackward];
+        end = [[YYTextPosition alloc] initWithOffset:end.offset affinity:YYTextAffinityBackward];
     }
     
     if (start != range.start || end != range.end) {
-        range = [YYTextRange rangeWithStart:start end:end];
+        range = [[YYTextRange alloc] initWithStart:start end:end];
     }
     return range;
 }
@@ -1296,9 +1296,9 @@ fail:
     __block NSUInteger position = [self textPositionForPoint:point lineIndex:lineIndex];
     if (position == NSNotFound) position = line.range.location;
     if (position <= _visibleRange.location) {
-        return [YYTextPosition positionWithOffset:_visibleRange.location affinity:YYTextAffinityForward];
+        return [[YYTextPosition alloc] initWithOffset:_visibleRange.location affinity:YYTextAffinityForward];
     } else if (position >= _visibleRange.location + _visibleRange.length) {
-        return [YYTextPosition positionWithOffset:_visibleRange.location + _visibleRange.length affinity:YYTextAffinityBackward];
+        return [[YYTextPosition alloc] initWithOffset:_visibleRange.location + _visibleRange.length affinity:YYTextAffinityBackward];
     }
     
     YYTextAffinity finalAffinity = YYTextAffinityForward;
@@ -1308,8 +1308,8 @@ fail:
     NSRange bindingRange;
     YYTextBinding *binding = [_text attribute:YYTextBindingAttributeName atIndex:position longestEffectiveRange:&bindingRange inRange:NSMakeRange(0, _text.length)];
     if (binding && bindingRange.length > 0) {
-        NSUInteger headLineIdx = [self lineIndexForPosition:[YYTextPosition positionWithOffset:bindingRange.location]];
-        NSUInteger tailLineIdx = [self lineIndexForPosition:[YYTextPosition positionWithOffset:bindingRange.location + bindingRange.length affinity:YYTextAffinityBackward]];
+        NSUInteger headLineIdx = [self lineIndexForPosition:[[YYTextPosition alloc] initWithOffset:bindingRange.location]];
+        NSUInteger tailLineIdx = [self lineIndexForPosition:[[YYTextPosition alloc] initWithOffset:bindingRange.location + bindingRange.length affinity:YYTextAffinityBackward]];
         if (headLineIdx == lineIndex && lineIndex == tailLineIdx) { // all in same line
             CGFloat left = [self offsetForTextPosition:bindingRange.location lineIndex:lineIndex];
             CGFloat right = [self offsetForTextPosition:bindingRange.location + bindingRange.length lineIndex:lineIndex];
@@ -1389,14 +1389,14 @@ fail:
     // empty line
     if (line.range.length == 0) {
         BOOL behind = (_lines.count > 1 && lineIndex == _lines.count - 1);  //end line
-        return [YYTextPosition positionWithOffset:line.range.location affinity:behind ? YYTextAffinityBackward:YYTextAffinityForward];
+        return [[YYTextPosition alloc] initWithOffset:line.range.location affinity:behind ? YYTextAffinityBackward:YYTextAffinityForward];
     }
     
     // detect weather the line is a linebreak token
     if (line.range.length <= 2) {
         NSString *str = [_text.string substringWithRange:line.range];
         if (YYTextIsLinebreakString(str)) { // an empty line ("\r", "\n", "\r\n")
-            return [YYTextPosition positionWithOffset:line.range.location];
+            return [[YYTextPosition alloc] initWithOffset:line.range.location];
         }
     }
     
@@ -1430,10 +1430,10 @@ fail:
         }
     }
     if (position == line.range.location) {
-        return [YYTextPosition positionWithOffset:position];
+        return [[YYTextPosition alloc] initWithOffset:position];
     }
     if (position == line.range.location + line.range.length) {
-        return [YYTextPosition positionWithOffset:position affinity:YYTextAffinityBackward];
+        return [[YYTextPosition alloc] initWithOffset:position affinity:YYTextAffinityBackward];
     }
     
     [self _insideComposedCharacterSequences:line position:position block: ^(CGFloat left, CGFloat right, NSUInteger prev, NSUInteger next) {
@@ -1469,7 +1469,7 @@ fail:
         }
     }
     
-    return [YYTextPosition positionWithOffset:position affinity:finalAffinity];
+    return [[YYTextPosition alloc] initWithOffset:position affinity:finalAffinity];
 }
 
 - (YYTextPosition *)positionForPoint:(CGPoint)point
@@ -1586,16 +1586,16 @@ fail:
     
     // head or tail, returns immediately
     if (position.offset == visibleStart) {
-        return [YYTextRange rangeWithRange:NSMakeRange(position.offset, 0)];
+        return [[YYTextRange alloc] initWithRange:NSMakeRange(position.offset, 0)];
     } else if (position.offset == visibleEnd) {
-        return [YYTextRange rangeWithRange:NSMakeRange(position.offset, 0) affinity:YYTextAffinityBackward];
+        return [[YYTextRange alloc] initWithRange:NSMakeRange(position.offset, 0) affinity:YYTextAffinityBackward];
     }
     
     // binding range
     NSRange tRange;
     YYTextBinding *binding = [_text attribute:YYTextBindingAttributeName atIndex:position.offset longestEffectiveRange:&tRange inRange:_visibleRange];
     if (binding && tRange.length > 0 && tRange.location < position.offset) {
-        return [YYTextRange rangeWithRange:tRange];
+        return [[YYTextRange alloc] initWithRange:tRange];
     }
     
     // inside emoji or composed character sequences
@@ -1616,7 +1616,7 @@ fail:
             }];
         }
         if (emoji || seq) {
-            return [YYTextRange rangeWithRange:NSMakeRange(_prev, _next - _prev)];
+            return [[YYTextRange alloc] initWithRange:NSMakeRange(_prev, _next - _prev)];
         }
     }
     
@@ -1626,17 +1626,17 @@ fail:
         if ((c0 == '\r') && position.offset < visibleEnd) {
             unichar c1 = [_text.string characterAtIndex:position.offset];
             if (c1 == '\n') {
-                return [YYTextRange rangeWithStart:[YYTextPosition positionWithOffset:position.offset - 1] end:[YYTextPosition positionWithOffset:position.offset + 1]];
+                return [[YYTextRange alloc] initWithStart:[[YYTextPosition alloc] initWithOffset:position.offset - 1] end:[[YYTextPosition alloc] initWithOffset:position.offset + 1]];
             }
         }
         if (YYTextIsLinebreakChar(c0) && position.affinity == YYTextAffinityBackward) {
             NSString *str = [_text.string substringToIndex:position.offset];
             NSUInteger len = YYTextLinebreakTailLength(str);
-            return [YYTextRange rangeWithStart:[YYTextPosition positionWithOffset:position.offset - len] end:[YYTextPosition positionWithOffset:position.offset]];
+            return [[YYTextRange alloc] initWithStart:[[YYTextPosition alloc] initWithOffset:position.offset - len] end:[[YYTextPosition alloc] initWithOffset:position.offset]];
         }
     }
     
-    return [YYTextRange rangeWithRange:NSMakeRange(position.offset, 0) affinity:position.affinity];
+    return [[YYTextRange alloc] initWithRange:NSMakeRange(position.offset, 0) affinity:position.affinity];
 }
 
 - (YYTextRange *)textRangeByExtendingPosition:(YYTextPosition *)position
@@ -1667,16 +1667,16 @@ fail:
     
     // head or tail, returns immediately
     if (!forwardMove && position.offset == visibleStart) {
-        return [YYTextRange rangeWithRange:NSMakeRange(_visibleRange.location, 0)];
+        return [[YYTextRange alloc] initWithRange:NSMakeRange(_visibleRange.location, 0)];
     } else if (forwardMove && position.offset == visibleEnd) {
-        return [YYTextRange rangeWithRange:NSMakeRange(position.offset, 0) affinity:YYTextAffinityBackward];
+        return [[YYTextRange alloc] initWithRange:NSMakeRange(position.offset, 0) affinity:YYTextAffinityBackward];
     }
     
     // extend from position
     YYTextRange *fromRange = [self textRangeByExtendingPosition:position];
     if (!fromRange) return nil;
-    YYTextRange *allForward = [YYTextRange rangeWithStart:fromRange.start end:[YYTextPosition positionWithOffset:visibleEnd]];
-    YYTextRange *allBackward = [YYTextRange rangeWithStart:[YYTextPosition positionWithOffset:visibleStart] end:fromRange.end];
+    YYTextRange *allForward = [[YYTextRange alloc] initWithStart:fromRange.start end:[[YYTextPosition alloc] initWithOffset:visibleEnd]];
+    YYTextRange *allBackward = [[YYTextRange alloc] initWithStart:[[YYTextPosition alloc] initWithOffset:visibleStart] end:fromRange.end];
     
     if (verticalMove) { // up/down in text layout
         NSInteger lineIndex = [self lineIndexForPosition:position];
@@ -1749,23 +1749,23 @@ fail:
             if (pos == insideLine.range.location + insideLine.range.length) {
                 NSString *subStr = [_text.string substringWithRange:insideLine.range];
                 NSUInteger lineBreakLen = YYTextLinebreakTailLength(subStr);
-                extPos = [YYTextPosition positionWithOffset:pos - lineBreakLen];
+                extPos = [[YYTextPosition alloc] initWithOffset:pos - lineBreakLen];
             } else {
-                extPos = [YYTextPosition positionWithOffset:pos];
+                extPos = [[YYTextPosition alloc] initWithOffset:pos];
             }
         } else {
-            extPos = [YYTextPosition positionWithOffset:pos];
+            extPos = [[YYTextPosition alloc] initWithOffset:pos];
         }
         YYTextRange *ext = [self textRangeByExtendingPosition:extPos];
         if (!ext) return nil;
         if (forwardMove) {
-            return [YYTextRange rangeWithStart:fromRange.start end:ext.end];
+            return [[YYTextRange alloc] initWithStart:fromRange.start end:ext.end];
         } else {
-            return [YYTextRange rangeWithStart:ext.start end:fromRange.end];
+            return [[YYTextRange alloc] initWithStart:ext.start end:fromRange.end];
         }
         
     } else { // left/right in text layout
-        YYTextPosition *toPosition = [YYTextPosition positionWithOffset:position.offset + (forwardMove ? offset : -offset)];
+        YYTextPosition *toPosition = [[YYTextPosition alloc] initWithOffset:position.offset + (forwardMove ? offset : -offset)];
         if (toPosition.offset <= visibleStart) return allBackward;
         else if (toPosition.offset >= visibleEnd) return allForward;
         
@@ -1774,7 +1774,7 @@ fail:
         
         NSInteger start = MIN(fromRange.start.offset, toRange.start.offset);
         NSInteger end = MAX(fromRange.end.offset, toRange.end.offset);
-        return [YYTextRange rangeWithRange:NSMakeRange(start, end - start)];
+        return [[YYTextRange alloc] initWithRange:NSMakeRange(start, end - start)];
     }
 }
 

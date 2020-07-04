@@ -26,7 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return A new transaction, or nil if an error occurs.
  */
-+ (YYTextTransaction *)transactionWithTarget:(id)target selector:(SEL)selector;
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector;
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  Commit the trancaction to main runloop.

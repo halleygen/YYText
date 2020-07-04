@@ -82,7 +82,7 @@ static CFTypeID CTRubyAnnotationTypeID() {
     _CGColor = NULL;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     _YYCGColor *color = [self.class new];
     color.CGColor = self.CGColor;
     return color;
@@ -134,7 +134,7 @@ static CFTypeID CTRubyAnnotationTypeID() {
     if (_CGImage) CFRelease(_CGImage);
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     _YYCGImage *image = [self.class new];
     image.CGImage = self.CGImage;
     return image;
@@ -171,7 +171,7 @@ static CFTypeID CTRubyAnnotationTypeID() {
         if (ref) return ref;
     } else if (typeID == CTRubyAnnotationTypeID()) {
         CTRubyAnnotationRef ctRuby = (__bridge CFTypeRef)(object);
-        YYTextRubyAnnotation *ruby = [YYTextRubyAnnotation rubyWithCTRubyRef:ctRuby];
+        YYTextRubyAnnotation *ruby = [[YYTextRubyAnnotation alloc] initWithCTRubyRef:ctRuby];
         if (ruby) return ruby;
     } else if (typeID == CGColorGetTypeID()) {
         return [_YYCGColor colorWithCGColor:(CGColorRef)object];

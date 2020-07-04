@@ -47,11 +47,11 @@ typedef struct {
  */
 @interface YYTextKeyboardManager : NSObject
 
-- (instancetype)init UNAVAILABLE_ATTRIBUTE;
-+ (instancetype)new UNAVAILABLE_ATTRIBUTE;
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 /// Get the default manager (returns nil in App Extension).
-@property (nullable, class, nonatomic, readonly) YYTextKeyboardManager *defaultManager;
+@property (nullable, class, nonatomic, readonly) YYTextKeyboardManager *defaultManager NS_SWIFT_NAME(default);
 
 /// Get the keyboard window. nil if there's no keyboard window.
 @property (nullable, nonatomic, readonly) UIWindow *keyboardWindow;

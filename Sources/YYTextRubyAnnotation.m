@@ -18,24 +18,21 @@
 }
 
 - (instancetype)init {
-    self = super.init;
-    self.alignment = kCTRubyAlignmentAuto;
-    self.overhang = kCTRubyOverhangAuto;
-    self.sizeFactor = 0.5;
-    return self;
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
-+ (instancetype)rubyWithCTRubyRef:(CTRubyAnnotationRef)ctRuby {
+- (instancetype)initWithCTRubyRef:(CTRubyAnnotationRef)ctRuby {
     if (!ctRuby) return nil;
-    YYTextRubyAnnotation *one = [self new];
-    one.alignment = CTRubyAnnotationGetAlignment(ctRuby);
-    one.overhang = CTRubyAnnotationGetOverhang(ctRuby);
-    one.sizeFactor = CTRubyAnnotationGetSizeFactor(ctRuby);
-    one.textBefore = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionBefore));
-    one.textAfter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionAfter));
-    one.textInterCharacter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInterCharacter));
-    one.textInline = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInline));
-    return one;
+    self = [super init];
+    self.alignment = CTRubyAnnotationGetAlignment(ctRuby);
+    self.overhang = CTRubyAnnotationGetOverhang(ctRuby);
+    self.sizeFactor = CTRubyAnnotationGetSizeFactor(ctRuby);
+    self.textBefore = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionBefore));
+    self.textAfter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionAfter));
+    self.textInterCharacter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInterCharacter));
+    self.textInline = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInline));
+    return self;
 }
 
 - (CTRubyAnnotationRef)CTRubyAnnotation CF_RETURNS_RETAINED {
@@ -50,7 +47,7 @@
     return ruby;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
+- (nonnull id)copyWithZone:(nullable NSZone *)zone {
     YYTextRubyAnnotation *one = [self.class new];
     one.alignment = _alignment;
     one.overhang = _overhang;

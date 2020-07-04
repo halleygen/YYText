@@ -51,12 +51,17 @@ static void YYTextTransactionSetup() {
 
 @implementation YYTextTransaction
 
-+ (YYTextTransaction *)transactionWithTarget:(id)target selector:(SEL)selector{
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector{
     if (!target || !selector) return nil;
-    YYTextTransaction *t = [YYTextTransaction new];
-    t.target = target;
-    t.selector = selector;
-    return t;
+    self = [super init];
+    self.target = target;
+    self.selector = selector;
+    return self;
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)commit {

@@ -17,13 +17,18 @@
     CGFloat _firstGlyphPos; // first glyph position for baseline, typically 0.
 }
 
-+ (instancetype)lineWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical {
+- (instancetype)initWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical {
     if (!CTLine) return nil;
-    YYTextLine *line = [self new];
-    line->_position = position;
-    line->_vertical = isVertical;
-    [line setCTLine:CTLine];
-    return line;
+    self = [super init];
+    self->_position = position;
+    self->_vertical = isVertical;
+    [self setCTLine:CTLine];
+    return self;
+}
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)dealloc {
@@ -160,10 +165,16 @@
 
 
 @implementation YYTextRunGlyphRange
-+ (instancetype)rangeWithRange:(NSRange)range drawMode:(YYTextRunGlyphDrawMode)mode {
-    YYTextRunGlyphRange *one = [self new];
-    one.glyphRangeInRun = range;
-    one.drawMode = mode;
-    return one;
+- (instancetype)initWithRange:(NSRange)range drawMode:(YYTextRunGlyphDrawMode)mode {
+    self = [super init];
+    self.glyphRangeInRun = range;
+    self.drawMode = mode;
+    return self;
 }
+
+- (instancetype)init {
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 @end

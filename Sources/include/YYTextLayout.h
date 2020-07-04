@@ -215,8 +215,8 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
                                                       text:(nonnull NSAttributedString *)text
                                                      range:(NSRange)range;
 
-- (instancetype)init UNAVAILABLE_ATTRIBUTE;
-+ (instancetype)new UNAVAILABLE_ATTRIBUTE;
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 
 #pragma mark - Text layout attributes
