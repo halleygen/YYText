@@ -63,51 +63,6 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 @implementation YYLabel
 
-#pragma mark - Context Menu Additions
-
-- (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range {
-    YYTextRange *yyRange = [[YYTextRange alloc] initWithRange:range];
-    
-    UIPreviewParameters *previewParams = [self._innerLayout previewParametersForTextIn:yyRange];
-    previewParams.backgroundColor = self.targetedPreviewBackgroundColor ?: self.backgroundColor;
-    if (!previewParams) { return nil; }
-
-    CGRect unconvertedRect = [self._innerLayout rectForRange:yyRange];
-    CGRect rect = [self _convertRectFromLayout:unconvertedRect];
-    CGPoint center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
-    UIPreviewTarget *target = [[UIPreviewTarget alloc] initWithContainer:self center:center];
-
-    UIView *snapshot = [UIView new];
-    snapshot.layer.contents = self.layer.contents;
-    snapshot.layer.contentsGravity = snapshot.layer.contentsAreFlipped ? kCAGravityBottomLeft : kCAGravityTopLeft;
-    snapshot.layer.contentsScale = self.layer.contentsScale;
-    
-    return [[UITargetedPreview alloc] initWithView:snapshot parameters:previewParams target:target];
-}
-
-- (nullable YYTextHighlight *)getHighlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range {
-    if (!self._innerLayout.containsHighlights) return nil;
-    point = [self _convertPointToLayout:point];
-    YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
-    if (!textRange) return nil;
-    
-    NSUInteger startIndex = textRange.start.offset;
-    if (startIndex == _innerText.length) {
-        if (startIndex > 0) {
-            startIndex--;
-        }
-    }
-    NSRange highlightRange = {0};
-    YYTextHighlight *highlight = [_innerText attribute:YYTextHighlightAttributeName
-                                               atIndex:startIndex
-                                 longestEffectiveRange:&highlightRange
-                                               inRange:NSMakeRange(0, _innerText.length)];
-    
-    if (!highlight) return nil;
-    if (range) *range = highlightRange;
-    return highlight;
-}
-
 #pragma mark - Private
 
 - (void)_updateIfNeeded {
@@ -1028,6 +983,54 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     _displaysAsynchronously = displaysAsynchronously;
     ((YYTextAsyncLayer *)self.layer).displaysAsynchronously = displaysAsynchronously;
 }
+
+#pragma mark - Context Menu
+
+- (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range {
+    YYTextRange *yyRange = [[YYTextRange alloc] initWithRange:range];
+    
+    UIPreviewParameters *previewParams = [self._innerLayout previewParametersForTextIn:yyRange];
+    previewParams.backgroundColor = self.backgroundColor ?: self.superview.backgroundColor;
+    if (!previewParams) { return nil; }
+
+    CGRect unconvertedRect = [self._innerLayout rectForRange:yyRange];
+    CGRect rect = [self _convertRectFromLayout:unconvertedRect];
+    CGPoint center = CGPointMake(CGRectGetMidX(rect), CGRectGetMidY(rect));
+    UIPreviewTarget *target = [[UIPreviewTarget alloc] initWithContainer:self center:center];
+
+    UIView *snapshot = [UIView new];
+    snapshot.layer.contents = self.layer.contents;
+    snapshot.layer.contentsGravity = snapshot.layer.contentsAreFlipped ? kCAGravityBottomLeft : kCAGravityTopLeft;
+    snapshot.layer.contentsScale = self.layer.contentsScale;
+    
+    return [[UITargetedPreview alloc] initWithView:snapshot parameters:previewParams target:target];
+}
+
+#pragma mark - Highlights
+
+- (nullable YYTextHighlight *)getHighlightAtPoint:(CGPoint)point range:(nullable NSRangePointer)range {
+    if (!self._innerLayout.containsHighlights) return nil;
+    point = [self _convertPointToLayout:point];
+    YYTextRange *textRange = [self._innerLayout textRangeAtPoint:point];
+    if (!textRange) return nil;
+    
+    NSUInteger startIndex = textRange.start.offset;
+    if (startIndex == _innerText.length) {
+        if (startIndex > 0) {
+            startIndex--;
+        }
+    }
+    NSRange highlightRange = {0};
+    YYTextHighlight *highlight = [_innerText attribute:YYTextHighlightAttributeName
+                                               atIndex:startIndex
+                                 longestEffectiveRange:&highlightRange
+                                               inRange:NSMakeRange(0, _innerText.length)];
+    
+    if (!highlight) return nil;
+    if (range) *range = highlightRange;
+    return highlight;
+}
+
 
 #pragma mark - AutoLayout
 
