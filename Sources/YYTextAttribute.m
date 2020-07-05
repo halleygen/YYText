@@ -423,8 +423,8 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 }
 
 - (instancetype)init {
-    [self doesNotRecognizeSelector:_cmd];
-    return nil;
+    self = [self initWithAttributes:nil];
+    return self;
 }
 
 - (void)setAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {

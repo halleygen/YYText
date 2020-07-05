@@ -309,7 +309,9 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  @param attributes The attributes which will replace original attributes when highlight,
         If the value is NSNull, it will removed when highlight.
  */
-- (instancetype)initWithAttributes:(nullable NSDictionary<NSString *, id> *)attributes NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithAttributes:(nullable NSDictionary<NSAttributedStringKey, id> *)attributes NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init;
 
 /**
  Convenience methods to create a default highlight with the specifeid background color.
