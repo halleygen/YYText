@@ -217,6 +217,10 @@ Indicates whether the corresponding element should automatically update its font
 
 #pragma mark - Context Menu Additions
 
+/// The background color to use for targeted previews of the label.
+/// @discussion The default value is nil, which results in the label's background color being used.
+@property (nullable, nonatomic) UIColor *targetedPreviewBackgroundColor;
+
 /// Returns a targeted preview that focuses on the text in a given range.
 /// @param range The range from which to create a targeted preview. It must lie within the bounds of the receiver.
 - (nullable UITargetedPreview *)targetedPreviewForTextIn:(NSRange)range;
