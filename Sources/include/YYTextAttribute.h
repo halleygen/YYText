@@ -334,6 +334,11 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 - (void)setAttachment:(nullable YYTextAttachment *)attachment;
 
 /**
+ The URL associated with the highlight, default is nil.
+ */
+@property (nullable, nonatomic, copy) NSURL *url;
+
+/**
  The user information dictionary, default is nil.
  */
 @property (nullable, nonatomic, copy) NSDictionary *userInfo;
