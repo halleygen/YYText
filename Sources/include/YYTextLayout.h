@@ -168,7 +168,7 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
  @param text The text (if nil, returns nil).
  @return A new layout, or nil when an error occurs.
 */
-- (nullable instancetype)initWithContainerSize:(CGSize)size text:(NSAttributedString *)text;
+- (instancetype)initWithContainerSize:(CGSize)size text:(NSAttributedString *)text;
 
 /**
  Generate a layout with the given container and text.
@@ -177,7 +177,7 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
  @param text      The text (if nil, returns nil).
  @return A new layout, or nil when an error occurs.
  */
-- (nullable instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text;
+- (instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text;
 
 /**
  Generate a layout with the given container and text.
@@ -188,7 +188,7 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
     length of the range is 0, it means the length is no limit.
  @return A new layout, or nil when an error occurs.
  */
-- (nullable instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range NS_DESIGNATED_INITIALIZER;
 
 /**
  Generate layouts with the given containers and text.
@@ -198,7 +198,7 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
  @return An array of YYTextLayout object (the count is same as containers),
     or nil when an error occurs.
  */
-+ (nonnull NSArray<YYTextLayout *> *)layoutWithContainers:(NSArray<YYTextContainer *> *)containers
++ (NSArray<YYTextLayout *> *)layoutWithContainers:(NSArray<YYTextContainer *> *)containers
                                                       text:(NSAttributedString *)text;
 
 /**
@@ -211,7 +211,7 @@ extern const CGSize YYTextContainerMaxSize NS_SWIFT_NAME(YYTextContainer.maxSize
  @return An array of YYTextLayout object (the count is same as containers),
     or nil when an error occurs.
  */
-+ (nonnull NSArray<YYTextLayout *> *)layoutWithContainers:(nonnull NSArray<YYTextContainer *> *)containers
++ (NSArray<YYTextLayout *> *)layoutWithContainers:(nonnull NSArray<YYTextContainer *> *)containers
                                                       text:(nonnull NSAttributedString *)text
                                                      range:(NSRange)range;
 

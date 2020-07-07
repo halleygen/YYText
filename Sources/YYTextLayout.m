@@ -371,8 +371,15 @@ os_unfair_lock_unlock(&_lock);
     
     text = text.mutableCopy;
     container = container.copy;
-    if (!text || !container) return nil;
-    if (range.location + range.length > text.length) return nil;
+    
+    if (!text) {
+        [[NSException exceptionWithName:NSInvalidArgumentException reason:@"Text must not be nil." userInfo:nil] raise];
+    } else if (!container) {
+        [[NSException exceptionWithName:NSInvalidArgumentException reason:@"Container must not be nil." userInfo:nil] raise];
+    } else if (range.location + range.length > text.length) {
+        [NSException exceptionWithName:NSRangeException reason:@"Range must not exceed the bounds of the attributed text." userInfo:@{ @"Text Length": [NSNumber numberWithUnsignedInteger:text.length], @"Range": [NSValue valueWithRange:range] }];
+    }
+
     container->_readonly = YES;
     maximumNumberOfRows = container.maximumNumberOfRows;
     
@@ -862,8 +869,7 @@ fail:
 
 + (NSArray *)layoutWithContainers:(NSArray *)containers text:(NSAttributedString *)text range:(NSRange)range {
     if (range.location + range.length > text.length) {
-        NSException *e = [[NSException alloc] initWithName:NSRangeException reason:@"Range must not exceed the bounds of the attributed text." userInfo:nil];
-        [e raise];
+        [[NSException exceptionWithName:NSRangeException reason:@"Range must not exceed the bounds of the attributed text." userInfo:@{ @"Text Length": [NSNumber numberWithUnsignedInteger:text.length], @"Range": [NSValue valueWithRange:range] }] raise];
     }
 
     NSMutableArray *layouts = [NSMutableArray array];
