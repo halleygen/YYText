@@ -24,7 +24,7 @@ typedef NS_OPTIONS(NSInteger, YYTextAttributeType) {
 };
 
 /// Get the attribute type from an attribute name.
-extern YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attributeName) NS_SWIFT_NAME(YYText.type(of:));
+extern YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attributeName) NS_SWIFT_NAME(YYTextAttributeType.init(_:));
 
 /**
  Line style in YYText (similar to NSUnderlineStyle).
@@ -146,8 +146,10 @@ UIKIT_EXTERN NSAttributedStringKey const YYTextGlyphTransformAttributeName NS_SW
 
 #pragma mark - String Token Define
 
-UIKIT_EXTERN NSString *const YYTextAttachmentToken NS_SWIFT_NAME(YYText.attachmentToken); ///< Object replacement character (U+FFFC), used for text attachment.
-UIKIT_EXTERN NSString *const YYTextTruncationToken NS_SWIFT_NAME(YYText.truncationToken); ///< Horizontal ellipsis (U+2026), used for text truncation  "…".
+typedef NSString *YYTextToken;
+
+UIKIT_EXTERN YYTextToken const YYTextTokenAttachment; ///< Object replacement character (U+FFFC), used for text attachment.
+UIKIT_EXTERN YYTextToken const YYTextTokenTruncationTruncation; ///< Horizontal ellipsis (U+2026), used for text truncation  "…".
 
 
 

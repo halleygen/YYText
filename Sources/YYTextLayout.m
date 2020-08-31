@@ -666,7 +666,7 @@ os_unfair_lock_unlock(&_lock);
                     }
                     if (!attrs) attrs = [NSMutableDictionary new];
                 }
-                truncationToken = [[NSAttributedString alloc] initWithString:YYTextTruncationToken attributes:attrs];
+                truncationToken = [[NSAttributedString alloc] initWithString:YYTextTokenTruncationTruncation attributes:attrs];
                 truncationTokenLine = CTLineCreateWithAttributedString((CFAttributedStringRef)truncationToken);
             }
             if (truncationTokenLine) {

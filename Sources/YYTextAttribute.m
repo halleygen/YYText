@@ -28,8 +28,8 @@ NSAttributedStringKey const YYTextAttachmentAttributeName = @"YYTextAttachment";
 NSAttributedStringKey const YYTextHighlightAttributeName = @"YYTextHighlight";
 NSAttributedStringKey const YYTextGlyphTransformAttributeName = @"YYTextGlyphTransform";
 
-NSString *const YYTextAttachmentToken = @"\uFFFC";
-NSString *const YYTextTruncationToken = @"\u2026";
+YYTextToken const YYTextTokenAttachment = @"\uFFFC";
+YYTextToken const YYTextTokenTruncationTruncation = @"\u2026";
 
 
 YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){

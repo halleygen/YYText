@@ -447,7 +447,7 @@ return style. _attr_;
                                                         width:(CGFloat)width
                                                        ascent:(CGFloat)ascent
                                                       descent:(CGFloat)descent {
-    NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
+    NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextTokenAttachment];
     
     YYTextAttachment *attach = [YYTextAttachment new];
     attach.content = content;
@@ -470,7 +470,7 @@ return style. _attr_;
                                                attachmentSize:(CGSize)attachmentSize
                                                   alignToFont:(UIFont *)font
                                                     alignment:(YYTextVerticalAlignment)alignment {
-    NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
+    NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextTokenAttachment];
     
     YYTextAttachment *attach = [YYTextAttachment new];
     attach.content = content;
@@ -556,7 +556,7 @@ return style. _attr_;
         attachment.content = image;
     }
     
-    NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
+    NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextTokenAttachment];
     [atr yy_setTextAttachment:attachment range:NSMakeRange(0, atr.length)];
     CTRunDelegateRef ctDelegate = delegate.CTRunDelegate;
     [atr yy_setRunDelegate:ctDelegate range:NSMakeRange(0, atr.length)];

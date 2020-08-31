@@ -2264,6 +2264,20 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     return layout.boundingSize;
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    
+    if ([self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        [self _commitUpdate];
+    }
+
+    if (self.adjustsFontForContentSizeCategory && (self.traitCollection.preferredContentSizeCategory != previousTraitCollection.preferredContentSizeCategory)) {
+        [self _updateIfNeeded];
+        [self _updateOuterProperties];
+        [self _updateSelectionView];
+    }
+}
+
 #pragma mark - Override UIResponder
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {

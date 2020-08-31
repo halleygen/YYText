@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
  See NSAttributedString+YYText.h for more convenience methods to set the attributes.
  See YYTextAttribute.h and YYTextLayout.h for more information.
  */
-@interface YYTextView : UIScrollView <UITextInput>
+@interface YYTextView : UIScrollView <UITextInput, UIContentSizeCategoryAdjusting>
 
 
 #pragma mark - Accessing the Delegate
@@ -200,6 +200,20 @@ NS_ASSUME_NONNULL_BEGIN
  See `NSAttributedString+YYText` for more convenience methods to set the attributes.
  */
 @property (nullable, nonatomic, copy) NSAttributedString *placeholderAttributedText;
+
+
+# pragma mark - UIContentSizeCategoryAdjusting
+
+/**
+Indicates whether the corresponding element should automatically update its font when the device’s UIContentSizeCategory is changed.
+
+ @discussion For this property to take effect, the element’s font must be one of the following:
+ 
+ - a font vended using +preferredFontForTextStyle: or +preferredFontForTextStyle:compatibleWithTraitCollection: with a valid UIFontTextStyle
+ 
+ - a font vended using -[UIFontMetrics scaledFontForFont:] or one of its variants
+*/
+@property (nonatomic) BOOL adjustsFontForContentSizeCategory;
 
 
 #pragma mark - Configuring the Text Container

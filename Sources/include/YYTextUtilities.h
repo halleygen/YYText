@@ -18,7 +18,7 @@
 #define YYTEXT_CLAMP(x, min, max)  MIN(max, MAX(x, min))
 #endif
 
-#ifndef YYTEXT_SWAP // swap two value
+#ifndef YYTEXT_SWAP // swap two values
 #define YYTEXT_SWAP(a, b) ({ __typeof__(a) SWAP_tmp = (a); (a) = (b); (b) = SWAP_tmp; })
 #endif
 
