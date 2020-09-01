@@ -346,7 +346,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     }
 }
 
-- (void)_initLabel {
+- (void)commonInitSetup {
     ((YYTextAsyncLayer *)self.layer).displaysAsynchronously = NO;
     self.layer.contentsScale = [UIScreen mainScreen].scale;
     self.contentMode = UIViewContentModeRedraw;
@@ -376,13 +376,20 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
 
 #pragma mark - Override
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:CGRectZero];
-    if (!self) return nil;
-    self.backgroundColor = [UIColor clearColor];
-    self.opaque = NO;
-    [self _initLabel];
-    self.frame = frame;
+- (instancetype)init
+{
+    self = [self initWithFrame:CGRectZero];
+    return self;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.backgroundColor = UIColor.clearColor;
+        self.opaque = false;
+        [self commonInitSetup];
+    }
     return self;
 }
 
@@ -494,18 +501,20 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     [aCoder encodeObject:_innerContainer forKey:@"innerContainer"];
 }
 
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    [self _initLabel];
-    YYTextContainer *innerContainer = [aDecoder decodeObjectForKey:@"innerContainer"];
-    if (innerContainer) {
-        _innerContainer = innerContainer;
-    } else {
-        _innerContainer.size = self.bounds.size;
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self commonInitSetup];
+        YYTextContainer *innerContainer = [coder decodeObjectForKey:@"innerContainer"];
+        if (innerContainer) {
+            _innerContainer = innerContainer;
+        } else {
+            _innerContainer.size = self.bounds.size;
+        }
+        [self _updateOuterContainerProperties];
+        self.attributedText = [coder decodeObjectForKey:@"attributedText"];
+        [self _setLayoutNeedUpdate];
     }
-    [self _updateOuterContainerProperties];
-    self.attributedText = [aDecoder decodeObjectForKey:@"attributedText"];
-    [self _setLayoutNeedUpdate];
     return self;
 }
 

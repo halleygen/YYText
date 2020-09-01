@@ -26,9 +26,10 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (!self) return nil;
-    self.userInteractionEnabled = NO;
-    self.mirror = [UIView new];
+    if (self) {
+        self.userInteractionEnabled = NO;
+        _mirror = [UIView new];
+    }
     return self;
 }
 

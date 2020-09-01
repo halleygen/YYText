@@ -54,8 +54,10 @@ static void YYTextTransactionSetup() {
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector{
     if (!target || !selector) return nil;
     self = [super init];
-    self.target = target;
-    self.selector = selector;
+    if (self) {
+        _target = target;
+        _selector = selector;
+    }
     return self;
 }
 

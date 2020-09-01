@@ -177,6 +177,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 @interface YYTextBackedString : NSObject <NSSecureCoding, NSCopying>
 - (instancetype)initWithString:(nullable NSString *)string NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @property (nullable, nonatomic, copy) NSString *string; ///< backed string
 @end
 
@@ -193,6 +194,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 @interface YYTextBinding : NSObject <NSSecureCoding, NSCopying>
 - (instancetype)initWithDeleteConfirm:(BOOL)deleteConfirm NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @property (nonatomic) BOOL deleteConfirm; ///< confirm the range when delete in YYTextView
 @end
 
@@ -207,6 +209,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 @interface YYTextShadow : NSObject <NSSecureCoding, NSCopying>
 - (instancetype)initWithColor:(nullable UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 
 @property (nullable, nonatomic, strong) UIColor *color; ///< shadow color
 @property (nonatomic) CGSize offset;                    ///< shadow offset
@@ -231,6 +234,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 - (instancetype)initWithStyle:(YYTextLineStyle)style;
 - (instancetype)initWithStyle:(YYTextLineStyle)style width:(nullable NSNumber *)width color:(nullable UIColor *)color NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @property (nonatomic) YYTextLineStyle style;                   ///< line style
 @property (nullable, nonatomic, strong) NSNumber *width;       ///< line width (nil means automatic width)
 @property (nullable, nonatomic, strong) UIColor *color;        ///< line color (nil means automatic color)
@@ -255,6 +259,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 - (instancetype)initWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(nullable UIColor *)color;
 - (instancetype)initWithFillColor:(nullable UIColor *)color cornerRadius:(CGFloat)cornerRadius;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @property (nonatomic) YYTextLineStyle lineStyle;              ///< border line style
 @property (nonatomic) CGFloat strokeWidth;                    ///< border line width
 @property (nullable, nonatomic, strong) UIColor *strokeColor; ///< border line color
@@ -279,6 +284,7 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
 @interface YYTextAttachment : NSObject<NSSecureCoding, NSCopying>
 - (instancetype)initWithContent:(id)content;
 - (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
 @property (nullable, nonatomic, strong) id content;             ///< Supported type: UIImage, UIView, CALayer
 @property (nonatomic) UIViewContentMode contentMode;            ///< Content display mode.
 @property (nonatomic) UIEdgeInsets contentInsets;               ///< The insets when drawing content.
@@ -321,8 +327,6 @@ typedef void(^YYTextAction)(UIView *containerView, NSAttributedString *text, NSR
  @param color The background border color.
  */
 - (instancetype)initWithBackgroundColor:(nullable UIColor *)color;
-
-- (instancetype)init NS_UNAVAILABLE;
 
 // Convenience methods below to set the `attributes`.
 - (void)setFont:(nullable UIFont *)font;

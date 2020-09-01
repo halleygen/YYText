@@ -30,22 +30,26 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    _contentView = [UIImageView new];
-    _contentView.frame = CGRectMake(kPadding, kPadding, kDiameter, kDiameter);
-    _contentView.layer.cornerRadius = kDiameter / 2;
-    _contentView.clipsToBounds = YES;
-    [self addSubview:_contentView];
+    if (self) {
+        _contentView = [UIImageView new];
+        _contentView.frame = CGRectMake(kPadding, kPadding, kDiameter, kDiameter);
+        _contentView.layer.cornerRadius = kDiameter / 2;
+        _contentView.clipsToBounds = YES;
+        [self addSubview:_contentView];
     
-    _coverView = [UIImageView new];
-    _coverView.frame = (CGRect){.origin = CGPointZero, .size = kSize};
-    _coverView.image = [self.class coverImage];
-    [self addSubview:_coverView];
+        _coverView = [UIImageView new];
+        _coverView.frame = (CGRect){.origin = CGPointZero, .size = kSize};
+        _coverView.image = [self.class coverImage];
+        [self addSubview:_coverView];
+    }
     return self;
 }
 
 - (instancetype)init {
     self = [self initWithFrame:CGRectZero];
-    self.frame = (CGRect){.size = [self sizeThatFits:CGSizeZero]};
+    if (self) {
+        self.frame = (CGRect){.size = [self sizeThatFits:CGSizeZero]};
+    }
     return self;
 }
 
@@ -175,24 +179,28 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    _contentView = [UIImageView new];
-    _contentView.frame = CGRectMake(kPadding, kPadding, kSize.width - 2 * kPadding, kHeight);
-    _contentView.layer.cornerRadius = kRadius;
-    _contentView.clipsToBounds = YES;
-    [self addSubview:_contentView];
+    if (self) {
+        _contentView = [UIImageView new];
+        _contentView.frame = CGRectMake(kPadding, kPadding, kSize.width - 2 * kPadding, kHeight);
+        _contentView.layer.cornerRadius = kRadius;
+        _contentView.clipsToBounds = YES;
+        [self addSubview:_contentView];
     
-    _coverView = [UIImageView new];
-    _coverView.frame = (CGRect){.origin = CGPointZero, .size = kSize};
-    _coverView.image = [self.class coverImage];
-    [self addSubview:_coverView];
+        _coverView = [UIImageView new];
+        _coverView.frame = (CGRect){.origin = CGPointZero, .size = kSize};
+        _coverView.image = [self.class coverImage];
+        [self addSubview:_coverView];
     
-    self.layer.anchorPoint = CGPointMake(0.5, 1.2);
+        self.layer.anchorPoint = CGPointMake(0.5, 1.2);
+    }
     return self;
 }
 
 - (instancetype)init {
     self = [self initWithFrame:CGRectZero];
-    self.frame = (CGRect){.size = [self sizeThatFits:CGSizeZero]};
+    if (self) {
+        self.frame = (CGRect){.size = [self sizeThatFits:CGSizeZero]};
+    }
     return self;
 }
 

@@ -104,11 +104,6 @@ static int _YYTextKeyboardViewFrameObserverKey;
 }
 
 - (instancetype)init {
-    @throw [NSException exceptionWithName:@"YYTextKeyboardManager init error" reason:@"Use 'defaultManager' to get instance." userInfo:nil];
-    return [super init];
-}
-
-- (instancetype)_init {
     self = [super init];
     _observers = [[NSHashTable alloc] initWithOptions:NSPointerFunctionsWeakMemory|NSPointerFunctionsObjectPointerPersonality capacity:0];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -146,7 +141,7 @@ static int _YYTextKeyboardViewFrameObserverKey;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if (!YYTextIsAppExtension()) {
-            mgr = [[self alloc] _init];
+            mgr = [[self alloc] init];
         }
     });
     return mgr;

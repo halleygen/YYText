@@ -449,8 +449,7 @@ return style. _attr_;
                                                       descent:(CGFloat)descent {
     NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextTokenAttachment];
     
-    YYTextAttachment *attach = [YYTextAttachment new];
-    attach.content = content;
+    YYTextAttachment *attach = [[YYTextAttachment alloc] initWithContent:content];
     attach.contentMode = contentMode;
     [atr yy_setTextAttachment:attach range:NSMakeRange(0, atr.length)];
     
@@ -472,8 +471,7 @@ return style. _attr_;
                                                     alignment:(YYTextVerticalAlignment)alignment {
     NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextTokenAttachment];
     
-    YYTextAttachment *attach = [YYTextAttachment new];
-    attach.content = content;
+    YYTextAttachment *attach = [[YYTextAttachment alloc] initWithContent:content];
     attach.contentMode = contentMode;
     [atr yy_setTextAttachment:attach range:NSMakeRange(0, atr.length)];
     
@@ -540,10 +538,8 @@ return style. _attr_;
     delegate.ascent = ascent;
     delegate.descent = descent;
     delegate.width = bounding.size.width + 2 * bounding.origin.x;
-    
-    YYTextAttachment *attachment = [YYTextAttachment new];
-    attachment.contentMode = UIViewContentModeScaleAspectFit;
-    attachment.contentInsets = UIEdgeInsetsMake(ascent - (bounding.size.height + bounding.origin.y), bounding.origin.x, descent + bounding.origin.y, bounding.origin.x);
+
+    YYTextAttachment *attachment = nil;
     if (hasAnim) {
         Class imageClass = NSClassFromString(@"YYAnimatedImageView");
         if (!imageClass) imageClass = [UIImageView class];
@@ -551,10 +547,12 @@ return style. _attr_;
         view.frame = bounding;
         view.image = image;
         view.contentMode = UIViewContentModeScaleAspectFit;
-        attachment.content = view;
+        attachment = [[YYTextAttachment alloc] initWithContent:view];
     } else {
-        attachment.content = image;
+        attachment = [[YYTextAttachment alloc] initWithContent:image];
     }
+    attachment.contentMode = UIViewContentModeScaleAspectFit;
+    attachment.contentInsets = UIEdgeInsetsMake(ascent - (bounding.size.height + bounding.origin.y), bounding.origin.x, descent + bounding.origin.y, bounding.origin.x);
     
     NSMutableAttributedString *atr = [[NSMutableAttributedString alloc] initWithString:YYTextTokenAttachment];
     [atr yy_setTextAttachment:attachment range:NSMakeRange(0, atr.length)];

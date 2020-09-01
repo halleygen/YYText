@@ -89,22 +89,27 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
 
 - (instancetype)initWithSize:(CGSize)size insets:(UIEdgeInsets)insets {
     self = [self init];
-    self.size = YYTextClipCGSize(size);
-    self.insets = insets;
+    if (self) {
+        self.size = size;
+        self.insets = insets;
+    }
     return self;
 }
 
 - (instancetype)initWithPath:(UIBezierPath *)path {
     self = [self init];
-    self.path = path;
+    if (self) {
+        self.path = path;
+    }
     return self;
 }
 
 - (instancetype)init {
     self = [super init];
-    if (!self) return nil;
-    _lock = OS_UNFAIR_LOCK_INIT;
-    _pathFillEvenOdd = YES;
+    if (self) {
+        _lock = OS_UNFAIR_LOCK_INIT;
+        _pathFillEvenOdd = YES;
+    }
     return self;
 }
 
@@ -149,17 +154,19 @@ static inline UIEdgeInsets UIEdgeInsetRotateVertical(UIEdgeInsets insets) {
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [self init];
-    _size = ((NSValue *)[aDecoder decodeObjectForKey:@"size"]).CGSizeValue;
-    _insets = ((NSValue *)[aDecoder decodeObjectForKey:@"insets"]).UIEdgeInsetsValue;
-    _path = [aDecoder decodeObjectForKey:@"path"];
-    _exclusionPaths = [aDecoder decodeObjectForKey:@"exclusionPaths"];
-    _pathFillEvenOdd = [aDecoder decodeBoolForKey:@"pathFillEvenOdd"];
-    _pathLineWidth = [aDecoder decodeDoubleForKey:@"pathLineWidth"];
-    _verticalForm = [aDecoder decodeBoolForKey:@"verticalForm"];
-    _maximumNumberOfRows = [aDecoder decodeIntegerForKey:@"maximumNumberOfRows"];
-    _truncationType = [aDecoder decodeIntegerForKey:@"truncationType"];
-    _truncationToken = [aDecoder decodeObjectForKey:@"truncationToken"];
-    _linePositionModifier = [aDecoder decodeObjectForKey:@"linePositionModifier"];
+    if (self) {
+        _size = ((NSValue *)[aDecoder decodeObjectForKey:@"size"]).CGSizeValue;
+        _insets = ((NSValue *)[aDecoder decodeObjectForKey:@"insets"]).UIEdgeInsetsValue;
+        _path = [aDecoder decodeObjectForKey:@"path"];
+        _exclusionPaths = [aDecoder decodeObjectForKey:@"exclusionPaths"];
+        _pathFillEvenOdd = [aDecoder decodeBoolForKey:@"pathFillEvenOdd"];
+        _pathLineWidth = [aDecoder decodeDoubleForKey:@"pathLineWidth"];
+        _verticalForm = [aDecoder decodeBoolForKey:@"verticalForm"];
+        _maximumNumberOfRows = [aDecoder decodeIntegerForKey:@"maximumNumberOfRows"];
+        _truncationType = [aDecoder decodeIntegerForKey:@"truncationType"];
+        _truncationToken = [aDecoder decodeObjectForKey:@"truncationToken"];
+        _linePositionModifier = [aDecoder decodeObjectForKey:@"linePositionModifier"];
+    }
     return self;
 }
 
@@ -384,6 +391,7 @@ os_unfair_lock_unlock(&_lock);
     maximumNumberOfRows = container.maximumNumberOfRows;
     
     layout = [super init];
+    if (!layout) return nil;
     layout.text = text;
     layout.container = container;
     layout.range = range;

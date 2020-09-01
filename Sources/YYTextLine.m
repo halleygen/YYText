@@ -20,9 +20,11 @@
 - (instancetype)initWithCTLine:(CTLineRef)CTLine position:(CGPoint)position vertical:(BOOL)isVertical {
     if (!CTLine) return nil;
     self = [super init];
-    self->_position = position;
-    self->_vertical = isVertical;
-    [self setCTLine:CTLine];
+    if (self) {
+        _position = position;
+        _vertical = isVertical;
+        [self setCTLine:CTLine];
+    }
     return self;
 }
 
@@ -167,8 +169,10 @@
 @implementation YYTextRunGlyphRange
 - (instancetype)initWithRange:(NSRange)range drawMode:(YYTextRunGlyphDrawMode)mode {
     self = [super init];
-    self.glyphRangeInRun = range;
-    self.drawMode = mode;
+    if (self) {
+        _glyphRangeInRun = range;
+        _drawMode = mode;
+    }
     return self;
 }
 

@@ -25,13 +25,15 @@
 - (instancetype)initWithCTRubyRef:(CTRubyAnnotationRef)ctRuby {
     if (!ctRuby) return nil;
     self = [super init];
-    self.alignment = CTRubyAnnotationGetAlignment(ctRuby);
-    self.overhang = CTRubyAnnotationGetOverhang(ctRuby);
-    self.sizeFactor = CTRubyAnnotationGetSizeFactor(ctRuby);
-    self.textBefore = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionBefore));
-    self.textAfter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionAfter));
-    self.textInterCharacter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInterCharacter));
-    self.textInline = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInline));
+    if (self) {
+        _alignment = CTRubyAnnotationGetAlignment(ctRuby);
+        _overhang = CTRubyAnnotationGetOverhang(ctRuby);
+        _sizeFactor = CTRubyAnnotationGetSizeFactor(ctRuby);
+        _textBefore = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionBefore));
+        _textAfter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionAfter));
+        _textInterCharacter = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInterCharacter));
+        _textInline = (__bridge NSString *)(CTRubyAnnotationGetTextForPosition(ctRuby, kCTRubyPositionInline));
+    }
     return self;
 }
 

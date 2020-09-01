@@ -89,14 +89,16 @@ static dispatch_queue_t YYTextAsyncLayerGetReleaseQueue() {
 
 - (instancetype)init {
     self = [super init];
-    static CGFloat scale; //global
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        scale = [UIScreen mainScreen].scale;
-    });
-    self.contentsScale = scale;
-    _sentinel = [_YYTextSentinel new];
-    _displaysAsynchronously = YES;
+    if (self) {
+        static CGFloat scale; //global
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            scale = [UIScreen mainScreen].scale;
+        });
+        self.contentsScale = scale;
+        _sentinel = [_YYTextSentinel new];
+        _displaysAsynchronously = YES;
+    }
     return self;
 }
 

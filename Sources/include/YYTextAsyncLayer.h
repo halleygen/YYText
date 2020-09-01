@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
  for a async display task to render the contents in a background queue.
  */
 @interface YYTextAsyncLayer : CALayer
+
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+
 /// Whether the render code is executed in background. Default is YES.
 @property BOOL displaysAsynchronously;
 @end

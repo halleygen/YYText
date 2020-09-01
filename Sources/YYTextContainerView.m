@@ -19,11 +19,18 @@
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
-    if (!self) return nil;
-    self.backgroundColor = [UIColor clearColor];
-    _attachmentViews = [NSMutableArray array];
-    _attachmentLayers = [NSMutableArray array];
+    if (self) {
+        self.backgroundColor = [UIColor clearColor];
+        _attachmentViews = [NSMutableArray array];
+        _attachmentLayers = [NSMutableArray array];
+    }
     return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 - (void)setDebugOption:(YYTextDebugOption *)debugOption {

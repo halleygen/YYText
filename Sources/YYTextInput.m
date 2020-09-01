@@ -21,8 +21,10 @@
 
 - (instancetype)initWithOffset:(NSInteger)offset affinity:(YYTextAffinity)affinity {
     self = [super init];
-    self->_offset = offset;
-    self->_affinity = affinity;
+    if (self) {
+        _offset = offset;
+        _affinity = affinity;
+    }
     return self;
 }
 

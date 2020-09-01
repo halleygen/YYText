@@ -40,6 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface YYLabel : UIView <NSCoding, UIContentSizeCategoryAdjusting>
 
+#pragma mark - Init
+
+- (instancetype)init;
+- (instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithFrame:(CGRect)frame NS_DESIGNATED_INITIALIZER;
+
 #pragma mark - Accessing the Text Attributes
 ///=============================================================================
 /// @name Accessing the Text Attributes

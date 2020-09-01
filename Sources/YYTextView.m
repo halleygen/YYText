@@ -1747,10 +1747,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                             (id)kCTForegroundColorAttributeName : (id)[self _defaultTintColor].CGColor};
     
     YYTextHighlight *highlight = [YYTextHighlight new];
-    YYTextBorder * border = [YYTextBorder new];
+    YYTextBorder *border = [[YYTextBorder alloc] initWithFillColor:[UIColor colorWithWhite:0.1 alpha:0.2] cornerRadius:3];
     border.insets = UIEdgeInsetsMake(-2, -2, -2, -2);
-    border.fillColor = [UIColor colorWithWhite:0.1 alpha:0.2];
-    border.cornerRadius = 3;
     [highlight setBorder:border];
     _highlightTextAttributes = highlight.attributes.copy;
     
@@ -2859,14 +2857,16 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
-    [self _initTextView];
-    self.attributedText = [aDecoder decodeObjectForKey:@"attributedText"];
-    self.selectedRange = ((NSValue *)[aDecoder decodeObjectForKey:@"selectedRange"]).rangeValue;
-    self.textVerticalAlignment = [aDecoder decodeIntegerForKey:@"textVerticalAlignment"];
-    self.dataDetectorTypes = [aDecoder decodeIntegerForKey:@"dataDetectorTypes"];
-    self.textContainerInset = ((NSValue *)[aDecoder decodeObjectForKey:@"textContainerInset"]).UIEdgeInsetsValue;
-    self.exclusionPaths = [aDecoder decodeObjectForKey:@"exclusionPaths"];
-    self.verticalForm = [aDecoder decodeBoolForKey:@"verticalForm"];
+    if (self) {
+        [self _initTextView];
+        self.attributedText = [aDecoder decodeObjectForKey:@"attributedText"];
+        self.selectedRange = ((NSValue *)[aDecoder decodeObjectForKey:@"selectedRange"]).rangeValue;
+        self.textVerticalAlignment = [aDecoder decodeIntegerForKey:@"textVerticalAlignment"];
+        self.dataDetectorTypes = [aDecoder decodeIntegerForKey:@"dataDetectorTypes"];
+        self.textContainerInset = ((NSValue *)[aDecoder decodeObjectForKey:@"textContainerInset"]).UIEdgeInsetsValue;
+        self.exclusionPaths = [aDecoder decodeObjectForKey:@"exclusionPaths"];
+        self.verticalForm = [aDecoder decodeBoolForKey:@"verticalForm"];
+    }
     return self;
 }
 

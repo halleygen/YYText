@@ -45,6 +45,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// The contents fade animation duration when the layout's contents changed. Default is 0 (no animation).
 @property (nonatomic) NSTimeInterval contentsFadeDuration;
 
+- (instancetype)initWithFrame:(CGRect)frame NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithCoder:(NSCoder *)coder NS_UNAVAILABLE;
+
 /// Convenience method to set `layout` and `contentsFadeDuration`.
 /// @param layout  Same as `layout` property.
 /// @param fadeDuration  Same as `contentsFadeDuration` property.

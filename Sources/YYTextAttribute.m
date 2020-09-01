@@ -111,7 +111,9 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithString:(NSString *)string {
     self = [super init];
-    self.string = string;
+    if (self) {
+        _string = string;
+    }
     return self;
 }
 
@@ -146,7 +148,9 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithDeleteConfirm:(BOOL)deleteConfirm {
     self = [super init];
-    self.deleteConfirm = deleteConfirm;
+    if (self) {
+        _deleteConfirm = deleteConfirm;
+    }
     return self;
 }
 
@@ -181,9 +185,11 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithColor:(UIColor *)color offset:(CGSize)offset radius:(CGFloat)radius {
     self = [super init];
-    self.color = color;
-    self.offset = offset;
-    self.radius = radius;
+    if (self) {
+        _color = color;
+        _offset = offset;
+        _radius = radius;
+    }
     return self;
 }
 
@@ -251,9 +257,11 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithStyle:(YYTextLineStyle)style width:(NSNumber *)width color:(UIColor *)color {
     self = [super init];
-    self.style = style;
-    self.width = width;
-    self.color = color;
+    if (self) {
+        _style = style;
+        _width = width;
+        _color = color;
+    }
     return self;
 }
 
@@ -294,18 +302,22 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithLineStyle:(YYTextLineStyle)lineStyle lineWidth:(CGFloat)width strokeColor:(UIColor *)color {
     self = [super init];
-    self.lineStyle = lineStyle;
-    self.strokeWidth = width;
-    self.strokeColor = color;
+    if (self) {
+        _lineStyle = lineStyle;
+        _strokeWidth = width;
+        _strokeColor = color;
+    }
     return self;
 }
 
 - (instancetype)initWithFillColor:(UIColor *)color cornerRadius:(CGFloat)cornerRadius {
     self = [super init];
-    self.lineStyle = YYTextLineStyleSingle;
-    self.fillColor = color;
-    self.cornerRadius = cornerRadius;
-    self.insets = UIEdgeInsetsMake(-2, 0, 0, -2);
+    if (self) {
+        _lineStyle = YYTextLineStyleSingle;
+        _fillColor = color;
+        _cornerRadius = cornerRadius;
+        _insets = UIEdgeInsetsMake(-2, 0, 0, -2);
+    }
     return self;
 }
 
@@ -362,7 +374,9 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithContent:(id)content {
     self = [super init];
-    self.content = content;
+    if (self) {
+        _content = content;
+    }
     return self;
 }
 
@@ -381,8 +395,10 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
     NSSet *contentClasses = [[NSSet alloc] initWithObjects:[UIImage class], [UIView class], [CALayer class], nil];
     id content = [aDecoder decodeObjectOfClasses:contentClasses forKey:@"content"];
     self = [self initWithContent:content];
-    self.contentInsets = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"contentInsets"]).UIEdgeInsetsValue;
-    self.userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:@"userInfo"];
+    if (self) {
+        _contentInsets = ((NSValue *)[aDecoder decodeObjectOfClass:[NSValue class] forKey:@"contentInsets"]).UIEdgeInsetsValue;
+        _userInfo = [aDecoder decodeObjectOfClass:[NSDictionary class] forKey:@"userInfo"];
+    }
     return self;
 }
 
@@ -409,16 +425,15 @@ YYTextAttributeType YYTextAttributeGetType(NSAttributedStringKey attribute){
 
 - (instancetype)initWithAttributes:(NSDictionary<NSAttributedStringKey, id> *)attributes {
     self = [super init];
-    self.attributes = attributes;
+    if (self) {
+        _attributes = attributes.mutableCopy;
+    }
     return self;
 }
 
 - (instancetype)initWithBackgroundColor:(UIColor *)color {
-    YYTextBorder *highlightBorder = [YYTextBorder new];
+    YYTextBorder *highlightBorder = [[YYTextBorder alloc] initWithFillColor:color cornerRadius:3];
     highlightBorder.insets = UIEdgeInsetsMake(-2, -1, -2, -1);
-    highlightBorder.cornerRadius = 3;
-    highlightBorder.fillColor = color;
-    
     return [self initWithAttributes:@{ YYTextBackgroundBorderAttributeName: highlightBorder }];
 }
 
