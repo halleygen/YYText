@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Init
 
 - (instancetype)init;
-- (instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder *)coder NS_DESIGNATED_INITIALIZER;
 - (instancetype)initWithFrame:(CGRect)frame NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Accessing the Text Attributes
