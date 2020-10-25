@@ -1057,6 +1057,10 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         }
     }
     
+    if (!_innerText) {
+        return CGSizeMake(_preferredMaxLayoutWidth > 0 ? _preferredMaxLayoutWidth : UIViewNoIntrinsicMetric, UIViewNoIntrinsicMetric);
+    }
+    
     if (_preferredMaxLayoutWidth == 0) {
         YYTextContainer *container = [_innerContainer copy];
         container.size = YYTextContainerMaxSize;
