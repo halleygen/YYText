@@ -340,16 +340,16 @@ os_unfair_lock_unlock(&_lock);
 
 #pragma mark - Layout
 
-- (instancetype)initWithContainerSize:(CGSize)size text:(NSAttributedString *)text {
+- (nonnull instancetype)initWithContainerSize:(CGSize)size text:(nonnull NSAttributedString *)text {
     YYTextContainer *container = [[YYTextContainer alloc] initWithSize:size];
     return [self initWithContainer:container text:text];
 }
 
-- (instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text {
+- (nonnull instancetype)initWithContainer:(nonnull YYTextContainer *)container text:(nonnull NSAttributedString *)text {
     return [self initWithContainer:container text:text range:NSMakeRange(0, text.length)];
 }
 
-- (instancetype)initWithContainer:(YYTextContainer *)container text:(NSAttributedString *)text range:(NSRange)range {
+- (nonnull instancetype)initWithContainer:(nonnull YYTextContainer *)container text:(nonnull NSAttributedString *)text range:(NSRange)range {
     YYTextLayout *layout = NULL;
     CGPathRef cgPath = nil;
     CGRect cgPathBox = {0};

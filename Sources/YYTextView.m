@@ -1739,8 +1739,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     _textAlignment = NSTextAlignmentNatural;
     
     _innerText = [NSMutableAttributedString new];
-    _innerContainer = [YYTextContainer new];
-    _innerContainer.insets = kDefaultInset;
+    _innerContainer = [[YYTextContainer alloc] initWithSize:CGSizeZero insets:kDefaultInset];
     _textContainerInset = kDefaultInset;
     _typingAttributesHolder = [[NSMutableAttributedString alloc] initWithString:@" "];
     _linkTextAttributes = @{NSForegroundColorAttributeName : [self _defaultTintColor],

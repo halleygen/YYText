@@ -364,7 +364,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
     _textAlignment = NSTextAlignmentNatural;
     _lineBreakMode = NSLineBreakByTruncatingTail;
     _innerText = [NSMutableAttributedString new];
-    _innerContainer = [YYTextContainer new];
+    _innerContainer = [[YYTextContainer alloc] initWithSize:CGSizeZero];
     _innerContainer.truncationType = YYTextTruncationTypeEnd;
     _innerContainer.maximumNumberOfRows = _numberOfLines;
     _clearsContentsBeforeAsynchronouslyDisplay = YES;
@@ -967,9 +967,7 @@ static dispatch_queue_t YYLabelGetReleaseQueue() {
         
         _innerContainer = textLayout.container.copy;
         if (!_innerContainer) {
-            _innerContainer = [YYTextContainer new];
-            _innerContainer.size = self.bounds.size;
-            _innerContainer.insets = self.textContainerInset;
+            _innerContainer = [[YYTextContainer alloc] initWithSize:self.bounds.size insets:self.textContainerInset];
         }
         [self _updateOuterContainerProperties];
     }
